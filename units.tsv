@@ -1,0 +1,5 @@
+sample	type	condition	fq1	fq2	readgroup
+Blood_A	A	normal	Blood_A_1.fq.gz	Blood_A_2.fq.gz	0
+Tissue_A	A	tumor	Tissue_A_1.fq.gt	Tissue_A_1.fq.gz	0
+Blood_B	B	normal	Blood_B_1.fq.gz	Blood_B_2.fq.gz	0
+Tissue_B	B	tumor	Tissue_B_1.fq.gt	Tissue_B_1.fq.gz	0

@@ -1,0 +1,21 @@
+samples: "samples.tsv"
+units: "units.tsv"
+
+reference:
+    assembly: assembly
+    genome: "path/to/genome.fa"
+    call_regions: "path/to/target_regions"
+    hla_data: "ref/HLA_Data/hla_reference_dna.fasta"
+
+params:
+    bwa:
+        "-M"
+    strelka:
+        "--exome"
+    razers3:
+        "-i 95 -m 1 -dr 0"
+    netMHCpan:
+        "-BA -l 9 -s -xls"
+    optitype:
+        "optitype.config.ini"
+
