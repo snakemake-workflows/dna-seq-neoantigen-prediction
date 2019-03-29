@@ -50,7 +50,7 @@ rule concat_tsvs:
     output:
        "microphaser/info/{tumor}_{normal}/filtered/{tumor}_{normal}.tsv"
     conda:
-        "envs/xsv.yaml"
+        "../envs/xsv.yaml"
     shell:
         "xsv cat rows -d '\t' | xsv table > {output}"
 
