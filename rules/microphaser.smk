@@ -33,10 +33,18 @@ rule concat_proteome:
     shell:
         "cat {input} > {output}"
 
+rule build_germline_proteome:
+    input:
+        "microphaser/fasta/{normal}/reference_proteome.fa"
+    output:
+        "microphaser/fasta/{normal}/reference_proteome.bin"
+    shell:
+        "../microphaser/target/release/microphaser build_reference -r {input} -o {output}"
+
 rule microphaser_filter:
     input:
         tsv="microphaser/info/{tumor}_{normal}/{tumor}_{normal}.{chrom}.tsv",
-        proteome="microphaser/fasta/{normal}/reference_proteome.fa"
+        proteome="microphaser/fasta/{normal}/reference_proteome.bin"
     output:
         mt_fasta="microphaser/fasta/{tumor}_{normal}/filtered/{tumor}_{normal}.{chrom}.mt.fa",
         wt_fasta="microphaser/fasta/{tumor}_{normal}/filtered/{tumor}_{normal}.{chrom}.wt.fa",
@@ -52,5 +60,5 @@ rule concat_tsvs:
     conda:
         "../envs/xsv.yaml"
     shell:
-        "xsv cat rows -d '\t' | xsv table > {output}"
+        "xsv cat rows -d '\t' {input} | xsv table -d '\t' > {output}"
 

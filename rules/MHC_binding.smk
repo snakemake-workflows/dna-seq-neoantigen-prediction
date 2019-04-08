@@ -1,8 +1,9 @@
 rule razers3:
     input:
-        "raw/{sample}_{group}.fastq.gz"
+        "../raw/{sample}_{group}.fastq.gz"
     output:
-        "razers3/fastq/{sample}_{group}.fished.fastq"
+        bam="razers3/bam/{sample}_{group}.bam",
+        fastq="razers3/fastq/{sample}_{group}.fished.fastq"
     threads: 10
     params:
         hlaref=config["reference"]["hla_data"],
@@ -10,7 +11,7 @@ rule razers3:
     conda:
         "../envs/optitype.yaml"
     shell:
-        "razers3 -tc {threads} {params.extra} {params.hlaref} {input} | samtools bam2fq > {output}"
+        "razers3 -tc {threads} {params.extra} {params.hlaref} {input} -o {output.bam} && samtools bam2fq {output.bam} > {output.fastq}"
 
 rule OptiType:
     input:
@@ -32,8 +33,9 @@ rule OptiType:
 
 rule netMHCpan:
     input:
-        peptides=expand("out/fasta/{tumor}_{normal}/filtered/{tumor}_{normal}.{chr}.{group}.fa", tumor = wildcards.tumor, normal = wildcards.normal, chr = CHROMOSOMES, group = ["mt","wt"]),
-        alleles="optitype/{tumor}/HLAI_alleles.tsv"
+        peptides="microphaser/fasta/{tumor}_{normal}/filtered/{tumor}_{normal}.{chr}.{group}.fa",
+        alleles="optitype/{tumor}/hla_alleles.tsv",
+        wt_alleles="optitype/{normal}/hla_alleles.tsv"
     output:
         "netMHCpan/{tumor}_{normal}/{chr}/{tumor}_{normal}.{chr}.{group}.xls",
     log:
@@ -41,8 +43,11 @@ rule netMHCpan:
     params:
         extra = config["params"]["netMHCpan"]
     run:
-        alleles = ",".join(pd.read_csv(input.alleles, sep="\t").iloc[0]
-        cmd = "netMHCpan {params.extra} -xlsfile {output.xls} -a {alleles} -f {input.peptides} > {log}"
+        if "wt" in input.peptides:
+            alleles = ",".join(pd.read_csv(input.wt_alleles, sep="\t").iloc[0])
+        else:
+            alleles = ",".join(pd.read_csv(input.alleles, sep="\t").iloc[0])
+        cmd = "if [ -s {input.peptides} ]; then ../netMHCpan-4.0/netMHCpan {params.extra} -xlsfile {output} -a {alleles} -f {input.peptides} > {log}; else touch {output}; fi"
         shell(cmd)
 
 #rule netMHC2:
@@ -64,33 +69,25 @@ rule netMHCpan:
 #            shell(cmd)
 
 
-    rule parse_wt_mhc_out:
+rule parse_wt_mhc_out:
     input:
-        expand("out/mhc_binding/{{tumor}}_{{normal}}/{chr}/{{tumor}}_{{normal}}.{chr}.{{type}}.xls", chr=CHROMOSOMES)
+        expand("netMHCpan/{{tumor}}_{{normal}}/{chr}/{{tumor}}_{{normal}}.{chr}.{{type}}.xls", chr=CHROMOSOMES)
     output:
-        "out/mhc_binding/{tumor}_{normal}/{tumor}_{normal}.mhc.{type}.tsv"
+        "netMHCpan/{tumor}_{normal}/{tumor}_{normal}.mhc.{type}.tsv"
     wildcard_constraints:
         type="wt|mt"
     run:
         s = input[0]
-        shell("python scripts/group_mhcout.py " + s + " >> {output}")
+        shell("python scripts/group_mhc_output.py " + s + " >> {output}")
         for i in input[1:]:
-            shell("python scripts/group_mhcout.py " + i + " | grep -v -h '^Pos' - >> {output}") ## xsv
+            shell("python scripts/group_mhc_output.py " + i + " | grep -v -h '^Pos' - >> {output}") ## xsv
 
 rule mhc_csv_table:
     input:
-        info="out/info/{tumor}_{normal}/{tumor}_{normal}.tsv",
-        mt="out/mhc_binding/{tumor}_{normal}/{tumor}_{normal}.mhc.mt.tsv",
-        wt="out/mhc_binding/{tumor}_{normal}/{tumor}_{normal}.mhc.wt.tsv"
+        info="microphaser/info/{tumor}_{normal}/filtered/{tumor}_{normal}.tsv",
+        mt="netMHCpan/{tumor}_{normal}/{tumor}_{normal}.mhc.mt.tsv",
+        wt="netMHCpan/{tumor}_{normal}/{tumor}_{normal}.mhc.wt.tsv"
     output:
-        "out/tables/{tumor}_{normal}.tsv"
+        "tables/{tumor}_{normal}.tsv"
     script:
         "../scripts/merge_data.py"
-
-rule filter_table:
-    input:
-        "out/tables/{tumor}_{normal}.tsv"
-    output:
-        "out/tables/{tumor}_{normal}.filtered.tsv"
-    script:
-        "../scripts/filter_tables_neoantigens.py"
