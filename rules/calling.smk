@@ -22,7 +22,7 @@ rule Strelka_somatic:
         "--callRegions {params.callRegions} {params.extra} "
         "&& strelka/{wildcards.tumor}-{wildcards.normal}/runWorkflow.py -m local -j {threads}"
 
-rule Strelka_germline:
+rule strelka_germline:
     input:
         bam="bwa/{normal}.rmdup.bam",
         index_n="bwa/{normal}.rmdup.bam.bai"
@@ -47,7 +47,7 @@ rule vcf_to_bcf:
     input:
         "{variants}.vcf.gz"
     output:
-        "{variants}.bcf"
+        "{variants}.output.bcf"
     params:
         "-O u -f PASS"
     wrapper:
@@ -78,8 +78,8 @@ rule index_bcf:
 
 rule concat_somatic:
     input:
-        calls=expand("strelka/{{tumor}}-{{normal}}/results/variants/somatic.{type}.bcf.gz", type=["snvs","indels"]),
-        indices=expand("strelka/{{tumor}}-{{normal}}/results/variants/somatic.{type}.bcf.gz.csi", type=["snvs","indels"])
+        calls=expand("strelka/{{tumor}}-{{normal}}/results/variants/somatic.{type}.output.bcf.gz", type=["snvs","indels"]),
+        indices=expand("strelka/{{tumor}}-{{normal}}/results/variants/somatic.{type}.output.bcf.gz.csi", type=["snvs","indels"])
     output:
         "strelka/{tumor}-{normal}/results/variants/somatic.complete.bcf"
     params:
@@ -89,7 +89,7 @@ rule concat_somatic:
 
 rule clean_germline:
     input:
-        bcf="strelka/{normal}/results/variants/variants.bcf"
+        bcf="strelka/{normal}/results/variants/variants.output.bcf"
     output:
         "strelka/{normal}/results/variants/variants.reheader.bcf"
     params:
@@ -107,7 +107,7 @@ rule concat_variants:
         somatic="strelka/{tumor}-{normal}/results/variants/somatic.complete.bcf.gz",
         index_s="strelka/{tumor}-{normal}/results/variants/somatic.complete.bcf.gz.csi"
     output:
-        "strelka/{tumor}-{normal}/results/variants/all_variants.vcf"
+        "strelka/{tumor}-{normal}/results/variants/all_variants.bcf"
     params:
         assembly=config["reference"]["assembly"],
         extra="-O v"

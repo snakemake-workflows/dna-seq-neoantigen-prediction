@@ -1,12 +1,12 @@
 rule microphaser_somatic:
     input:
-        vcf="strelka/{tumor}_{normal}/results/variants/all_variants.bcf",
+        vcf="strelka/{tumor}-{normal}/results/variants/all_variants.bcf",
         bam="bwa/{tumor}.rmdup.bam",
-        track="ref/gtfs/{chrom}.gtf",
+        track="../gtfs/{chrom}.gtf",
     output:
-        mt_fasta="microphaser/fasta/{tumor}_{normal}/{tumor}_{normal}.{chrom}.mt.fa",
-        wt_fasta="microphaser/fasta/{tumor}_{normal}/{tumor}_{normal}.{chrom}.wt.fa",
-        tsv="microphaser/info/{tumor}_{normal}/{tumor}_{normal}.{chrom}.tsv"
+        mt_fasta="microphaser/fasta/{tumor}-{normal}/{tumor}-{normal}.{chrom}.mt.fa",
+        wt_fasta="microphaser/fasta/{tumor}-{normal}/{tumor}-{normal}.{chrom}.wt.fa",
+        tsv="microphaser/info/{tumor}-{normal}/{tumor}-{normal}.{chrom}.tsv"
     params:
         ref=config["reference"]["genome"]
     shell:
@@ -17,7 +17,7 @@ rule microphaser_germline:
     input:
         vcf="strelka/{normal}/results/variants/variants.reheader.bcf",
         bam="bwa/{normal}.rmdup.bam",
-        track="ref/gtfs/{chrom}.gtf",
+        track="../gtfs/{chrom}.gtf",
     output:
         wt_fasta="microphaser/fasta/{normal}/{normal}.{chrom}.fa"
     params:
@@ -43,20 +43,20 @@ rule build_germline_proteome:
 
 rule microphaser_filter:
     input:
-        tsv="microphaser/info/{tumor}_{normal}/{tumor}_{normal}.{chrom}.tsv",
+        tsv="microphaser/info/{tumor}-{normal}/{tumor}-{normal}.{chrom}.tsv",
         proteome="microphaser/fasta/{normal}/reference_proteome.bin"
     output:
-        mt_fasta="microphaser/fasta/{tumor}_{normal}/filtered/{tumor}_{normal}.{chrom}.mt.fa",
-        wt_fasta="microphaser/fasta/{tumor}_{normal}/filtered/{tumor}_{normal}.{chrom}.wt.fa",
-        tsv="microphaser/info/{tumor}_{normal}/filtered/{tumor}_{normal}.{chrom}.tsv"
+        mt_fasta="microphaser/fasta/{tumor}-{normal}/filtered/{tumor}-{normal}.{chrom}.mt.fa",
+        wt_fasta="microphaser/fasta/{tumor}-{normal}/filtered/{tumor}-{normal}.{chrom}.wt.fa",
+        tsv="microphaser/info/{tumor}-{normal}/filtered/{tumor}-{normal}.{chrom}.tsv"
     shell:
         "../microphaser/target/release/microphaser filter -r {input.proteome} -t {input.tsv} -o {output.tsv} -n {output.wt_fasta} > {output.mt_fasta}"
 
 rule concat_tsvs:
     input:
-        expand("microphaser/info/{{tumor}}_{{normal}}/filtered/{{tumor}}_{{normal}}.{chrom}.tsv", chrom = CHROMOSOMES)
+        expand("microphaser/info/{{tumor}}-{{normal}}/filtered/{{tumor}}-{{normal}}.{chrom}.tsv", chrom = CHROMOSOMES)
     output:
-       "microphaser/info/{tumor}_{normal}/filtered/{tumor}_{normal}.tsv"
+       "microphaser/info/{tumor}-{normal}/filtered/{tumor}-{normal}.tsv"
     conda:
         "../envs/xsv.yaml"
     shell:
