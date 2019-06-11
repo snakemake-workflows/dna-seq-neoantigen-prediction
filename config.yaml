@@ -3,7 +3,7 @@ units: "units.tsv"
 
 reference:
     assembly: hg38
-    genome: "/vol/tiny/ref/old/homo-sapiens/hg38/reference/hg38.fa"
+    genome: "path/to/genome"
     call_regions: "ref/call_regions.bed.gz"
     hla_data: "ref/HLA_Data/hla_reference_dna.fasta"
 

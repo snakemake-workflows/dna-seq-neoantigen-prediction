@@ -1,37 +1,5 @@
 sample	condition	matched_normal
-number03_SH_tissue	tumor	number03_SH_blood
-number05_KM_tissue	tumor	number05_KM_blood
-number08_HK_tissue	tumor	number08_HK_blood
-number10_MA_tissue	tumor	number10_MA_blood
-number11_KT_tissue	tumor	number11_KT_blood
-number14_UW_tissue	tumor	number14_UW_blood
-number16_ES_tissue	tumor	number16_ES_blood
-number17_MS_tissue	tumor	number17_MS_blood
-number18_BW_tissue	tumor	number18_BW_blood
-number20_KB_tissue	tumor	number20_KB_blood
-number21_LJ_tissue	tumor	number21_LJ_blood
-number23_GS_tissue	tumor	number23_GS_blood
-number25_PS_tissue	tumor	number25_PS_blood
-number26_HL_tissue	tumor	number26_HL_blood
-number27_AB_tissue	tumor	number27_AB_blood
-number28_BW_tissue	tumor	number28_BW_blood
-number30_HK_tissue	tumor	number30_HK_blood
-number25_PS_tissue_new	tumor	number25_PS_blood
-number26_HL_tissue_new	tumor	number26_HL_blood
-number03_SH_blood	healthy	
-number05_KM_blood	healthy	
-number08_HK_blood	healthy	
-number10_MA_blood	healthy	
-number11_KT_blood	healthy	
-number14_UW_blood	healthy	
-number16_ES_blood	healthy	
-number17_MS_blood	healthy	
-number18_BW_blood	healthy	
-number20_KB_blood	healthy	
-number21_LJ_blood	healthy	
-number23_GS_blood	healthy	
-number25_PS_blood	healthy	
-number26_HL_blood	healthy	
-number27_AB_blood	healthy	
-number28_BW_blood	healthy	
-number30_HK_blood	healthy	
+A_normal	healthy	
+A_tumor	tumor	A_normal
+B_normal	healthy	
+B_tumor	tumor	B_normal

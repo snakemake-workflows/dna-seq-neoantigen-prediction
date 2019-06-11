@@ -1,7 +1,7 @@
 def get_reads(wildcards):
     if not is_single_end(**wildcards):
         # paired-end sample
-        return get(**wildcards)#expand("../raw/{sample}_{group}.fastq.gz",
+        return get(**wildcards)#expand("fastq/{sample}_{group}.fastq.gz",
                      # group=[1, 2], **wildcards)
     # single end sample
     return "raw/{sample}.fastq.gz".format(**wildcards)
