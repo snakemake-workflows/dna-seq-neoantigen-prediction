@@ -100,7 +100,7 @@ rule parse_wt_mhc_out:
         s = input[0]
         shell("python scripts/group_mhc_output.py " + s + " >> {output}")
         for i in input[1:]:
-            shell("python scripts/group_mhc_output.py " + i + " | grep -v -h '^Pos' - >> {output}") ## xsv
+            shell("python scripts/group_mhc_output.py " + i + " | grep -v -h '^Pos' - >> {output}") # xsv
 
 rule parse_mhcflurry:
     input:
@@ -117,19 +117,19 @@ rule parse_mhcflurry:
 rule mhc_csv_table:
     input:
         info="microphaser/info/{tumor}-{normal}/filtered/{tumor}-{normal}.tsv",
-        mt="netMHCpan/{tumor}-{normal}/{tumor}-{normal}.mhc.mt.csv",
-        wt="netMHCpan/{tumor}-{normal}/{tumor}-{normal}.mhc.wt.csv"
+        mt="netMHCpan/{tumor}-{normal}/{tumor}-{normal}.mhc.mt.tsv",
+        wt="netMHCpan/{tumor}-{normal}/{tumor}-{normal}.mhc.wt.tsv"
     output:
-        "tables/{tumor}-{normal}.tsv"
+        "results/netMHCpan/{tumor}-{normal}.tsv"
     script:
         "../scripts/merge_data.py"
 
 rule mhcflurry_table:
     input:
         info="microphaser/info/{tumor}-{normal}/filtered/{tumor}-{normal}.tsv",
-        mt="mhcflurry/{tumor}-{normal}/{tumor}-{normal}.mhc.mt.tsv",
-        wt="mhcflurry/{tumor}-{normal}/{tumor}-{normal}.mhc.wt.tsv"
+        mt="mhcflurry/{tumor}-{normal}/{tumor}-{normal}.mhc.mt.csv",
+        wt="mhcflurry/{tumor}-{normal}/{tumor}-{normal}.mhc.wt.csv"
     output:
-        "results/{tumor}-{normal}.tsv"
+        "results/mhcflurry/{tumor}-{normal}.tsv"
     script:
         "../scripts/merge_mhcflurry.py"

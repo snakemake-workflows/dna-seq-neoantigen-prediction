@@ -28,9 +28,9 @@ CHROMOSOMES.extend(["chrX"])
 def allinput(wildcards):
     ret = []
     tumors = samples[samples.condition == "tumor"].index.to_list()
-    for t in ["number03_SH_tissue"]:#tumors:
+    for t in tumors:
         normal = samples[samples["sample"] == t].matched_normal.to_string(index=False, header=False).replace(" ","")
-        ret.extend(expand(["results/{tumor}-{normal}.tsv"], tumor = t, normal = normal))
+        ret.extend(expand(["results/netMHCpan/{tumor}-{normal}.tsv"], tumor = t, normal = normal))
     return ret
 
 rule all:
