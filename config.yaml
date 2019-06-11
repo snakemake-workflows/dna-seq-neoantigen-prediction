@@ -2,9 +2,9 @@ samples: "samples.tsv"
 units: "units.tsv"
 
 reference:
-    assembly: assembly
-    genome: "path/to/genome.fa"
-    call_regions: "path/to/target_regions"
+    assembly: hg38
+    genome: "/vol/tiny/ref/old/homo-sapiens/hg38/reference/hg38.fa"
+    call_regions: "ref/call_regions.bed.gz"
     hla_data: "ref/HLA_Data/hla_reference_dna.fasta"
 
 params:
@@ -17,5 +17,5 @@ params:
     netMHCpan:
         "-BA -l 9 -s -xls"
     optitype:
-        "optitype.config.ini"
+        "ref/optitype.config.ini"
 

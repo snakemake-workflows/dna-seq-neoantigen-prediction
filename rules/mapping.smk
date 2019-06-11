@@ -1,8 +1,8 @@
 def get_reads(wildcards):
     if not is_single_end(**wildcards):
         # paired-end sample
-        return expand("../raw/{sample}_{group}.fastq.gz",
-                      group=[1, 2], **wildcards)
+        return get(**wildcards)#expand("../raw/{sample}_{group}.fastq.gz",
+                     # group=[1, 2], **wildcards)
     # single end sample
     return "raw/{sample}.fastq.gz".format(**wildcards)
 
@@ -25,7 +25,7 @@ rule map:
 
 rule mark_duplicates:
     input:
-        "../bwa/{sample}.bam"
+        "bwa/{sample}.bam"
     output:
         bam="bwa/{sample}.rmdup.bam",
         metrics="dedup/{sample}.metrics.txt"
