@@ -29,8 +29,10 @@ def allinput(wildcards):
     ret = []
     tumors = samples[samples.condition == "tumor"].index.to_list()
     for t in tumors:
-        normal = samples[samples["sample"] == t].matched_normal.to_string(index=False, header=False).replace(" ","")
-        ret.extend(expand(["results/netMHCpan/{tumor}-{normal}.tsv"], tumor = t, normal = normal))
+        normal = normal = samples.loc[t, "matched_normal"]
+        ret.extend(expand(["results/{mhc}/{tumor}-{normal}.{typ}.tsv"], 
+                          tumor = t, normal = normal, mhc = ["netMHCpan", "netMHC2pan"], 
+                          typ=units[units["sample"] == t]["typ"].to_list()))
     return ret
 
 rule all:
@@ -47,6 +49,7 @@ report: "report/workflow.rst"
 ##### load rules #####
 
 include: "rules/common.smk"
+include: "rules/quant.smk"
 include: "rules/mapping.smk"
 include: "rules/calling.smk"
 include: "rules/microphaser.smk"
