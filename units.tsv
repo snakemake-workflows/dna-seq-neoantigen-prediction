@@ -1,5 +1,6 @@
-sample	fq1	fq2
-A_normal	A_normal_1.fastq.gz	A_normal_2.fastq.gz
-A_tumor	A_tumor_1.fastq.gz	A_tumor_2.fastq.gz
-B_normal	B_normal_1.fastq.gz	B_normal_2.fastq.gz
-B_tumor	B_tumor_1.fastq.gz	B_tumor_2.fastq.gz
+sample	type 	fq1	fq2
+A_normal	WES	A_normal_1.fastq.gz	A_normal_2.fastq.gz
+A_tumor	WES	A_tumor_1.fastq.gz	A_tumor_2.fastq.gz
+B_normal	WES	B_normal_1.fastq.gz	B_normal_2.fastq.gz
+B_tumor	WES	B_tumor_1.fastq.gz	B_tumor_2.fastq.gz
+B_tumor	RNA	B_tumor_RNA_1.fastq.gz	B_tumor_RNA_2.fastq.gz
