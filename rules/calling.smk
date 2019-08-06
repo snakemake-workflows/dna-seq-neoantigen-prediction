@@ -1,9 +1,9 @@
 rule Strelka_somatic:
     input:
-        normal="bwa/{normal}.rmdup.bam",
-        index_n="bwa/{normal}.rmdup.bam.bai",
-        tumor="bwa/{tumor}.rmdup.bam",
-        index_t="bwa/{tumor}.rmdup.bam.bai"
+        normal="bwa/{normal}-WES.rmdup.bam",
+        index_n="bwa/{normal}-WES.rmdup.bam.bai",
+        tumor="bwa/{tumor}-WES.rmdup.bam",
+        index_t="bwa/{tumor}-WES.rmdup.bam.bai"
     output:
         "strelka/{tumor}-{normal}/results/variants/somatic.snvs.vcf.gz",
         "strelka/{tumor}-{normal}/results/variants/somatic.indels.vcf.gz"
@@ -24,8 +24,8 @@ rule Strelka_somatic:
 
 rule strelka_germline:
     input:
-        bam="bwa/{normal}.rmdup.bam",
-        index_n="bwa/{normal}.rmdup.bam.bai"
+        bam="bwa/{normal}-WES.rmdup.bam",
+        index_n="bwa/{normal}-WES.rmdup.bam.bai"
     output:
         "strelka/{normal}/results/variants/variants.vcf.gz"
     log:

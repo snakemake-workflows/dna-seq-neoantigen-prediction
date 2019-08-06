@@ -1,18 +1,23 @@
 def get_reads(wildcards):
-    if not is_single_end(**wildcards):
-        # paired-end sample
-        return get(**wildcards)#expand("fastq/{sample}_{group}.fastq.gz",
-                     # group=[1, 2], **wildcards)
-    # single end sample
-    return "raw/{sample}.fastq.gz".format(**wildcards)
+    if config["trimming"]["skip"]:
+        # no need for trimming, return raw reads
+        return units.loc[(wildcards.sample, wildcards.typ), ["fq1", "fq2"]].tolist()
+    else:
+        # trimming needed, use trimmed reads
+        if not is_single_end(**wildcards):
+            # paired-end sample
+            return expand("trimmed/{sample}-{typ}.fastq.gz",
+                    group=[1,2], **wildcards)
+        # single end sample
+        return "trimmed/{sample}-{typ}.fastq.gz".format(**wildcards)
 
 rule map:
     input:
         reads=get_reads
     output:
-        "bwa/{sample}.bam"
+        "bwa/{sample}-{typ}.bam"
     log:
-        "logs/bwa_mem/{sample}.log"
+        "logs/bwa_mem/{sample}-{typ}.log"
     params:
         index=config["reference"]["genome"],
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
@@ -25,12 +30,12 @@ rule map:
 
 rule mark_duplicates:
     input:
-        "bwa/{sample}.bam"
+        "bwa/{sample}-{typ}.bam"
     output:
-        bam="bwa/{sample}.rmdup.bam",
-        metrics="dedup/{sample}.metrics.txt"
+        bam="bwa/{sample}-{typ}.rmdup.bam",
+        metrics="dedup/{sample}-{typ}.metrics.txt"
     log:
-        "logs/picard/dedup/{sample}.log"
+        "logs/picard/dedup/{sample}-{typ}.log"
     params:
         "REMOVE_DUPLICATES=true"
     wrapper:
@@ -38,9 +43,9 @@ rule mark_duplicates:
 
 rule index:
     input:
-        bam="bwa/{sample}.rmdup.bam"
+        bam="bwa/{sample}-{typ}.rmdup.bam"
     output:
-        bam="bwa/{sample}.rmdup.bam.bai"
+        bam="bwa/{sample}-{typ}.rmdup.bam.bai"
     params: ""
     wrapper:
         "0.31.1/bio/samtools/index"

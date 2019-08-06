@@ -1,29 +1,29 @@
 rule microphaser_somatic:
     input:
         vcf="strelka/{tumor}-{normal}/results/variants/all_variants.bcf",
-        bam="bwa/{tumor}.rmdup.bam",
-        track="../gtfs/{chrom}.gtf",
+        bam="bwa/{tumor}-WES.rmdup.bam",
+        track="ref/gtfs/{chrom}.gtf",
     output:
         mt_fasta="microphaser/fasta/{tumor}-{normal}/{tumor}-{normal}.{chrom}.mt.fa",
         wt_fasta="microphaser/fasta/{tumor}-{normal}/{tumor}-{normal}.{chrom}.wt.fa",
-        tsv="microphaser/info/{tumor}-{normal}/{tumor}-{normal}.{chrom}.tsv"
+        tsv=temp("microphaser/info/{tumor}-{normal}/{tumor}-{normal}.{chrom}.tsv")
     params:
         ref=config["reference"]["genome"]
     shell:
-        "../microphaser/target/release/microphaser somatic {input.bam} --variants {input.vcf} --ref {params.ref} --tsv {output.tsv} -n {output.wt_fasta} "
+        "../microphaser/target/release/microphaser somatic {input.bam} --variants {input.vcf} --ref {params.ref} --tsv {output.tsv} -n {output.wt_fasta} -w 45 "
         "< {input.track} > {output.mt_fasta}"
 
 rule microphaser_germline:
     input:
         vcf="strelka/{normal}/results/variants/variants.reheader.bcf",
-        bam="bwa/{normal}.rmdup.bam",
-        track="../gtfs/{chrom}.gtf",
+        bam="bwa/{normal}-WES.rmdup.bam",
+        track="ref/gtfs/{chrom}.gtf",
     output:
         wt_fasta="microphaser/fasta/{normal}/{normal}.{chrom}.fa"
     params:
         ref=config["reference"]["genome"]
     shell:
-        "../microphaser/target/release/microphaser normal {input.bam} --variants {input.vcf} --ref {params.ref} < {input.track} > {output.wt_fasta}"
+        "../microphaser/target/release/microphaser normal {input.bam} --variants {input.vcf} --ref {params.ref} -w 45 < {input.track} > {output.wt_fasta}"
 
 rule concat_proteome:
     input:
