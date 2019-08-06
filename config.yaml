@@ -22,7 +22,7 @@ params:
     netMHCpan:
         "-BA -l 9 -s -xls"
     netMHCIIpan:
-        "-s -xls
+        "-s -xls"
     optitype:
         "ref/optitype.config.ini"
     kallisto:
