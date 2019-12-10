@@ -1,14 +1,21 @@
-rule Strelka_somatic:
+def get_normal_bam(wildcards):
+    return(expand("bwa/{normal}.rmdup.bam", normal=samples[samples["sample"] == wildcards.sample]["matched_normal"]))
+
+def get_normal_bai(wildcards):
+    return(expand("bwa/{normal}.rmdup.bam.bai", normal=samples[samples["sample"] == wildcards.sample]["matched_normal"]))
+
+rule strelka_somatic:
     input:
-        normal="bwa/{normal}-WES.rmdup.bam",
-        index_n="bwa/{normal}-WES.rmdup.bam.bai",
-        tumor="bwa/{tumor}-WES.rmdup.bam",
-        index_t="bwa/{tumor}-WES.rmdup.bam.bai"
+        normal=get_normal_bam,#"bwa/{normal}.rmdup.bam",
+        normal_index=get_normal_bai,#"bwa/{normal}.rmdup.bam.bai",
+        tumor="bwa/{sample}.rmdup.bam",
+        tumor_index="bwa/{sample}.rmdup.bam.bai"
     output:
-        "strelka/{tumor}-{normal}/results/variants/somatic.snvs.vcf.gz",
-        "strelka/{tumor}-{normal}/results/variants/somatic.indels.vcf.gz"
+#        directory("strelka/somatic/{sample}")
+        "strelka/somatic/{sample}/results/variants/somatic.snvs.vcf.gz",
+        "strelka/somatic/{sample}/results/variants/somatic.indels.vcf.gz"
     log:
-        "log/calling/strelka_somatic/{tumor}_{normal}.log"
+        "log/calling/strelka_somatic/{sample}.log"
     params:
         ref=config["reference"]["genome"],
         callRegions=config["reference"]["call_regions"],
@@ -18,16 +25,17 @@ rule Strelka_somatic:
     threads: 22
     shell:
         "configureStrelkaSomaticWorkflow.py --normalBam {input.normal} --tumorBam {input.tumor} "
-        "--referenceFasta {params.ref} --runDir strelka/{wildcards.tumor}-{wildcards.normal} "
+        "--referenceFasta {params.ref} --runDir strelka/somatic/{wildcards.sample} "
         "--callRegions {params.callRegions} {params.extra} "
-        "&& strelka/{wildcards.tumor}-{wildcards.normal}/runWorkflow.py -m local -j {threads}"
+        "&& strelka/somatic/{wildcards.sample}/runWorkflow.py -m local -j {threads}"
 
 rule strelka_germline:
     input:
-        bam="bwa/{normal}-WES.rmdup.bam",
-        index_n="bwa/{normal}-WES.rmdup.bam.bai"
+        bam="bwa/{normal}.rmdup.bam",
+        normal_index="bwa/{normal}.rmdup.bam.bai"
     output:
-        "strelka/{normal}/results/variants/variants.vcf.gz"
+#        directory("strelka/germline/sample")
+        "strelka/germline/{normal}/results/variants/variants.vcf.gz"
     log:
         "log/calling/strelka_germline/{normal}.log"
     params:
@@ -39,9 +47,9 @@ rule strelka_germline:
     threads: 22
     shell:
         "configureStrelkaGermlineWorkflow.py --bam {input.bam} "
-        "--referenceFasta {params.ref} --runDir strelka/{wildcards.normal} "
+        "--referenceFasta {params.ref} --runDir strelka/germline/{wildcards.normal} "
         "--callRegions {params.callRegions} {params.extra} "
-        "&& strelka/{wildcards.normal}/runWorkflow.py -m local -j {threads}"
+        "&& strelka/germline/{wildcards.normal}/runWorkflow.py -m local -j {threads}"
 
 rule vcf_to_bcf:
     input:
@@ -78,10 +86,10 @@ rule index_bcf:
 
 rule concat_somatic:
     input:
-        calls=expand("strelka/{{tumor}}-{{normal}}/results/variants/somatic.{type}.output.bcf.gz", type=["snvs","indels"]),
-        indices=expand("strelka/{{tumor}}-{{normal}}/results/variants/somatic.{type}.output.bcf.gz.csi", type=["snvs","indels"])
+        calls=expand("strelka/somatic/{{sample}}/results/variants/somatic.{type}.output.bcf.gz", type=["snvs","indels"]),
+        indices=expand("strelka/somatic/{{sample}}/results/variants/somatic.{type}.output.bcf.gz.csi", type=["snvs","indels"])
     output:
-        "strelka/{tumor}-{normal}/results/variants/somatic.complete.bcf"
+        "strelka/somatic/{sample}/results/variants/somatic.complete.bcf"
     params:
         "-O b -a"
     wrapper:
@@ -89,25 +97,30 @@ rule concat_somatic:
 
 rule clean_germline:
     input:
-        bcf="strelka/{normal}/results/variants/variants.output.bcf"
+        bcf="{germline}/variants.output.bcf"
     output:
-        "strelka/{normal}/results/variants/variants.reheader.bcf"
+        "{germline}/variants.reheader.bcf"
     params:
-        ""
+        extra=""
     conda:
         "../envs/variant_handling.yaml"
     shell:
-        "bcftools reheader {params} -s ref/newsamples.txt {input.bcf} > {output}"
+        "bcftools reheader {params.extra} -s ref/newsamples.txt {input.bcf} > {output}"
 
+def get_germline(wildcards):
+    return(expand("strelka/germline/{germline}/results/variants/variants.reheader.bcf.gz", germline=samples[samples["sample"] == wildcards.sample]["matched_normal"]))
+
+def get_germline_index(wildcards):
+    return(expand("strelka/germline/{germline}/results/variants/variants.reheader.bcf.gz.csi", germline=samples[samples["sample"] == wildcards.sample]["matched_normal"]))
 
 rule concat_variants:
     input:
-        germline="strelka/{normal}/results/variants/variants.reheader.bcf.gz",
-        index_g="strelka/{normal}/results/variants/variants.reheader.bcf.gz.csi",
-        somatic="strelka/{tumor}-{normal}/results/variants/somatic.complete.bcf.gz",
-        index_s="strelka/{tumor}-{normal}/results/variants/somatic.complete.bcf.gz.csi"
+        germline=get_germline,#"strelka/germline/{sample}/results/variants/variants.reheader.bcf.gz",
+        index_g=get_germline_index,#"strelka/germline/{sample}/results/variants/variants.reheader.bcf.gz.csi",
+        somatic="strelka/somatic/{sample}/results/variants/somatic.complete.bcf.gz",
+        index_s="strelka/somatic/{sample}/results/variants/somatic.complete.bcf.gz.csi"
     output:
-        "strelka/{tumor}-{normal}/results/variants/all_variants.bcf"
+        "strelka/merged/{sample}/all_variants.bcf"
     params:
         assembly=config["reference"]["assembly"],
         extra="-O v"

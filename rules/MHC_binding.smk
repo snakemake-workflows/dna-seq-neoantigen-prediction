@@ -1,21 +1,23 @@
 def get_reads(wildcards):
-    return get_seperate(wildcards.sample, "WES", wildcards.group)
+    return get_seperate(wildcards.sample, wildcards.group)
 
 rule HLA_LA:
     input:
-        bam="bwa/{sample}-{typ}.rmdup.bam",
-        bai="bwa/{sample}-{typ}.rmdup.bam.bai"
+        bam="bwa/{sample}.rmdup.bam",
+        bai="bwa/{sample}.rmdup.bam.bai"
     output:
-        "HLA-LA/output/{typ}/{sample}/hla/R1_bestguess_G.txt"
+        "HLA-LA/output/{sample}/hla/R1_bestguess_G.txt"
     threads: 7
     params:
-        graph="PRG_MHC_GRCh38_withIMGT"
+        graph="PRG_MHC_GRCh38_withIMGT",
+        graphdir="/vol/tiny/MaMel-Neoantigens/HLA-LA_graphs",
+        extra_refs="../HLA-LA_graphs/additionalReferences/PRG_MHC_GRCh38_withIMGT"
     shell:
-        "HLA-LA.pl --bam {input.bam} --sampleID {wildcards.sample} --graph {params.graph} --workingDir HLA-LA/output/{wildcards.typ} --maxThreads {threads}"
+        "HLA-LA.pl --bam {input.bam} --sampleID {wildcards.sample} --graph {params.graph} --customGraphDir {params.graphdir} --workingDir HLA-LA/output --maxThreads {threads}"
 
 rule parse_HLA_LA:
     input:
-        "HLA-LA/output/WES/{sample}/hla/R1_bestguess_G.txt"
+        "HLA-LA/output/{sample}/hla/R1_bestguess_G.txt"
     output:
         report("HLA-LA/hlaI_{sample}.tsv", caption="../report/HLA-LA_Types.rst", category="HLA-Typing(HLA-LA)"),
         report("HLA-LA/hlaII_{sample}.tsv", caption="../report/HLA-LA_Types.rst", category="HLA-Typing(HLA-LA)")
@@ -42,7 +44,7 @@ rule OptiType:
         f1='razers3/fastq/{sample}_1.fished.fastq',
         f2='razers3/fastq/{sample}_2.fished.fastq'
     output:
-        report("optitype/{sample}/hla_alleles.{sample}.tsv", caption="../report/HLA_Types.rst", category="HLA-Typing")
+        report("optitype/{sample}/hla_alleles_{sample}.tsv", caption="../report/HLA_Types.rst", category="HLA-Typing")
     params:
         outdir="optitype/{sample}/",
         conf=config["params"]["optitype"]
@@ -53,18 +55,20 @@ rule OptiType:
         "&& cat {params.outdir}*/*_result.tsv | cut - -f2-7 | awk 'NR == 1 {{print}} NR>1 {{for (i = 1; i<=6; ++i) sub(/^/, \"&HLA-\", $i); print}}' "
         "| sed -e s/[*,:]/''/g | sed s/' '/'\t'/g > {output}"
 
+def get_germline_optitype(wildcards):
+    return(expand("optitype/{germline}/hla_alleles_{germline}.tsv", germline=samples[samples["sample"] == wildcards.sample]["matched_normal"]))
 
 rule mhcflurry:
     input:
-        peptides="microphaser/fasta/{tumor}-{normal}/filtered/{tumor}-{normal}.{chr}.{group}.fa",
-        alleles="optitype/{tumor}/hla_alleles.tsv",
-        wt_alleles="optitype/{normal}/hla_alleles.tsv"
+        peptides="microphaser/fasta/{sample}/filtered/{sample}.{chr}.{group}.fa",
+        alleles="optitype/{sample}/hla_alleles_{sample}.tsv",
+        wt_alleles=get_germline_optitype
     output:
-        "mhcflurry/{tumor}-{normal}/{chr}/output.{group}.csv"
+        "mhcflurry/{sample}/{chr}/output.{group}.csv"
     log:
-        "logs/mhcflurry/{tumor}-{normal}/{chr}/log.{group}.txt"
-    conda:
-        "../envs/mhctools.yaml"
+        "logs/mhcflurry/{sample}/{chr}/log.{group}.txt"
+#    conda:
+#        "../envs/mhctools.yaml"
     run:
         if "wt" in input.peptides:
             alleles = ",".join(pd.read_csv(input.wt_alleles, sep="\t").iloc[0])
@@ -75,13 +79,13 @@ rule mhcflurry:
 
 rule netMHCpan:
     input:
-        peptides="microphaser/fasta/{tumor}-{normal}/filtered/{tumor}-{normal}.{chr}.{group}.fa",
-        alleles="optitype/{tumor}/hla_alleles.tsv",
-        wt_alleles="optitype/{normal}/hla_alleles.tsv"
+        peptides="microphaser/fasta/{sample}/filtered/{sample}.{chr}.{group}.fa",
+        alleles="optitype/{sample}/hla_alleles_{sample}.tsv",
+        wt_alleles=get_germline_optitype
     output:
-        "netMHCpan/{tumor}-{normal}/{chr}/{tumor}-{normal}.{chr}.{group}.xls",
+        "netMHCpan/{sample}/{chr}/{sample}.{chr}.{group}.xls",
     log:
-        "logs/netMHCpan/{tumor}-{normal}/{chr}/{tumor}-{normal}.{chr}.{group}.log"
+        "logs/netMHCpan/{sample}/{chr}/{sample}.{chr}.{group}.log"
     params:
         extra = config["params"]["netMHCpan"]
     run:
@@ -92,15 +96,18 @@ rule netMHCpan:
         cmd = "if [ -s {input.peptides} ]; then ../netMHCpan-4.0/netMHCpan {params.extra} -xlsfile {output} -a {alleles} -f {input.peptides} > {log}; else touch {output}; fi"
         shell(cmd)
 
+def get_germline_hla(wildcards):
+    return(expand("HLA-LA/hlaII_{germline}.tsv", germline=samples[samples["sample"] == wildcards.sample]["matched_normal"]))
+
 rule netMHC2:
     input:
-        peptides = "microphaser/fasta/{tumor}-{normal}/filtered/{tumor}-{normal}.{chr}.{group}.fa",
-        alleles = "HLA-LA/hlaII_{tumor}.tsv",
-        wt_alleles="HLA-LA/hlaII_{normal}.tsv"
+        peptides="microphaser/fasta/{sample}/filtered/{sample}.{chr}.{group}.fa",
+        alleles = "HLA-LA/hlaII_{sample}.tsv",
+        wt_alleles=get_germline_hla
     output:
-        "netMHC2pan/{tumor}-{normal}/{chr}/{tumor}-{normal}.{chr}.{group}.xls",
+        "netMHC2pan/{sample}/{chr}/{sample}.{chr}.{group}.xls",
     log:
-        "logs/netMHC2pan/{tumor}-{normal}/{chr}/{tumor}-{normal}.{chr}.{group}.log"
+        "logs/netMHC2pan/{sample}/{chr}/{sample}.{chr}.{group}.log"
     params:
         extra=config["params"]["netMHCIIpan"]
     run:
@@ -114,9 +121,9 @@ rule netMHC2:
 
 rule parse_mhc_out:
     input:
-        expand("{{mhc}}/{{tumor}}-{{normal}}/{chr}/{{tumor}}-{{normal}}.{chr}.{{group}}.xls", chr=CHROMOSOMES)
+        expand("{{mhc}}/{{sample}}/{chr}/{{sample}}.{chr}.{{group}}.xls", chr=CHROMOSOMES)
     output:
-        "{mhc}/{tumor}-{normal}/{tumor}-{normal}.mhc.{group}.tsv"
+        "{mhc}/{sample}/{sample}.mhc.{group}.tsv"
     wildcard_constraints:
         group="wt|mt"
     script:
@@ -124,9 +131,9 @@ rule parse_mhc_out:
 
 rule parse_mhcflurry:
     input:
-        expand("mhcflurry/{{tumor}}-{{normal}}/{chr}/output.{{group}}.csv", chr=CHROMOSOMES)
+        expand("mhcflurry/{{sample}}/{chr}/output.{{group}}.csv", chr=CHROMOSOMES)
     output:
-        "mhcflurry/{tumor}-{normal}/{tumor}-{normal}.mhc.{group}.csv"
+        "mhcflurry/{sample}/{sample}.mhc.{group}.csv"
     wildcard_constraints:
         group="wt|mt"
     conda:
@@ -136,29 +143,29 @@ rule parse_mhcflurry:
 
 rule mhc_csv_table:
     input:
-        info="microphaser/info/{tumor}-{normal}/filtered/{tumor}-{normal}.tsv",
-        mt="{mhc}/{tumor}-{normal}/{tumor}-{normal}.mhc.mt.tsv",
-        wt="{mhc}/{tumor}-{normal}/{tumor}-{normal}.mhc.wt.tsv"
+        info="microphaser/info/{sample}/filtered/{sample}.tsv",
+        mt="{mhc}/{sample}/{sample}.mhc.mt.tsv",
+        wt="{mhc}/{sample}/{sample}.mhc.wt.tsv"
     output:
-        report("results/{mhc}/{tumor}-{normal}.WES.tsv", caption="../report/WES_results.rst", category="Results WES")
+        report("results/{mhc}/{sample}.WES.tsv", caption="../report/WES_results.rst", category="Results WES")
     script:
         "../scripts/merge_data.py"
 
 rule mhcflurry_table:
     input:
-        info="microphaser/info/{tumor}-{normal}/filtered/{tumor}-{normal}.tsv",
-        mt="mhcflurry/{tumor}-{normal}/{tumor}-{normal}.mhc.mt.csv",
-        wt="mhcflurry/{tumor}-{normal}/{tumor}-{normal}.mhc.wt.csv"
+        info="microphaser/info/{sample}/filtered/{sample}.tsv",
+        mt="mhcflurry/{sample}/{sample}.mhc.mt.tsv",
+        wt="mhcflurry/{sample}/{sample}.mhc.wt.tsv"
     output:
-        report("results/mhcflurry/{tumor}-{normal}.WES.tsv", caption="../report/WES_results.rst", category="Results WES")
+        report("results/mhcflurry/{sample}.WES.tsv", caption="../report/WES_results.rst", category="Results WES")
     script:
         "../scripts/merge_mhcflurry.py"
 
 rule add_RNA_info:
     input:
-        counts="transcriptome/kallisto/{tumor}/abundance.tsv",
-        table="results/{mhc}/{tumor}-{normal}.WES.tsv"
+        counts="transcriptome/kallisto/{sample}/abundance.tsv",
+        table="results/{mhc}/{sample}.WES.tsv"
     output:
-        report("results/{mhc}/{tumor}-{normal}.RNA.tsv", caption="../report/RNA_results.rst", category="Results RNA")
+        report("results/{mhc}/{sample}.RNA.tsv", caption="../report/RNA_results.rst", category="Results RNA")
     script:
         "../scripts/add_rna_info.py"
