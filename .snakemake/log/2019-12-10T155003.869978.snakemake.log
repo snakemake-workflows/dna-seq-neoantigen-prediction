@@ -1,0 +1,6 @@
+Building DAG of jobs...
+InputFunctionException in line 18 of /home/forster/Projects/Neoantigen_Prediction/rules/microphaser.smk:
+AttributeError: 'Wildcards' object has no attribute 'sample'
+Wildcards:
+normal=A_normal
+chrom=chr1

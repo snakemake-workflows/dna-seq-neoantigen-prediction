@@ -11,6 +11,7 @@ reference:
     call_regions: "ref/call_regions.bed.gz"
     hla_data: "ref/HLA_Data/hla_reference_dna.fasta"
     transcriptome: "path/to/transcript_reference"
+    gtfs: /vol/tiny/christoph-MPM/NeoPred/gtfs
 
 params:
     bwa:
@@ -19,6 +20,9 @@ params:
         "--exome"
     razers3:
         "-i 95 -m 1 -dr 0"
+    microphaser:
+        window_len:
+            60
     netMHCpan:
         "-BA -l 9 -s -xls"
     netMHCIIpan:

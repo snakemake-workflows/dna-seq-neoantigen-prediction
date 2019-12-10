@@ -1,0 +1,5 @@
+Building DAG of jobs...
+InputFunctionException in line 6 of /home/forster/Projects/Neoantigen_Prediction/rules/mapping.smk:
+AttributeError: 'DataFrame' object has no attribute 'tolist'
+Wildcards:
+sample=A_normal

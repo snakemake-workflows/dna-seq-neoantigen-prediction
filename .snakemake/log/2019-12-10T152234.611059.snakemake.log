@@ -1,0 +1,4 @@
+TokenError in line 55 of /home/forster/Projects/Neoantigen_Prediction/Snakefile:
+('EOF in multi-line statement', (131, 0))
+  File "/home/forster/Projects/Neoantigen_Prediction/Snakefile", line 55, in <module>
+  File "/home/forster/miniconda3/lib/python3.6/tokenize.py", line 602, in _tokenize

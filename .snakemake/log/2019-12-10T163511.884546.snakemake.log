@@ -1,0 +1,4 @@
+NameError in line 65 of /home/forster/Projects/Neoantigen_Prediction/rules/MHC_binding.smk:
+name 'get_wt_optitype' is not defined
+  File "/home/forster/Projects/Neoantigen_Prediction/Snakefile", line 57, in <module>
+  File "/home/forster/Projects/Neoantigen_Prediction/rules/MHC_binding.smk", line 65, in <module>

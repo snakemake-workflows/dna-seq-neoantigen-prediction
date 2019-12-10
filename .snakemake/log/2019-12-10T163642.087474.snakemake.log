@@ -1,0 +1,6 @@
+Building DAG of jobs...
+InputFunctionException in line 27 of /home/forster/Projects/Neoantigen_Prediction/rules/MHC_binding.smk:
+NameError: name 'get_seperate' is not defined
+Wildcards:
+sample=A_tumor
+group=1

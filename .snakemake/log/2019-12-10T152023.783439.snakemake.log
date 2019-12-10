@@ -1,0 +1,5 @@
+Building DAG of jobs...
+MissingInputException in line 39 of /home/forster/Projects/Neoantigen_Prediction/Snakefile:
+Missing input files for rule all:
+strelka/merged/B_tumor/all_variants.bcf
+strelka/merged/A_tumor/all_variants.bcf

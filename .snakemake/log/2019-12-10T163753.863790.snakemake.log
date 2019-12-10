@@ -1,0 +1,5 @@
+Building DAG of jobs...
+InputFunctionException in line 6 of /home/forster/Projects/Neoantigen_Prediction/rules/mapping.smk:
+KeyError: ('WES/A_tumor', 'DNA')
+Wildcards:
+sample=WES/A_tumor

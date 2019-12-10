@@ -1,5 +1,4 @@
 sample	condition	matched_normal
 A_normal	healthy	
 A_tumor	tumor	A_normal
-B_normal	healthy	
-B_tumor	tumor	B_normal
+B_tumor	tumor	A_normal

@@ -1,0 +1,4 @@
+NameError in line 4 of /home/forster/Projects/Neoantigen_Prediction/rules/microphaser.smk:
+name 'get_tumor_bam' is not defined
+  File "/home/forster/Projects/Neoantigen_Prediction/Snakefile", line 56, in <module>
+  File "/home/forster/Projects/Neoantigen_Prediction/rules/microphaser.smk", line 4, in <module>

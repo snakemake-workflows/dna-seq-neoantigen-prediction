@@ -1,0 +1,2 @@
+SyntaxError in line 35 of /home/forster/Projects/Neoantigen_Prediction/Snakefile:
+EOF in multi-line statement (Snakefile, line 35)
