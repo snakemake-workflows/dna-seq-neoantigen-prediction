@@ -1,17 +1,10 @@
-def get_normal_bam(wildcards):
-    return(expand("bwa/{normal}.rmdup.bam", normal=samples[samples["sample"] == wildcards.sample]["matched_normal"]))
-
-def get_normal_bai(wildcards):
-    return(expand("bwa/{normal}.rmdup.bam.bai", normal=samples[samples["sample"] == wildcards.sample]["matched_normal"]))
-
 rule strelka_somatic:
     input:
-        normal=get_normal_bam,#"bwa/{normal}.rmdup.bam",
-        normal_index=get_normal_bai,#"bwa/{normal}.rmdup.bam.bai",
+        normal=get_normal_bam,
+        normal_index=get_normal_bai,
         tumor="bwa/{sample}.rmdup.bam",
         tumor_index="bwa/{sample}.rmdup.bam.bai"
     output:
-#        directory("strelka/somatic/{sample}")
         "strelka/somatic/{sample}/results/variants/somatic.snvs.vcf.gz",
         "strelka/somatic/{sample}/results/variants/somatic.indels.vcf.gz"
     log:
@@ -34,7 +27,6 @@ rule strelka_germline:
         bam="bwa/{normal}.rmdup.bam",
         normal_index="bwa/{normal}.rmdup.bam.bai"
     output:
-#        directory("strelka/germline/sample")
         "strelka/germline/{normal}/results/variants/variants.vcf.gz"
     log:
         "log/calling/strelka_germline/{normal}.log"
@@ -107,16 +99,10 @@ rule clean_germline:
     shell:
         "bcftools reheader {params.extra} -s ref/newsamples.txt {input.bcf} > {output}"
 
-def get_germline(wildcards):
-    return(expand("strelka/germline/{germline}/results/variants/variants.reheader.bcf.gz", germline=samples[samples["sample"] == wildcards.sample]["matched_normal"]))
-
-def get_germline_index(wildcards):
-    return(expand("strelka/germline/{germline}/results/variants/variants.reheader.bcf.gz.csi", germline=samples[samples["sample"] == wildcards.sample]["matched_normal"]))
-
 rule concat_variants:
     input:
-        germline=get_germline,#"strelka/germline/{sample}/results/variants/variants.reheader.bcf.gz",
-        index_g=get_germline_index,#"strelka/germline/{sample}/results/variants/variants.reheader.bcf.gz.csi",
+        germline=get_germline_variants,
+        index_g=get_germline__variants_index,
         somatic="strelka/somatic/{sample}/results/variants/somatic.complete.bcf.gz",
         index_s="strelka/somatic/{sample}/results/variants/somatic.complete.bcf.gz.csi"
     output:

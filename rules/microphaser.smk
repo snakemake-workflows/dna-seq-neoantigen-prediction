@@ -46,13 +46,10 @@ rule build_germline_proteome:
     shell:
         "../microphaser/target/release/microphaser build_reference -r {input} -o {output}"
 
-def get_proteome(wildcards):
-    return(expand("microphaser/fasta/germline/{normal}/reference_proteome.bin", normal=samples[samples["sample"] == wildcards.sample]["matched_normal"]))
-
 rule microphaser_filter:
     input:
         tsv="microphaser/info/{sample}/{sample}.{chrom}.tsv",
-        proteome=get_proteome#"microphaser/fasta/germline/{normal}/reference_proteome.bin"
+        proteome=get_proteome
     output:
         mt_fasta="microphaser/fasta/{sample}/filtered/{sample}.{chrom}.mt.fa",
         wt_fasta="microphaser/fasta/{sample}/filtered/{sample}.{chrom}.wt.fa",

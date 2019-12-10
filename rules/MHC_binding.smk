@@ -1,6 +1,3 @@
-def get_reads(wildcards):
-    return get_seperate(wildcards.sample, wildcards.group)
-
 rule HLA_LA:
     input:
         bam="bwa/{sample}.rmdup.bam",
@@ -55,9 +52,6 @@ rule OptiType:
         "&& cat {params.outdir}*/*_result.tsv | cut - -f2-7 | awk 'NR == 1 {{print}} NR>1 {{for (i = 1; i<=6; ++i) sub(/^/, \"&HLA-\", $i); print}}' "
         "| sed -e s/[*,:]/''/g | sed s/' '/'\t'/g > {output}"
 
-def get_germline_optitype(wildcards):
-    return(expand("optitype/{germline}/hla_alleles_{germline}.tsv", germline=samples[samples["sample"] == wildcards.sample]["matched_normal"]))
-
 rule mhcflurry:
     input:
         peptides="microphaser/fasta/{sample}/filtered/{sample}.{chr}.{group}.fa",
@@ -96,8 +90,6 @@ rule netMHCpan:
         cmd = "if [ -s {input.peptides} ]; then ../netMHCpan-4.0/netMHCpan {params.extra} -xlsfile {output} -a {alleles} -f {input.peptides} > {log}; else touch {output}; fi"
         shell(cmd)
 
-def get_germline_hla(wildcards):
-    return(expand("HLA-LA/hlaII_{germline}.tsv", germline=samples[samples["sample"] == wildcards.sample]["matched_normal"]))
 
 rule netMHC2:
     input:

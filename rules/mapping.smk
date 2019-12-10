@@ -1,8 +1,3 @@
-def get_DNA_reads(wildcards):
-    if config["trimming"]["skip"]:
-        # no need for trimming, return raw reads
-        return units.loc[(wildcards.sample, "DNA"), ["fq1", "fq2"]]
-
 rule map:
     input:
         reads=get_DNA_reads
