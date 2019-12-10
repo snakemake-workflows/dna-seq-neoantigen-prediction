@@ -13,15 +13,15 @@ for e in snakemake.input:
         if first:
             allele = ''
             for i in range(0, len(header)):
-                print(header[i].rstrip())
+                #print(header[i].rstrip())
                 if i < len(alleles):
-                    print(alleles[i])
+                    #print(alleles[i])
                     if alleles[i] != '':
                         allele = alleles[i].rstrip() + '_'
                 header[i] = allele + header[i].rstrip()
             header[len(header) -1] = "NB"
             first = False
-            print(header)
+            #print(header)
             out.write('\t'.join(header) + '\n')
         for line in mhcout:
             out.write(line)

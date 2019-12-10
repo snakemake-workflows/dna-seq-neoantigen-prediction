@@ -20,7 +20,8 @@ def select_columns(mhc):
 def merge(info, tumor, normal, outfile):
     tumor = select_columns(tumor)
     normal = select_columns(normal)
-    id_length = len(info.id[0])
+    id_length = len(tumor.ID[0])
+    print(info.columns)
     info["ID"] = info["id"].astype(str).str[:id_length]
     merged_mhc = tumor.merge(normal,how='left', on=['Pos','ID'])
     merged_mhc = merged_mhc.rename(columns={col: col.replace("_y","_normal") for col in merged_mhc.columns}).rename(columns={col: col.replace("_x","_tumor") for col in merged_mhc.columns})
@@ -50,18 +51,21 @@ def merge(info, tumor, normal, outfile):
 
     data = data[data.BindingHLAs_tumor > 0]
     # data = data[(data.NB_normal.isna()) | (data.NB_normal == 0)]
-    data = data[(data.BindingHLAs_normal == 0)]
+    #data = data[(data.BindingHLAs_normal == 0)]
 
     ### Delete Stop-Codon including peptides
     data = data[data.Peptide_tumor.str.count("x") == 0]
     data = data[data.Peptide_tumor.str.count("X") == 0]
+
+    ### Remove Duplicate kmers
+    data = data.drop_duplicates(["Transcript_ID", "Peptide_tumor", "Somatic_AminoAcid_Change", "Peptide_normal"])
 
     data.to_csv(outfile, index=False, sep = '\t')
 
 
 ## highlight the difference between mutated neopeptide and wildtype
 def diffEpitope(e1,e2):
-    if str(e2) == 'nan':
+    if str(e2) == 'nan' or str(e2) == '':
         return(e1)
     e1 = str(e1)
     e2 = str(e2)
@@ -75,7 +79,7 @@ def diffEpitope(e1,e2):
 
 
 def main():
-    info = pd.read_csv(snakemake.input[0], sep = ',', dtype=str)
+    info = pd.read_csv(snakemake.input[0], sep = '\t', dtype=str)
     tumor = pd.read_csv(snakemake.input[1], sep = '\t')
     normal = pd.read_csv(snakemake.input[2], sep = '\t')
     outfile = snakemake.output[0]
