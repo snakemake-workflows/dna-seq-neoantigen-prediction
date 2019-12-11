@@ -65,9 +65,9 @@ rule compress_bcf:
 
 rule index_bcf:
     input:
-        "{variants}.bcf.gz"
+        "{variants}.bcf"
     output:
-        "{variants}.bcf.gz.csi"
+        "{variants}.bcf.csi"
     params:
         ""
     conda:
@@ -78,8 +78,8 @@ rule index_bcf:
 
 rule concat_somatic:
     input:
-        calls=expand("strelka/somatic/{{sample}}/results/variants/somatic.{type}.output.bcf.gz", type=["snvs","indels"]),
-        indices=expand("strelka/somatic/{{sample}}/results/variants/somatic.{type}.output.bcf.gz.csi", type=["snvs","indels"])
+        calls=expand("strelka/somatic/{{sample}}/results/variants/somatic.{type}.output.bcf", type=["snvs","indels"]),
+        indices=expand("strelka/somatic/{{sample}}/results/variants/somatic.{type}.output.bcf.csi", type=["snvs","indels"])
     output:
         "strelka/somatic/{sample}/results/variants/somatic.complete.bcf"
     params:
@@ -103,8 +103,8 @@ rule concat_variants:
     input:
         germline=get_germline_variants,
         index_g=get_germline_variants_index,
-        somatic="strelka/somatic/{sample}/results/variants/somatic.complete.bcf.gz",
-        index_s="strelka/somatic/{sample}/results/variants/somatic.complete.bcf.gz.csi"
+        somatic="strelka/somatic/{sample}/results/variants/somatic.complete.bcf",
+        index_s="strelka/somatic/{sample}/results/variants/somatic.complete.bcf.csi"
     output:
         "strelka/merged/{sample}/all_variants.bcf"
     params:
