@@ -32,7 +32,7 @@ def allinput(wildcards):
 
 rule all:
     input:
-        expand("calls/{group}.vcf", group=samples[samples.type == "tumor"]["sample"], mhc=["netMHCpan", "netMHC2pan"])
+        expand("calls/{group}.{event}.fdr-controlled.vcf", group=samples[samples.type == "tumor"]["sample"], event="complete", mhc=["netMHCpan", "netMHC2pan"])
 
 
 
@@ -49,5 +49,6 @@ include: "rules/mapping.smk"
 include: "rules/calling.smk"
 include: "rules/candidate_calling.smk"
 include: "rules/varlociraptor.smk"
+include: "rules/filtering.smk"
 include: "rules/microphaser.smk"
 include: "rules/MHC_binding.smk"
