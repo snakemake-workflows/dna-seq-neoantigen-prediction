@@ -22,13 +22,19 @@ calling:
           - "somatic"
           - "germline"
 
+fusion:
+  arriba:
+    blacklist:
+     "arriba_blacklist"
+
 reference:
   assembly: hg38
   genome: genome.fa
   call_regions: "ref/call_regions.bed.gz"
   hla_data: "ref/HLA_Data/hla_reference_dna.fasta"
   transcriptome: "path/to/transcript_reference"
-  gtfs: /vol/tiny/christoph-MPM/NeoPred/gtfs
+  gtfs: path/to/gtfs
+  annotation: complete.gtf
   n_chromosomes: 25
   snpeff: GRCh38.86
 
@@ -50,3 +56,5 @@ params:
     "ref/optitype.config.ini"
   kallisto:
     "-b 100"
+  star:
+    "--outSAMmapqUnique 60"
