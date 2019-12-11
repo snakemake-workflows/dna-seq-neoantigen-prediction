@@ -1,8 +1,8 @@
 rule control_fdr:
     input:
-        "calls/{group}.vcf"
+        "calls/{pair}.vcf"
     output:
-        "calls/{group}.{event}.{vartype}.fdr-controlled.bcf"
+        "calls/{pair}.{event}.{vartype}.fdr-controlled.bcf"
     params:
         threshold=config["calling"]["fdr-control"]["threshold"],
         events=lambda wc: config["calling"]["fdr-control"]["events"][wc.event]["varlociraptor"]
@@ -14,10 +14,10 @@ rule control_fdr:
 
 rule concat_vartypes:
     input:
-        calls=expand("calls/{{group}}.{{event}}.{vartype}.fdr-controlled.bcf", vartype=["SNV", "DEL", "INS"]),
-        indexes=expand("calls/{{group}}.{{event}}.{vartype}.fdr-controlled.bcf.csi", vartype=["SNV", "DEL", "INS"])
+        calls=expand("calls/{{pair}}.{{event}}.{vartype}.fdr-controlled.bcf", vartype=["SNV", "DEL", "INS"]),
+        indexes=expand("calls/{{pair}}.{{event}}.{vartype}.fdr-controlled.bcf.csi", vartype=["SNV", "DEL", "INS"])
     output:
-        "calls/{group}.{event}.fdr-controlled.vcf"
+        "calls/{pair}.{event}.fdr-controlled.vcf"
     params:
         "-a" # Check this
     wrapper:

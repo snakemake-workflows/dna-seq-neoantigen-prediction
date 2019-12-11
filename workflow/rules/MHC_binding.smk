@@ -110,10 +110,9 @@ rule netMHC2:
         cmd = "if [ -s {input.peptides} ]; then ../netMHCIIpan-3.2/netMHCIIpan {params.extra} -xlsfile {output} -a {alleles} -f {input.peptides} > {log}; else touch {output}; fi"
         shell(cmd)
 
-
 rule parse_mhc_out:
     input:
-        expand("{{mhc}}/{{sample}}/{chr}/{{sample}}.{chr}.{{group}}.xls", chr=CHROMOSOMES)
+        expand("{{mhc}}/{{sample}}/{chr}/{{sample}}.{chr}.{{group}}.xls", chr=contigs)
     output:
         "{mhc}/{sample}/{sample}.mhc.{group}.tsv"
     wildcard_constraints:
@@ -123,7 +122,7 @@ rule parse_mhc_out:
 
 rule parse_mhcflurry:
     input:
-        expand("mhcflurry/{{sample}}/{chr}/output.{{group}}.csv", chr=CHROMOSOMES)
+        expand("mhcflurry/{{sample}}/{chr}/output.{{group}}.csv", chr=contigs)
     output:
         "mhcflurry/{sample}/{sample}.mhc.{group}.csv"
     wildcard_constraints:

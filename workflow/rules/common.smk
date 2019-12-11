@@ -1,3 +1,17 @@
+import pandas as pd
+from snakemake.utils import validate, min_version
+##### set minimum snakemake version #####
+min_version("5.1.2")
+
+##### sample sheets #####
+
+samples = pd.read_csv(config["samples"], sep='\t').set_index("sample", drop=False)
+#validate(samples, schema="schemas/samples.schema.yaml")
+
+units = pd.read_csv(config["units"], dtype=str, sep='\t').set_index(["sample", "type"], drop=False)
+print(units)
+#validate(units, schema="schemas/units.schema.yaml")
+
 contigs = pd.read_csv(
     config["reference"]["genome"] + ".fai",
     header=None, usecols=[0], squeeze=True, dtype=str, sep="\t"
@@ -12,7 +26,7 @@ def get_DNA_reads(wildcards):
         return units.loc[(wildcards.sample, "DNA"), ["fq1", "fq2"]]
 
 def get_paired_samples(wildcards):
-    return [samples.loc[(wildcards.group), "matched_normal"], samples.loc[wildcards.group, "sample"]]
+    return [samples.loc[(wildcards.pair), "matched_normal"], samples.loc[wildcards.pair, "sample"]]
 
 def get_paired_bams(wildcards):
     return expand("bwa/{sample}.rmdup.bam", sample=get_paired_samples(wildcards))
@@ -45,23 +59,23 @@ def get_normal_bai(wildcards):
     return expand("bwa/{normal}.rmdup.bam.bai", normal=get_normal(wildcards))
 
 def get_germline_variants(wildcards):
-    return expand("strelka/germline/{germline}/results/variants/variants.reheader.bcf.gz", germline=get_normal(wildcards))
+    return expand("strelka/germline/{germline}/results/variants/variants.reheader.bcf", germline=get_normal(wildcards))
 
 def get_germline_variants_index(wildcards):
-    return expand("strelka/germline/{germline}/results/variants/variants.reheader.bcf.gz.csi", germline=get_normal(wildcards))
+    return expand("strelka/germline/{germline}/results/variants/variants.reheader.bcf.csi", germline=get_normal(wildcards))
 
-def get_group_observations(wildcards):
-    return expand("observations/{group}/{sample}.{caller}.{contig}.bcf", 
+def get_pair_observations(wildcards):
+    return expand("observations/{pair}/{sample}.{caller}.{contig}.bcf", 
                   contig=wildcards.contig, 
                   caller=wildcards.caller, 
-                  group=wildcards.group,
+                  pair=wildcards.pair,
                   sample=get_paired_samples(wildcards))
 
-def get_group_aliases(wildcards):
-    return samples.loc[(samples["sample"] == wildcards.group) | (samples["sample"] == samples.loc[wildcards.group, "matched_normal"])]["type"]
+def get_pair_aliases(wildcards):
+    return samples.loc[(samples["sample"] == wildcards.pair) | (samples["sample"] == samples.loc[wildcards.pair, "matched_normal"])]["type"]
 
 wildcard_constraints:
-    group="|".join(samples[samples.type == "tumor"]["sample"]),
+    pair="|".join(samples[samples.type == "tumor"]["sample"]),
     sample="|".join(samples["sample"]),
     contig="|".join(contigs),
     caller="|".join(["freebayes", "delly"])

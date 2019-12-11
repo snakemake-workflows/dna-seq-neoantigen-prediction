@@ -2,7 +2,7 @@ rule render_scenario:
     input:
         config["calling"]["scenario"]
     output:
-        report("scenarios/{group}.yaml", caption="../report/scenario.rst", category="Variant calling scenarios")
+        report("scenarios/{pair}.yaml", caption="../report/scenario.rst", category="Variant calling scenarios")
     params:
         samples = samples
     conda:
@@ -13,14 +13,14 @@ rule render_scenario:
 rule varlociraptor_preprocess:
     input:
         ref=config["reference"]["genome"],
-        candidates="candidate-calls/{group}.{caller}.bcf",
-        bcf_index = "candidate-calls/{group}.{caller}.bcf.csi",
+        candidates="candidate-calls/{pair}.{caller}.bcf",
+        bcf_index = "candidate-calls/{pair}.{caller}.bcf.csi",
         bam="bwa/{sample}.rmdup.bam",
         bai="bwa/{sample}.rmdup.bam.bai"
     output:
-        "observations/{group}/{sample}.{caller}.{contig}.bcf"
+        "observations/{pair}/{sample}.{caller}.{contig}.bcf"
     log:
-        "logs/varlociraptor/preprocess/{group}/{sample}.{caller}.{contig}.log"
+        "logs/varlociraptor/preprocess/{pair}/{sample}.{caller}.{contig}.log"
     conda:
         "../envs/varlociraptor.yaml"
     shell:
@@ -30,14 +30,14 @@ rule varlociraptor_preprocess:
 
 rule varlociraptor_call:
     input:
-        obs=get_group_observations,
-        scenario="scenarios/{group}.yaml"
+        obs=get_pair_observations,
+        scenario="scenarios/{pair}.yaml"
     output:
-        temp("calls/{group}.{caller}.{contig}.bcf")
+        temp("calls/{pair}.{caller}.{contig}.bcf")
     log:
-        "logs/varlociraptor/call/{group}.{caller}.{contig}.log"
+        "logs/varlociraptor/call/{pair}.{caller}.{contig}.log"
     params:
-        obs=lambda w, input: ["{}={}".format(s, f) for s, f in zip(get_group_aliases(w), input.obs)]
+        obs=lambda w, input: ["{}={}".format(s, f) for s, f in zip(get_pair_aliases(w), input.obs)]
     conda:
         "../envs/varlociraptor.yaml"
     shell:
@@ -48,17 +48,17 @@ rule varlociraptor_call:
 rule bcftools_concat:
     input:
         calls = expand(
-            "calls/{{group}}.{caller}.{contig}.bcf",
+            "calls/{{pair}}.{caller}.{contig}.bcf",
             caller=caller,
             contig=contigs
         ),
         indexes = expand(
-            "calls/{{group}}.{caller}.{contig}.bcf.csi",
+            "calls/{{pair}}.{caller}.{contig}.bcf.csi",
             caller=caller,
             contig=contigs
         ),
     output:
-        "calls/{group}.vcf"
+        "calls/{pair}.vcf"
     params:
         "-a" # Check this
     wrapper:

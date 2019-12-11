@@ -1,4 +1,4 @@
-sample	condition	matched_normal
-A_normal	healthy	
-A_tumor	tumor	A_normal
-B_tumor	tumor	A_normal
+sample	type	matched_normal	purity
+A_normal	healthy		
+A_tumor	tumor	A_normal	1
+B_tumor	tumor	A_normal	1

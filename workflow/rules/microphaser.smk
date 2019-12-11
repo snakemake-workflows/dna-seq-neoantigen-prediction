@@ -32,7 +32,7 @@ rule microphaser_germline:
 
 rule concat_proteome:
     input:
-        expand("microphaser/fasta/germline/{{normal}}/{{normal}}.germline.{chrom}.fa", chrom = CHROMOSOMES)
+        expand("microphaser/fasta/germline/{{normal}}/{{normal}}.germline.{chrom}.fa", chrom = contigs)
     output:
         "microphaser/fasta/germline/{normal}/reference_proteome.fa"
     shell:
@@ -59,7 +59,7 @@ rule microphaser_filter:
 
 rule concat_tsvs:
     input:
-        expand("microphaser/info/{{sample}}/filtered/{{sample}}.{chrom}.tsv", chrom = CHROMOSOMES)
+        expand("microphaser/info/{{sample}}/filtered/{{sample}}.{chrom}.tsv", chrom = contigs)
     output:
        "microphaser/info/{sample}/filtered/{sample}.tsv"
     conda:
