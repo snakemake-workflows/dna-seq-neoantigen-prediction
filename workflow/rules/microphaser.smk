@@ -65,5 +65,5 @@ rule concat_tsvs:
     conda:
         "../envs/xsv.yaml"
     shell:
-        "xsv cat rows -d '\t' {input} | xsv table -d '\t' > {output}"
+        "xsv cat rows -d '\t' {input} | xsv fmt -t '\t' -d ',' > {output}"
 
