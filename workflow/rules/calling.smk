@@ -102,7 +102,7 @@ rule clean_germline:
 rule concat_variants:
     input:
         germline=get_germline_variants,
-        index_g=get_germline__variants_index,
+        index_g=get_germline_variants_index,
         somatic="strelka/somatic/{sample}/results/variants/somatic.complete.bcf.gz",
         index_s="strelka/somatic/{sample}/results/variants/somatic.complete.bcf.gz.csi"
     output:
