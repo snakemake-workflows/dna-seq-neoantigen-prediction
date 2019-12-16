@@ -1,3 +1,0 @@
-WorkflowError in line 46 of /home/forster/Projects/Neoantigen_Prediction/Snakefile:
-Failed to open /home/forster/Projects/Neoantigen_Prediction/rules/common.smk.
-  File "/home/forster/Projects/Neoantigen_Prediction/Snakefile", line 46, in <module>

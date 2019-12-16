@@ -1,4 +1,0 @@
-NameError in line 69 of /home/forster/Projects/Neoantigen_Prediction/workflow/rules/common.smk:
-name 'is_activated' is not defined
-  File "/home/forster/Projects/Neoantigen_Prediction/workflow/Snakefile", line 46, in <module>
-  File "/home/forster/Projects/Neoantigen_Prediction/workflow/rules/common.smk", line 69, in <module>

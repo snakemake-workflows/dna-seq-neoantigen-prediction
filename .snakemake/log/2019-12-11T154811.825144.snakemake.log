@@ -1,5 +1,0 @@
-Building DAG of jobs...
-InputFunctionException in line 30 of /home/forster/Projects/Neoantigen_Prediction/workflow/Snakefile:
-AttributeError: 'Wildcards' object has no attribute 'sample'
-Wildcards:
-

@@ -1,4 +1,0 @@
-NameError in line 116 of /home/forster/Projects/Neoantigen_Prediction/workflow/rules/MHC_binding.smk:
-name 'CHROMOSOMES' is not defined
-  File "/home/forster/Projects/Neoantigen_Prediction/workflow/Snakefile", line 25, in <module>
-  File "/home/forster/Projects/Neoantigen_Prediction/workflow/rules/MHC_binding.smk", line 116, in <module>

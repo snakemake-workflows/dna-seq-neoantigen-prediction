@@ -1,4 +1,0 @@
-KeyError in line 3 of /home/forster/Projects/Neoantigen_Prediction/workflow/rules/varlociraptor.smk:
-'calling'
-  File "/home/forster/Projects/Neoantigen_Prediction/workflow/Snakefile", line 51, in <module>
-  File "/home/forster/Projects/Neoantigen_Prediction/workflow/rules/varlociraptor.smk", line 3, in <module>

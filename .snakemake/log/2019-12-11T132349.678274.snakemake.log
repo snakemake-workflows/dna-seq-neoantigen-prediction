@@ -1,4 +1,0 @@
-KeyError in line 2 of /home/forster/Projects/Neoantigen_Prediction/workflow/rules/common.smk:
-'ref'
-  File "/home/forster/Projects/Neoantigen_Prediction/workflow/Snakefile", line 46, in <module>
-  File "/home/forster/Projects/Neoantigen_Prediction/workflow/rules/common.smk", line 2, in <module>

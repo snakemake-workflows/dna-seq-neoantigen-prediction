@@ -1,4 +1,0 @@
-Building DAG of jobs...
-MissingInputException in line 123 of /home/forster/Projects/Neoantigen_Prediction/workflow/rules/MHC_binding.smk:
-Missing input files for rule parse_mhcflurry:
-mhcflurry/A_tumor/chr1/output.mt.csv

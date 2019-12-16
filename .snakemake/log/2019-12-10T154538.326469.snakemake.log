@@ -1,4 +1,0 @@
-KeyError in line 13 of /home/forster/Projects/Neoantigen_Prediction/rules/microphaser.smk:
-'microphaser'
-  File "/home/forster/Projects/Neoantigen_Prediction/Snakefile", line 56, in <module>
-  File "/home/forster/Projects/Neoantigen_Prediction/rules/microphaser.smk", line 13, in <module>

@@ -1,5 +1,0 @@
-Building DAG of jobs...
-MissingInputException in line 30 of /home/forster/Projects/Neoantigen_Prediction/workflow/Snakefile:
-Missing input files for rule all:
-razers3/bam/A_tumor_2.bam
-razers3/bam/A_tumor_1.bam

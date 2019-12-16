@@ -1,4 +1,0 @@
-Building DAG of jobs...
-MissingInputException in line 1 of /home/forster/Projects/Neoantigen_Prediction/rules/microphaser.smk:
-Missing input files for rule microphaser_somatic:
-ref/gtfs/chr1.gtf

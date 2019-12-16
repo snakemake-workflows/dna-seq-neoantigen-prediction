@@ -1,5 +1,0 @@
-Building DAG of jobs...
-MissingInputException in line 39 of /home/forster/Projects/Neoantigen_Prediction/workflow/rules/MHC_binding.smk:
-Missing input files for rule OptiType:
-razers3/fastq/A_tumor_2.fished.fastq
-razers3/fastq/A_tumor_1.fished.fastq

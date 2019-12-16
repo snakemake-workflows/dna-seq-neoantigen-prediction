@@ -1,4 +1,0 @@
-Building DAG of jobs...
-MissingInputException in line 1 of /home/forster/Projects/Neoantigen_Prediction/workflow/rules/candidate_calling.smk:
-Missing input files for rule freebayes:
-path/to/genome

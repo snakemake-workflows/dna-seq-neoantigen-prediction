@@ -1,5 +1,0 @@
-Building DAG of jobs...
-MissingInputException in line 33 of /home/forster/Projects/Neoantigen_Prediction/workflow/Snakefile:
-Missing input files for rule all:
-calls/B_tumor.complete.fdr-controlled.vcf
-calls/A_tumor.complete.fdr-controlled.vcf

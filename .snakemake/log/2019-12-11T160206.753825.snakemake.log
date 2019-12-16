@@ -1,7 +1,0 @@
-Building DAG of jobs...
-InputFunctionException in line 31 of /home/forster/Projects/Neoantigen_Prediction/workflow/rules/varlociraptor.smk:
-AttributeError: 'Wildcards' object has no attribute 'group'
-Wildcards:
-pair=A_tumor
-caller=freebayes
-contig=chr1
