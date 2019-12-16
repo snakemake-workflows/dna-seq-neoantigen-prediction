@@ -1,4 +1,4 @@
-sample	type	fq1	fq2
+sample	sequencing_type	fq1	fq2
 A_normal	DNA	A_normal_1.fastq.gz	A_normal_2.fastq.gz
 A_tumor	DNA	A_tumor_1.fastq.gz	A_tumor_2.fastq.gz
 B_tumor	DNA	B_tumor_1.fastq.gz	B_tumor_2.fastq.gz
