@@ -1,25 +1,60 @@
 samples: "samples.tsv"
 units: "units.tsv"
 
+# boolean if read trimming should be skipped
+trimming:
+  skip: true
+
+calling:
+  delly:
+    activate: false
+  freebayes:
+    activate: true
+  # See https://varlociraptor.github.io/docs/calling/#generic-variant-calling
+  scenario: scenario.yaml
+  # See http://snpeff.sourceforge.net/SnpSift.html#filter
+  filter: ANN[*].IMPACT has MODERATE
+  fdr-control:
+    threshold: 0.05
+    events: 
+      complete:
+        varlociraptor: 
+          - "somatic"
+          - "germline"
+
+fusion:
+  arriba:
+    blacklist:
+     "arriba_blacklist"
+
 reference:
-    assembly: hg38
-    genome: "/vol/tiny/MaMel-Neoantigens/Neoantigen_Prediction/ref/hg38/genome.fa"
-    call_regions: "ref/call_regions.bed.gz"
-    hla_data: "ref/HLA_Data/hla_reference_dna.fasta"
+  assembly: hg38
+  genome: "/vol/tiny/ref/autoref/Homo_sapiens/NCBI/GRCh38/BWAIndex/genome.fa"
+  call_regions: "ref/call_regions.bed.gz"
+  hla_data: "ref/HLA_Data/hla_reference_dna.fasta"
+  transcriptome: "path/to/transcript_reference"
+  gtfs: ../gtfs
+  annotation: complete.gtf
+  n_chromosomes: 25
+  snpeff: GRCh38.86
 
 params:
-    bwa:
-        "-M"
-    strelka:
-        "--exome"
-    razers3:
-        "-i 95 -m 1 -dr 0"
-    netMHCpan:
-        "-BA -l 9 -s -xls"
-    netMHCIIpan:
-        "-length 15 -s -xls"
-    optitype:
-        "ref/optitype.config.ini"
-    microphaser:
-        windowlen: 60
-
+  bwa:
+    "-M"
+  strelka:
+    "--exome"
+  razers3:
+    "-i 95 -m 1 -dr 0"
+  microphaser:
+    window_len:
+        60
+  netMHCpan:
+    "-BA -l 9 -s -xls"
+  netMHCIIpan:
+    "-length 15 -s -xls"
+  optitype:
+    "ref/optitype.config.ini"
+  kallisto:
+    "-b 100"
+  star:
+    "--outSAMmapqUnique 60"

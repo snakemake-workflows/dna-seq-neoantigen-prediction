@@ -1,4 +1,4 @@
-sample	condition	matched_normal	group
+sample	type	matched_normal	group
 number03_SH_tissue	tumor	number03_SH_blood	number03_SH
 number05_KM_tissue	tumor	number05_KM_blood	number05_KM
 number08_HK_tissue	tumor	number08_HK_blood	number08_HK

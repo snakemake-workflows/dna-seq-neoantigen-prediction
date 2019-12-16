@@ -1,0 +1,40 @@
+# The main entry point of your workflow.
+# After configuring, running snakemake -n in a clone of this repository should successfully execute a dry-run of the workflow.
+
+#### setup config #####
+
+configfile: "config.yaml"
+
+##### setup report #####
+
+report: "report/workflow.rst"
+
+# Allow users to fix the underlying OS via singularity.
+singularity: "docker://continuumio/miniconda3"
+
+##### load rules #####
+
+include: "rules/common.smk"
+include: "rules/quant.smk"
+include: "rules/mapping.smk"
+include: "rules/calling.smk"
+include: "rules/candidate_calling.smk"
+include: "rules/varlociraptor.smk"
+include: "rules/filtering.smk"
+include: "rules/microphaser.smk"
+include: "rules/MHC_binding.smk"
+include: "rules/star.smk"
+include: "rules/fusion.smk"
+
+
+print(contigs)
+
+rule all:
+    input:
+        expand("candidate-calls/{pair}.freebayes.bcf",
+            pair=samples[samples.type == "tumor"]["sample"]),
+#        expand("results/{mhc}/{sample}.WES.tsv",
+#            sample=samples[samples.type == "tumor"]["sample"],
+#            mhc=["netMHCpan", "netMHC2pan"]),
+#        expand("arriba/{sample}.fusions.tsv",
+#            sample=samples[samples.type == "tumor"][samples.has_RNA == "Yes"]["sample"])
