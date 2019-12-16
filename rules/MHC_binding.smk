@@ -1,6 +1,33 @@
 def get_reads(wildcards):
     return get_seperate(**wildcards)#expand("../raw/{sample}_{group}.fastq.gz",
 
+rule HLA_LA:
+    input:
+        bam="bwa/{sample}.rmdup.bam",
+        bai="bwa/{sample}.rmdup.bam.bai"
+    output:
+        "HLA-LA/output/{sample}/hla/R1_bestguess_G.txt"
+    threads: 7
+    params:
+        graph="PRG_MHC_GRCh38_withIMGT",
+        graphdir="/vol/tiny/MaMel-Neoantigens/HLA-LA_graphs",
+        extra_refs="../HLA-LA_graphs/additionalReferences/PRG_MHC_GRCh38_withIMGT"
+    log:
+        "logs/HLA-LA/{sample}.log"
+    conda:
+        "../envs/hla_la.yaml"
+    shell:
+        "HLA-LA.pl --bam {input.bam} --sampleID {wildcards.sample} --graph {params.graph}  --customGraphDir {params.graphdir} --workingDir HLA-LA/output/ --maxThreads {threads} > {log}"
+
+rule parse_HLA_LA:
+    input:
+        "HLA-LA/output/{sample}/hla/R1_bestguess_G.txt"
+    output:
+        report("HLA-LA/hlaI_{sample}.tsv", caption="../report/HLA-LA_Types.rst", category="HLA-Typing(HLA-LA)"),
+        report("HLA-LA/hlaII_{sample}.tsv", caption="../report/HLA-LA_Types.rst", category="HLA-Typing(HLA-LA)")
+    script:
+        "../scripts/parse_HLA_types.py"
+
 rule razers3:
     input:
         get_reads
@@ -21,7 +48,7 @@ rule OptiType:
         f1='razers3/fastq/{sample}_1.fished.fastq',
         f2='razers3/fastq/{sample}_2.fished.fastq'
     output:
-        "optitype/{sample}/hla_alleles.tsv"
+        report("optitype/{sample}/hla_alleles_{sample}.tsv")
     params:
         outdir="optitype/{sample}/",
         conf=config["params"]["optitype"]
@@ -35,8 +62,8 @@ rule OptiType:
 rule mhcflurry:
     input:
         peptides="microphaser/fasta/{tumor}-{normal}/filtered/{tumor}-{normal}.{chr}.{group}.fa",
-        alleles="optitype/{tumor}/hla_alleles.tsv",
-        wt_alleles="optitype/{normal}/hla_alleles.tsv"
+        alleles="optitype/{tumor}/hla_alleles_{tumor}.tsv",
+        wt_alleles="optitype/{normal}/hla_alleles_{normal}.tsv"
     output:
         "mhcflurry/{tumor}-{normal}/{chr}/output.{group}.csv"
     log:
@@ -54,8 +81,8 @@ rule mhcflurry:
 rule netMHCpan:
     input:
         peptides="microphaser/fasta/{tumor}-{normal}/filtered/{tumor}-{normal}.{chr}.{group}.fa",
-        alleles="optitype/{tumor}/hla_alleles.tsv",
-        wt_alleles="optitype/{normal}/hla_alleles.tsv"
+        alleles="optitype/{tumor}/hla_alleles_{tumor}.tsv",
+        wt_alleles="optitype/{normal}/hla_alleles_{normal}.tsv"
     output:
         "netMHCpan/{tumor}-{normal}/{chr}/{tumor}-{normal}.{chr}.{group}.xls",
     log:
@@ -68,68 +95,71 @@ rule netMHCpan:
         else:
             alleles = ",".join(pd.read_csv(input.alleles, sep="\t").iloc[0])
         cmd = "if [ -s {input.peptides} ]; then ../netMHCpan-4.0/netMHCpan {params.extra} -xlsfile {output} -a {alleles} -f {input.peptides} > {log}; else touch {output}; fi"
+        print(cmd)
         shell(cmd)
 
-#rule netMHC2:
-#    input:
-#        peptides = "out/peptides/relevant/{tumor}-{normal}/{tumor}-{normal}.{C}.filtered.pep",
-#        alleles = "out/alleles_MHC2/{tumor}_result.tsv"
-#    output:
-#        xls = "out/mhc2_binding/relevant/{tumor}-{normal}/{C}/{tumor}-{normal}_{C}.xls",
-#        log = "out/mhc2_binding/relevant/{tumor}-{normal}/{C}/{tumor}-{normal}_{C}.log"
-#    run:
-#        #shell('mkdir out/mhc_binding/{wildcards.P}/{wildcards.C}')
-#        alleles=open(input.alleles)
-#        head=next(alleles)
-#        line=next(alleles)
-#        if line.startswith('H'):
-#            line = ','.join(line.rstrip().split('\t'))
-#            #line = ','.join(list(set(line)))
-#            cmd="netMHC2pan -BA -l 9 -s -xls -xlsfile {output.xls} -a " + line + " -f {input.peptides} > {output.log}"
-#            shell(cmd)
-
+rule netMHC2:
+    input:
+        peptides="microphaser/fasta/{tumor}-{normal}/filtered/{tumor}-{normal}.{chr}.{group}.fa",
+        alleles = "HLA-LA/hlaII_{tumor}.tsv",
+        wt_alleles="HLA-LA/hlaII_{normal}.tsv"
+    output:
+        "netMHC2pan/{tumor}-{normal}/{chr}/{tumor}-{normal}.{chr}.{group}.xls",
+    log:
+        "logs/netMHC2pan/{tumor}-{normal}/{chr}/{tumor}-{normal}.{chr}.{group}.log"
+    params:
+        extra=config["params"]["netMHCIIpan"]
+    run:
+        if "wt" in input.peptides:
+            alleles = ",".join(pd.read_csv(input.wt_alleles, sep="\t")["Allele"].tolist())
+        else:
+            alleles = ",".join(pd.read_csv(input.alleles, sep="\t")["Allele"].tolist())
+        cmd = "if [ -s {input.peptides} ]; then ../netMHCIIpan-3.2/netMHCIIpan {params.extra} -xlsfile {output} -a {alleles} -f {input.peptides} > {log}; else touch {output}; fi"
+        shell(cmd)
 
 rule parse_wt_mhc_out:
     input:
-        expand("netMHCpan/{{tumor}}-{{normal}}/{chr}/{{tumor}}-{{normal}}.{chr}.{{group}}.xls", chr=CHROMOSOMES)
+        expand("{{mhc}}/{{tumor}}-{{normal}}/{chr}/{{tumor}}-{{normal}}.{chr}.{{group}}.xls", chr=CHROMOSOMES)
     output:
-        "netMHCpan/{tumor}-{normal}/{tumor}-{normal}.mhc.{group}.tsv"
+        "{mhc}/{tumor}-{normal}/{tumor}-{normal}.mhc.{group}.tsv"
     wildcard_constraints:
         group="wt|mt"
-    run:
-        s = input[0]
-        shell("python scripts/group_mhc_output.py " + s + " >> {output}")
-        for i in input[1:]:
-            shell("python scripts/group_mhc_output.py " + i + " | grep -v -h '^Pos' - >> {output}") # xsv
+    script:
+        "../scripts/group_mhc_output.py"
+#    run:
+#        s = input[0]
+#        shell("python scripts/group_mhc_output.py " + s + " >> {output}")
+#        for i in input[1:]:
+#            shell("python scripts/group_mhc_output.py " + i + " | grep -v -h '^Pos' - >> {output}") # xsv
 
-rule parse_mhcflurry:
-    input:
-        expand("mhcflurry/{{tumor}}-{{normal}}/{chr}/output.{{group}}.csv", chr=CHROMOSOMES)
-    output:
-        "mhcflurry/{tumor}-{normal}/{tumor}-{normal}.mhc.{group}.csv"
-    wildcard_constraints:
-        group="wt|mt"
-    conda:
-        "../envs/xsv.yaml"
-    shell:
-        "xsv cat rows -d ',' {input} | cut --complement -f2,7,8 > {output}"
+#rule parse_mhcflurry:
+#    input:
+#        expand("mhcflurry/{{tumor}}-{{normal}}/{chr}/output.{{group}}.csv", chr=CHROMOSOMES)
+#    output:
+#        "mhcflurry/{tumor}-{normal}/{tumor}-{normal}.mhc.{group}.csv"
+#    wildcard_constraints:
+#        group="wt|mt"
+#    conda:
+#        "../envs/xsv.yaml"
+#    shell:
+#        "xsv cat rows -d ',' {input} | cut --complement -f2,7,8 > {output}"
 
 rule mhc_csv_table:
     input:
         info="microphaser/info/{tumor}-{normal}/filtered/{tumor}-{normal}.tsv",
-        mt="netMHCpan/{tumor}-{normal}/{tumor}-{normal}.mhc.mt.tsv",
-        wt="netMHCpan/{tumor}-{normal}/{tumor}-{normal}.mhc.wt.tsv"
+        mt="{mhc}/{tumor}-{normal}/{tumor}-{normal}.mhc.mt.tsv",
+        wt="{mhc}/{tumor}-{normal}/{tumor}-{normal}.mhc.wt.tsv"
     output:
-        "results/netMHCpan/{tumor}-{normal}.tsv"
+        report("results/{mhc}/{tumor}-{normal}.tsv")
     script:
         "../scripts/merge_data.py"
 
-rule mhcflurry_table:
-    input:
-        info="microphaser/info/{tumor}-{normal}/filtered/{tumor}-{normal}.tsv",
-        mt="mhcflurry/{tumor}-{normal}/{tumor}-{normal}.mhc.mt.csv",
-        wt="mhcflurry/{tumor}-{normal}/{tumor}-{normal}.mhc.wt.csv"
-    output:
-        "results/mhcflurry/{tumor}-{normal}.tsv"
-    script:
-        "../scripts/merge_mhcflurry.py"
+#rule mhcflurry_table:
+#    input:
+#        info="microphaser/info/{tumor}-{normal}/filtered/{tumor}-{normal}.tsv",
+#        mt="mhcflurry/{tumor}-{normal}/{tumor}-{normal}.mhc.mt.csv",
+#        wt="mhcflurry/{tumor}-{normal}/{tumor}-{normal}.mhc.wt.csv"
+#    output:
+#        "results/mhcflurry/{tumor}-{normal}.tsv"
+#    script:
+#        "../scripts/merge_mhcflurry.py"

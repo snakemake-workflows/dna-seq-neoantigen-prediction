@@ -87,31 +87,45 @@ rule concat_somatic:
     wrapper:
         "0.31.1/bio/bcftools/concat"
 
-rule clean_germline:
-    input:
-        bcf="strelka/{normal}/results/variants/variants.output.bcf"
-    output:
-        "strelka/{normal}/results/variants/variants.reheader.bcf"
-    params:
-        ""
-    conda:
-        "../envs/variant_handling.yaml"
-    shell:
-        "bcftools reheader {params} -s ref/newsamples.txt {input.bcf} > {output}"
+#rule clean_germline:
+#    input:
+#        bcf="strelka/{normal}/results/variants/variants.output.bcf"
+#    output:
+#        "strelka/{normal}/results/variants/variants.reheader.bcf"
+#    params:
+#        ""
+#    conda:
+#        "../envs/variant_handling.yaml"
+#    shell:
+#        "bcftools reheader {params} -s ref/newsamples.txt {input.bcf} > {output}"
 
 
-rule concat_variants:
+#rule concat_variants:
+#    input:
+#        germline="strelka/{normal}/results/variants/variants.reheader.bcf.gz",
+#        index_g="strelka/{normal}/results/variants/variants.reheader.bcf.gz.csi",
+#        somatic="strelka/{tumor}-{normal}/results/variants/somatic.complete.bcf.gz",
+#        index_s="strelka/{tumor}-{normal}/results/variants/somatic.complete.bcf.gz.csi"
+#    output:
+#        "strelka/{tumor}-{normal}/results/variants/all_variants.bcf"
+#    params:
+#        assembly=config["reference"]["assembly"],
+#        extra="-Ov"
+#    conda:
+#        "../envs/variant_handling.yaml"
+#    shell:
+#        "bcftools concat {params.extra} -a {input.somatic} {input.germline} | snpEff -Xmx4g {params.assembly} - | bcftools view -Ou - > {output}"
+
+rule preprocess_variants:
     input:
-        germline="strelka/{normal}/results/variants/variants.reheader.bcf.gz",
-        index_g="strelka/{normal}/results/variants/variants.reheader.bcf.gz.csi",
-        somatic="strelka/{tumor}-{normal}/results/variants/somatic.complete.bcf.gz",
-        index_s="strelka/{tumor}-{normal}/results/variants/somatic.complete.bcf.gz.csi"
+        "{variants}.bcf"
     output:
-        "strelka/{tumor}-{normal}/results/variants/all_variants.bcf"
+        "{variants}.prepy.bcf"
     params:
-        assembly=config["reference"]["assembly"],
-        extra="-O v"
+        extra="-L --somatic",
+        ref=config["reference"]["genome"],
     conda:
-        "../envs/variant_handling.yaml"
+        "../envs/prepy.yaml"
     shell:
-        "bcftools concat {params.extra} -a {input.somatic} {input.germline} | snpEff -Xmx4g {params.assembly} - | bcftools view -O u - > {output}"
+        "pre.py {params.extra} -r {params.ref} {input} {output}"
+
