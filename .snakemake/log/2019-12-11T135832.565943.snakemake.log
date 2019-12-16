@@ -1,0 +1,249 @@
+Building DAG of jobs...
+Job counts:
+	count	jobs
+	1	all
+	2	bcftools_concat
+	2	delly
+	2	freebayes
+	3	index
+	8	index_bcf
+	3	map
+	3	mark_duplicates
+	2	render_scenario
+	4	varlociraptor_call
+	8	varlociraptor_preprocess
+	38
+
+[Wed Dec 11 13:58:32 2019]
+rule render_scenario:
+    input: scenario.yaml
+    output: scenarios/B_tumor.yaml
+    jobid: 18
+    wildcards: group=B_tumor
+
+[Wed Dec 11 13:58:32 2019]
+rule map:
+    input: A_tumor_1.fastq.gz, A_tumor_2.fastq.gz
+    output: bwa/A_tumor.bam
+    log: logs/bwa_mem/A_tumor.log
+    jobid: 36
+    wildcards: sample=A_tumor
+
+[Wed Dec 11 13:58:32 2019]
+rule render_scenario:
+    input: scenario.yaml
+    output: scenarios/A_tumor.yaml
+    jobid: 13
+    wildcards: group=A_tumor
+
+[Wed Dec 11 13:58:32 2019]
+rule map:
+    input: B_tumor_1.fastq.gz, B_tumor_2.fastq.gz
+    output: bwa/B_tumor.bam
+    log: logs/bwa_mem/B_tumor.log
+    jobid: 37
+    wildcards: sample=B_tumor
+
+[Wed Dec 11 13:58:32 2019]
+rule map:
+    input: A_normal_1.fastq.gz, A_normal_2.fastq.gz
+    output: bwa/A_normal.bam
+    log: logs/bwa_mem/A_normal.log
+    jobid: 35
+    wildcards: sample=A_normal
+
+[Wed Dec 11 13:58:32 2019]
+rule mark_duplicates:
+    input: bwa/A_tumor.bam
+    output: bwa/A_tumor.rmdup.bam, dedup/A_tumor.metrics.txt
+    log: logs/picard/dedup/A_tumor.log
+    jobid: 25
+    wildcards: sample=A_tumor
+
+[Wed Dec 11 13:58:32 2019]
+rule mark_duplicates:
+    input: bwa/B_tumor.bam
+    output: bwa/B_tumor.rmdup.bam, dedup/B_tumor.metrics.txt
+    log: logs/picard/dedup/B_tumor.log
+    jobid: 31
+    wildcards: sample=B_tumor
+
+[Wed Dec 11 13:58:32 2019]
+rule mark_duplicates:
+    input: bwa/A_normal.bam
+    output: bwa/A_normal.rmdup.bam, dedup/A_normal.metrics.txt
+    log: logs/picard/dedup/A_normal.log
+    jobid: 23
+    wildcards: sample=A_normal
+
+[Wed Dec 11 13:58:32 2019]
+rule freebayes:
+    input: genome.fa, bwa/A_normal.rmdup.bam, bwa/B_tumor.rmdup.bam
+    output: candidate-calls/B_tumor.freebayes.bcf
+    log: logs/freebayes/B_tumor.log
+    jobid: 29
+    wildcards: group=B_tumor
+
+[Wed Dec 11 13:58:32 2019]
+rule index:
+    input: bwa/B_tumor.rmdup.bam
+    output: bwa/B_tumor.rmdup.bam.bai
+    jobid: 32
+    wildcards: sample=B_tumor
+
+[Wed Dec 11 13:58:32 2019]
+rule index:
+    input: bwa/A_normal.rmdup.bam
+    output: bwa/A_normal.rmdup.bam.bai
+    jobid: 24
+    wildcards: sample=A_normal
+
+[Wed Dec 11 13:58:32 2019]
+rule freebayes:
+    input: genome.fa, bwa/A_normal.rmdup.bam, bwa/A_tumor.rmdup.bam
+    output: candidate-calls/A_tumor.freebayes.bcf
+    log: logs/freebayes/A_tumor.log
+    jobid: 21
+    wildcards: group=A_tumor
+
+[Wed Dec 11 13:58:32 2019]
+rule index:
+    input: bwa/A_tumor.rmdup.bam
+    output: bwa/A_tumor.rmdup.bam.bai
+    jobid: 26
+    wildcards: sample=A_tumor
+
+[Wed Dec 11 13:58:32 2019]
+rule index_bcf:
+    input: candidate-calls/B_tumor.freebayes.bcf
+    output: candidate-calls/B_tumor.freebayes.bcf.csi
+    jobid: 30
+    wildcards: variants=candidate-calls/B_tumor.freebayes
+
+
+[Wed Dec 11 13:58:32 2019]
+rule index_bcf:
+    input: candidate-calls/A_tumor.freebayes.bcf
+    output: candidate-calls/A_tumor.freebayes.bcf.csi
+    jobid: 22
+    wildcards: variants=candidate-calls/A_tumor.freebayes
+
+
+[Wed Dec 11 13:58:32 2019]
+rule delly:
+    input: genome.fa, bwa/A_normal.rmdup.bam, bwa/A_tumor.rmdup.bam, bwa/A_normal.rmdup.bam.bai, bwa/A_tumor.rmdup.bam.bai
+    output: candidate-calls/A_tumor.delly.bcf
+    log: logs/delly/A_tumor.log
+    jobid: 27
+    wildcards: group=A_tumor
+
+[Wed Dec 11 13:58:32 2019]
+rule delly:
+    input: genome.fa, bwa/A_normal.rmdup.bam, bwa/B_tumor.rmdup.bam, bwa/A_normal.rmdup.bam.bai, bwa/B_tumor.rmdup.bam.bai
+    output: candidate-calls/B_tumor.delly.bcf
+    log: logs/delly/B_tumor.log
+    jobid: 33
+    wildcards: group=B_tumor
+
+[Wed Dec 11 13:58:32 2019]
+rule varlociraptor_preprocess:
+    input: genome.fa, candidate-calls/A_tumor.freebayes.bcf, candidate-calls/A_tumor.freebayes.bcf.csi, bwa/A_normal.rmdup.bam, bwa/A_normal.rmdup.bam.bai
+    output: observations/A_tumor/A_normal.freebayes.1.bcf
+    log: logs/varlociraptor/preprocess/A_tumor/A_normal.freebayes.1.log
+    jobid: 11
+    wildcards: group=A_tumor, sample=A_normal, caller=freebayes, contig=1
+
+
+[Wed Dec 11 13:58:32 2019]
+rule varlociraptor_preprocess:
+    input: genome.fa, candidate-calls/B_tumor.freebayes.bcf, candidate-calls/B_tumor.freebayes.bcf.csi, bwa/A_normal.rmdup.bam, bwa/A_normal.rmdup.bam.bai
+    output: observations/B_tumor/A_normal.freebayes.1.bcf
+    log: logs/varlociraptor/preprocess/B_tumor/A_normal.freebayes.1.log
+    jobid: 16
+    wildcards: group=B_tumor, sample=A_normal, caller=freebayes, contig=1
+
+
+[Wed Dec 11 13:58:32 2019]
+rule varlociraptor_preprocess:
+    input: genome.fa, candidate-calls/B_tumor.freebayes.bcf, candidate-calls/B_tumor.freebayes.bcf.csi, bwa/B_tumor.rmdup.bam, bwa/B_tumor.rmdup.bam.bai
+    output: observations/B_tumor/B_tumor.freebayes.1.bcf
+    log: logs/varlociraptor/preprocess/B_tumor/B_tumor.freebayes.1.log
+    jobid: 17
+    wildcards: group=B_tumor, sample=B_tumor, caller=freebayes, contig=1
+
+
+[Wed Dec 11 13:58:32 2019]
+rule index_bcf:
+    input: candidate-calls/B_tumor.delly.bcf
+    output: candidate-calls/B_tumor.delly.bcf.csi
+    jobid: 34
+    wildcards: variants=candidate-calls/B_tumor.delly
+
+
+[Wed Dec 11 13:58:32 2019]
+rule varlociraptor_preprocess:
+    input: genome.fa, candidate-calls/A_tumor.freebayes.bcf, candidate-calls/A_tumor.freebayes.bcf.csi, bwa/A_tumor.rmdup.bam, bwa/A_tumor.rmdup.bam.bai
+    output: observations/A_tumor/A_tumor.freebayes.1.bcf
+    log: logs/varlociraptor/preprocess/A_tumor/A_tumor.freebayes.1.log
+    jobid: 12
+    wildcards: group=A_tumor, sample=A_tumor, caller=freebayes, contig=1
+
+
+[Wed Dec 11 13:58:32 2019]
+rule index_bcf:
+    input: candidate-calls/A_tumor.delly.bcf
+    output: candidate-calls/A_tumor.delly.bcf.csi
+    jobid: 28
+    wildcards: variants=candidate-calls/A_tumor.delly
+
+
+[Wed Dec 11 13:58:32 2019]
+rule varlociraptor_preprocess:
+    input: genome.fa, candidate-calls/B_tumor.delly.bcf, candidate-calls/B_tumor.delly.bcf.csi, bwa/A_normal.rmdup.bam, bwa/A_normal.rmdup.bam.bai
+    output: observations/B_tumor/A_normal.delly.1.bcf
+    log: logs/varlociraptor/preprocess/B_tumor/A_normal.delly.1.log
+    jobid: 19
+    wildcards: group=B_tumor, sample=A_normal, caller=delly, contig=1
+
+
+[Wed Dec 11 13:58:32 2019]
+rule varlociraptor_preprocess:
+    input: genome.fa, candidate-calls/A_tumor.delly.bcf, candidate-calls/A_tumor.delly.bcf.csi, bwa/A_tumor.rmdup.bam, bwa/A_tumor.rmdup.bam.bai
+    output: observations/A_tumor/A_tumor.delly.1.bcf
+    log: logs/varlociraptor/preprocess/A_tumor/A_tumor.delly.1.log
+    jobid: 15
+    wildcards: group=A_tumor, sample=A_tumor, caller=delly, contig=1
+
+
+[Wed Dec 11 13:58:32 2019]
+rule varlociraptor_preprocess:
+    input: genome.fa, candidate-calls/B_tumor.delly.bcf, candidate-calls/B_tumor.delly.bcf.csi, bwa/B_tumor.rmdup.bam, bwa/B_tumor.rmdup.bam.bai
+    output: observations/B_tumor/B_tumor.delly.1.bcf
+    log: logs/varlociraptor/preprocess/B_tumor/B_tumor.delly.1.log
+    jobid: 20
+    wildcards: group=B_tumor, sample=B_tumor, caller=delly, contig=1
+
+
+[Wed Dec 11 13:58:32 2019]
+rule varlociraptor_preprocess:
+    input: genome.fa, candidate-calls/A_tumor.delly.bcf, candidate-calls/A_tumor.delly.bcf.csi, bwa/A_normal.rmdup.bam, bwa/A_normal.rmdup.bam.bai
+    output: observations/A_tumor/A_normal.delly.1.bcf
+    log: logs/varlociraptor/preprocess/A_tumor/A_normal.delly.1.log
+    jobid: 14
+    wildcards: group=A_tumor, sample=A_normal, caller=delly, contig=1
+
+
+[Wed Dec 11 13:58:32 2019]
+rule varlociraptor_call:
+    input: observations/A_tumor/A_normal.freebayes.1.bcf, observations/A_tumor/A_tumor.freebayes.1.bcf, scenarios/A_tumor.yaml
+    output: calls/A_tumor.freebayes.1.bcf
+    log: logs/varlociraptor/call/A_tumor.freebayes.1.log
+    jobid: 3
+    wildcards: group=A_tumor, caller=freebayes, contig=1
+
+InputFunctionException in line 31 of /home/forster/Projects/Neoantigen_Prediction/workflow/rules/varlociraptor.smk:
+AttributeError: module 'snakemake' has no attribute 'wildcards'
+Wildcards:
+group=A_tumor
+caller=freebayes
+contig=1

@@ -1,0 +1,4 @@
+Building DAG of jobs...
+MissingInputException in line 27 of /home/forster/Projects/Neoantigen_Prediction/workflow/Snakefile:
+Missing input files for rule all:
+microphaser/fasta/A_tumor/A_tumor.chr1.wt.tsv

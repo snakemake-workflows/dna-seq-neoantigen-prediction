@@ -1,0 +1,4 @@
+AttributeError in line 39 of /home/forster/Projects/Neoantigen_Prediction/workflow/Snakefile:
+'DataFrame' object has no attribute 'has_RNA'
+  File "/home/forster/Projects/Neoantigen_Prediction/workflow/Snakefile", line 39, in <module>
+  File "/home/forster/miniconda3/lib/python3.7/site-packages/pandas/core/generic.py", line 5179, in __getattr__

@@ -1,0 +1,5 @@
+Building DAG of jobs...
+MissingInputException in line 16 of /home/forster/Projects/Neoantigen_Prediction/workflow/rules/star.smk:
+Missing input files for rule align:
+B_tumor_RNA_2.fastq.gz
+B_tumor_RNA_1.fastq.gz

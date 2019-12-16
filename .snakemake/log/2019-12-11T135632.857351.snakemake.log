@@ -1,0 +1,5 @@
+Building DAG of jobs...
+MissingInputException in line 48 of /home/forster/Projects/Neoantigen_Prediction/workflow/rules/varlociraptor.smk:
+Missing input files for rule bcftools_concat:
+calls/A_tumor.delly.1.bcf.csi
+calls/A_tumor.freebayes.1.bcf.csi

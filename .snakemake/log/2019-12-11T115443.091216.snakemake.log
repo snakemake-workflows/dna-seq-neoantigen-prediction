@@ -1,0 +1,4 @@
+NameError in line 33 of /home/forster/Projects/Neoantigen_Prediction/workflow/rules/varlociraptor.smk:
+name 'get_group_observations' is not defined
+  File "/home/forster/Projects/Neoantigen_Prediction/workflow/Snakefile", line 51, in <module>
+  File "/home/forster/Projects/Neoantigen_Prediction/workflow/rules/varlociraptor.smk", line 33, in <module>

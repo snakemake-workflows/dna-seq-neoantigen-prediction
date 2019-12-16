@@ -1,0 +1,6 @@
+Building DAG of jobs...
+MissingInputException in line 13 of /home/forster/Projects/Neoantigen_Prediction/workflow/rules/varlociraptor.smk:
+Missing input files for rule varlociraptor_preprocess:
+recal/A_normal.sorted.bam.bai
+candidate-calls/A_tumor.freebayes.bcf.csi
+recal/A_normal.sorted.bam

@@ -1,0 +1,52 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	3	HLA_LA
+	3	OptiType
+	1	all
+	1	build_germline_proteome
+	1	clean_germline
+	7	compress_bcf
+	1	concat_proteome
+	2	concat_somatic
+	2	concat_tsvs
+	2	concat_variants
+	3	index
+	7	index_bcf
+	3	map
+	3	mark_duplicates
+	4	mhc_csv_table
+	46	microphaser_filter
+	23	microphaser_germline
+	46	microphaser_somatic
+	92	netMHC2
+	92	netMHCpan
+	3	parse_HLA_LA
+	8	parse_mhc_out
+	6	razers3
+	1	strelka_germline
+	2	strelka_somatic
+	5	vcf_to_bcf
+	367
+
+[Wed Dec 11 10:34:34 2019]
+rule razers3:
+    input: A_normal_1.fastq.gz
+    output: razers3/bam/A_normal_1.bam, razers3/fastq/A_normal_1.fished.fastq
+    jobid: 304
+    wildcards: sample=A_normal, group=1
+
+[Wed Dec 11 10:34:34 2019]
+Error in rule razers3:
+    jobid: 304
+    output: razers3/bam/A_normal_1.bam, razers3/fastq/A_normal_1.fished.fastq
+    shell:
+        razers3 -tc 1 -i 95 -m 1 -dr 0 ref/HLA_Data/hla_reference_dna.fasta A_normal_1.fastq.gz -o razers3/bam/A_normal_1.bam && samtools bam2fq razers3/bam/A_normal_1.bam > razers3/fastq/A_normal_1.fished.fastq
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /home/forster/Projects/Neoantigen_Prediction/.snakemake/log/2019-12-11T103434.197201.snakemake.log

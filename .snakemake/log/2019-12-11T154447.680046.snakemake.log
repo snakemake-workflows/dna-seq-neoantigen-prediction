@@ -1,0 +1,5 @@
+Building DAG of jobs...
+MissingInputException in line 30 of /home/forster/Projects/Neoantigen_Prediction/workflow/Snakefile:
+Missing input files for rule all:
+netMHCpan/A_tumor/chr1/A_tumor.chr1.wt.xls
+netMHCpan/A_tumor/chr1/A_tumor.chr1.mt.xls

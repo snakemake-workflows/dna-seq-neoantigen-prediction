@@ -1,0 +1,4 @@
+NameError in line 35 of /home/forster/Projects/Neoantigen_Prediction/workflow/rules/microphaser.smk:
+name 'CHROMOSOMES' is not defined
+  File "/home/forster/Projects/Neoantigen_Prediction/workflow/Snakefile", line 24, in <module>
+  File "/home/forster/Projects/Neoantigen_Prediction/workflow/rules/microphaser.smk", line 35, in <module>

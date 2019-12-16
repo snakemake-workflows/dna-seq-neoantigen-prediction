@@ -1,0 +1,5 @@
+Building DAG of jobs...
+InputFunctionException in line 1 of /home/forster/Projects/Neoantigen_Prediction/workflow/rules/candidate_calling.smk:
+AttributeError: 'Wildcards' object has no attribute 'pair'
+Wildcards:
+group=A_tumor
