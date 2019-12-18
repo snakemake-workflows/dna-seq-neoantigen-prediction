@@ -1,4 +1,4 @@
 sample	type	matched_normal	purity	has_RNA
-A_normal	healthy			No
+A_normal	normal			No
 A_tumor	tumor	A_normal	1	No
 B_tumor	tumor	A_normal	1	Yes

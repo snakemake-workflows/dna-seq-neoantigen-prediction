@@ -8,7 +8,7 @@ min_version("5.1.2")
 samples = pd.read_csv(config["samples"], sep='\t').set_index("sample", drop=False)
 #validate(samples, schema="schemas/samples.schema.yaml")
 
-units = pd.read_csv(config["units"], dtype=str, sep='\t').set_index(["sample", "type"], drop=False)
+units = pd.read_csv(config["units"], dtype=str, sep='\t').set_index(["sample", "sequencing_type"], drop=False)
 print(units)
 #validate(units, schema="schemas/units.schema.yaml")
 
