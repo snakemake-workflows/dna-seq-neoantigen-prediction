@@ -1,6 +1,6 @@
 rule microphaser_somatic:
     input:
-        vcf="strelka/merged/{sample}/all_variants.bcf",
+        vcf="strelka/merged/{sample}/all_variants.prepy.bcf",
         bam="bwa/{sample}.rmdup.bam",
         bai="bwa/{sample}.rmdup.bam.bai",
         track=config["reference"]["gtfs"] + "/{chrom}.gtf",
@@ -17,7 +17,7 @@ rule microphaser_somatic:
 
 rule microphaser_germline:
     input:
-        vcf="strelka/germline/{normal}/results/variants/variants.reheader.bcf",
+        vcf="strelka/germline/{normal}/results/variants/variants.reheader.prepy.bcf",
         bam="bwa/{normal}.rmdup.bam",
         bai="bwa/{normal}.rmdup.bam.bai",
         track=config["reference"]["gtfs"] + "/{chrom}.gtf",
