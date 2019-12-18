@@ -87,6 +87,16 @@ rule concat_somatic:
     wrapper:
         "0.31.1/bio/bcftools/concat"
 
+rule get_tumor_from_somatic:
+    input:
+        "strelka/somatic/{sample}/results/variants/somatic.complete.bcf"
+    output:
+        "strelka/somatic/{sample}/results/variants/somatic.complete.tumor.bcf"
+    params:
+        "-O b -s TUMOR"
+    wrapper:
+        "0.31.1/bio/bcftools/view"
+
 rule clean_germline:
     input:
         bcf="{germline}/variants.output.bcf"
@@ -103,8 +113,8 @@ rule concat_variants:
     input:
         germline=get_germline_variants,
         index_g=get_germline_variants_index,
-        somatic="strelka/somatic/{sample}/results/variants/somatic.complete.bcf",
-        index_s="strelka/somatic/{sample}/results/variants/somatic.complete.bcf.csi"
+        somatic="strelka/somatic/{sample}/results/variants/somatic.complete.tumor.bcf",
+        index_s="strelka/somatic/{sample}/results/variants/somatic.complete.tumor.bcf.csi"
     output:
         "strelka/merged/{sample}/all_variants.bcf"
     params:
@@ -114,3 +124,15 @@ rule concat_variants:
         "../envs/variant_handling.yaml"
     shell:
         "bcftools concat {params.extra} -a {input.somatic} {input.germline} | snpEff -Xmx4g {params.assembly} - | bcftools view -O u - > {output}"
+
+rule preprocess_variants:
+    input:
+        variants="{variants}.bcf"
+    output:
+        "{variants}.prepy.bcf"
+    params:
+        extra="-L --somatic",
+        genom=config["reference"]["genome"],
+    threads: 2
+    wrapper:
+        "0.44.2/bio/hap.py/pre.py"
