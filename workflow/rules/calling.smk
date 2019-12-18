@@ -132,7 +132,7 @@ rule preprocess_variants:
         "{variants}.prepy.bcf"
     params:
         extra="-L --somatic",
-        genom=config["reference"]["genome"],
+        genome=config["reference"]["genome"],
     threads: 2
     wrapper:
         "0.44.2/bio/hap.py/pre.py"
