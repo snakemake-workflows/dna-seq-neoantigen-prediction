@@ -1,0 +1,48 @@
+{
+  "build": "hf8cf82a_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "constrains": [],
+  "depends": [
+    "krb5 >=1.16.4,<1.17.0a0",
+    "libcurl 7.68.0 hda55be3_0",
+    "libgcc-ng >=7.3.0",
+    "libssh2 >=1.8.2,<1.9.0a0",
+    "zlib >=1.2.11,<1.3.0a0"
+  ],
+  "extracted_package_dir": "/home/forster/miniconda3/pkgs/curl-7.68.0-hf8cf82a_0",
+  "features": "",
+  "files": [
+    "bin/curl"
+  ],
+  "fn": "curl-7.68.0-hf8cf82a_0.tar.bz2",
+  "license": "MIT/X derivate (http://curl.haxx.se/docs/copyright.html)",
+  "license_family": "MIT",
+  "link": {
+    "source": "/home/forster/miniconda3/pkgs/curl-7.68.0-hf8cf82a_0",
+    "type": 1
+  },
+  "md5": "966380ffbd349045294dfb3d4a6d8363",
+  "name": "curl",
+  "package_tarball_full_path": "/home/forster/miniconda3/pkgs/curl-7.68.0-hf8cf82a_0.tar.bz2",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "bin/curl",
+        "path_type": "hardlink",
+        "sha256": "140426af46c8c7e96b950ce3170ce9901c0a1c9c60704db38a185763e174ceee",
+        "sha256_in_prefix": "140426af46c8c7e96b950ce3170ce9901c0a1c9c60704db38a185763e174ceee",
+        "size_in_bytes": 254376
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "bf85491558310fde967cb9341ef863c133521ad5aab8b17c42b2bca80a0502b6",
+  "size": 139895,
+  "subdir": "linux-64",
+  "timestamp": 1580923891689,
+  "track_features": "",
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/curl-7.68.0-hf8cf82a_0.tar.bz2",
+  "version": "7.68.0"
+}

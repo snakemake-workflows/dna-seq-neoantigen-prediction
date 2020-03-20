@@ -1,0 +1,12 @@
+prefix=/home/forster/paschen_neoantigens/Neoantigen_Prediction/.snakemake/conda/824e66c9
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+vendor=MIT
+
+Name: gssrpc
+Description: GSSAPI RPC implementation
+Version: 1.16.4
+Cflags: -I${includedir}
+Libs: -L${libdir} -lgssrpc
+Requires.private: mit-krb5-gssapi

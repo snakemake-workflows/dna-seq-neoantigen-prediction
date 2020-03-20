@@ -1,0 +1,37 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	genome_faidx
+	1	split_annotation
+	2
+
+[Fri Mar 20 13:10:57 2020]
+rule genome_faidx:
+    input: refs/genome.fasta
+    output: refs/genome.fasta.fai
+    jobid: 0
+
+[Fri Mar 20 13:10:57 2020]
+rule split_annotation:
+    input: refs/genome.gtf
+    output: refs/annotation
+    jobid: 1
+
+[Fri Mar 20 13:10:57 2020]
+Error in rule split_annotation:
+    jobid: 1
+    output: refs/annotation
+    shell:
+        awk '!/^#/{print >"refs/annotation/"$1".gtf"}' refs/genome.gtf
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Activating conda environment: /home/forster/paschen_neoantigens/Neoantigen_Prediction/.snakemake/conda/d708f871
+[Fri Mar 20 13:11:35 2020]
+Finished job 0.
+1 of 2 steps (50%) done
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /home/forster/paschen_neoantigens/Neoantigen_Prediction/.snakemake/log/2020-03-20T131056.405700.snakemake.log

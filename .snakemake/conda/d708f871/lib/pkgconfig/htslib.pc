@@ -1,0 +1,15 @@
+includedir=/home/forster/paschen_neoantigens/Neoantigen_Prediction/.snakemake/conda/d708f871/include
+libdir=/home/forster/paschen_neoantigens/Neoantigen_Prediction/.snakemake/conda/d708f871/lib
+
+# Flags and libraries needed when linking against a static libhts.a
+# (used by manual and semi-manual pkg-config(1)-style enquiries).
+static_ldflags= -Wl,-rpath,/home/forster/paschen_neoantigens/Neoantigen_Prediction/.snakemake/conda/d708f871/lib -L/home/forster/paschen_neoantigens/Neoantigen_Prediction/.snakemake/conda/d708f871/lib -rdynamic
+static_libs=-lpthread -lz -lm -ldl -lbz2 -llzma -ldeflate
+
+Name: htslib
+Description: C library for high-throughput sequencing data formats
+Version: 1.9
+Cflags: -I${includedir}
+Libs: -L${libdir} -lhts
+Libs.private: -L${libdir}  -Wl,-rpath,/home/forster/paschen_neoantigens/Neoantigen_Prediction/.snakemake/conda/d708f871/lib -L/home/forster/paschen_neoantigens/Neoantigen_Prediction/.snakemake/conda/d708f871/lib -lbz2 -ldeflate -lhts -lm -lpthread
+Requires.private: zlib  liblzma

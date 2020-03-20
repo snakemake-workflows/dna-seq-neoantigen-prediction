@@ -1,0 +1,4 @@
+ValueError in line 32 of /home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/rules/ref.smk:
+dictionary update sequence element #0 has length 1; 2 is required
+  File "/home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/Snakefile", line 28, in <module>
+  File "/home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/rules/ref.smk", line 32, in <module>

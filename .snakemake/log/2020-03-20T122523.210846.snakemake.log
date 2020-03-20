@@ -1,0 +1,11 @@
+FileNotFoundError in line 17 of /home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/rules/common.smk:
+[Errno 2] File genome.fa.fai does not exist: 'genome.fa.fai'
+  File "/home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/Snakefile", line 17, in <module>
+  File "/home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/rules/common.smk", line 17, in <module>
+  File "/home/forster/miniconda3/envs/snakemake/lib/python3.6/site-packages/pandas/io/parsers.py", line 676, in parser_f
+  File "/home/forster/miniconda3/envs/snakemake/lib/python3.6/site-packages/pandas/io/parsers.py", line 448, in _read
+  File "/home/forster/miniconda3/envs/snakemake/lib/python3.6/site-packages/pandas/io/parsers.py", line 880, in __init__
+  File "/home/forster/miniconda3/envs/snakemake/lib/python3.6/site-packages/pandas/io/parsers.py", line 1114, in _make_engine
+  File "/home/forster/miniconda3/envs/snakemake/lib/python3.6/site-packages/pandas/io/parsers.py", line 1891, in __init__
+  File "pandas/_libs/parsers.pyx", line 374, in pandas._libs.parsers.TextReader.__cinit__
+  File "pandas/_libs/parsers.pyx", line 674, in pandas._libs.parsers.TextReader._setup_parser_source

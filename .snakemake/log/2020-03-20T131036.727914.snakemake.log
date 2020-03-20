@@ -1,0 +1,21 @@
+Building DAG of jobs...
+Job counts:
+	count	jobs
+	1	genome_faidx
+	1	split_annotation
+	2
+
+[Fri Mar 20 13:10:38 2020]
+rule genome_faidx:
+    input: refs/genome.fasta
+    output: refs/genome.fasta.fai
+    jobid: 0
+
+[Fri Mar 20 13:10:38 2020]
+rule split_annotation:
+    input: refs/genome.gtf
+    output: refs/annotation
+    jobid: 1
+
+RuleException in line 28 of /home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/rules/ref.smk:
+module 'snakemake' has no attribute 'output'

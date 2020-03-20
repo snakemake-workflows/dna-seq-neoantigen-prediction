@@ -3,11 +3,11 @@ rule microphaser_somatic:
         vcf="strelka/merged/{sample}/all_variants.prepy.bcf",
         bam="bwa/{sample}.rmdup.bam",
         bai="bwa/{sample}.rmdup.bam.bai",
-        track=config["reference"]["gtfs"] + "/{chrom}.gtf",
+        track="refs/annotation/{contig}.gtf",
     output:
-        mt_fasta="microphaser/fasta/{sample}/{sample}.{chrom}.mt.fa",
-        wt_fasta="microphaser/fasta/{sample}/{sample}.{chrom}.wt.fa",
-        tsv=temp("microphaser/info/{sample}/{sample}.{chrom}.tsv")
+        mt_fasta="microphaser/fasta/{sample}/{sample}.{contig}.mt.fa",
+        wt_fasta="microphaser/fasta/{sample}/{sample}.{contig}.wt.fa",
+        tsv=temp("microphaser/info/{sample}/{sample}.{contig}.tsv")
     params:
         ref=config["reference"]["genome"],
         window_length=config["params"]["microphaser"]["window_len"]
@@ -20,9 +20,9 @@ rule microphaser_germline:
         vcf="strelka/germline/{normal}/results/variants/variants.reheader.prepy.bcf",
         bam="bwa/{normal}.rmdup.bam",
         bai="bwa/{normal}.rmdup.bam.bai",
-        track=config["reference"]["gtfs"] + "/{chrom}.gtf",
+        track="refs/annotation/{contig}.gtf",
     output:
-        wt_fasta="microphaser/fasta/germline/{normal}/{normal}.germline.{chrom}.fa"
+        wt_fasta="microphaser/fasta/germline/{normal}/{normal}.germline.{contig}.fa"
     params:
         ref=config["reference"]["genome"],
         window_length=config["params"]["microphaser"]["window_len"]
@@ -32,7 +32,7 @@ rule microphaser_germline:
 
 rule concat_proteome:
     input:
-        expand("microphaser/fasta/germline/{{normal}}/{{normal}}.germline.{chrom}.fa", chrom = contigs)
+        expand("microphaser/fasta/germline/{{normal}}/{{normal}}.germline.{contig}.fa", contig = contigs)
     output:
         "microphaser/fasta/germline/{normal}/reference_proteome.fa"
     shell:
@@ -48,18 +48,18 @@ rule build_germline_proteome:
 
 rule microphaser_filter:
     input:
-        tsv="microphaser/info/{sample}/{sample}.{chrom}.tsv",
+        tsv="microphaser/info/{sample}/{sample}.{contig}.tsv",
         proteome=get_proteome
     output:
-        mt_fasta="microphaser/fasta/{sample}/filtered/{sample}.{chrom}.mt.fa",
-        wt_fasta="microphaser/fasta/{sample}/filtered/{sample}.{chrom}.wt.fa",
-        tsv="microphaser/info/{sample}/filtered/{sample}.{chrom}.tsv"
+        mt_fasta="microphaser/fasta/{sample}/filtered/{sample}.{contig}.mt.fa",
+        wt_fasta="microphaser/fasta/{sample}/filtered/{sample}.{contig}.wt.fa",
+        tsv="microphaser/info/{sample}/filtered/{sample}.{contig}.tsv"
     shell:
         "../microphaser/target/release/microphaser filter -r {input.proteome} -t {input.tsv} -o {output.tsv} -n {output.wt_fasta} > {output.mt_fasta}"
 
 rule concat_tsvs:
     input:
-        expand("microphaser/info/{{sample}}/filtered/{{sample}}.{chrom}.tsv", chrom = contigs)
+        expand("microphaser/info/{{sample}}/filtered/{{sample}}.{contig}.tsv", contig = contigs)
     output:
        "microphaser/info/{sample}/filtered/{sample}.tsv"
     conda:

@@ -1,0 +1,4 @@
+NameError in line 21 of /home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/rules/common.smk:
+name 'contigs' is not defined
+  File "/home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/Snakefile", line 17, in <module>
+  File "/home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/rules/common.smk", line 21, in <module>

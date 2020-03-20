@@ -1,7 +1,7 @@
 rule STAR_index:
     input:
-        fasta=config["reference"]["genome"],
-        gtf=config["reference"]["annotation"]
+        fasta="refs/genome.fa",
+        gtf="refs/genome.gtf"
     output:
         directory("STAR_index")
     params:

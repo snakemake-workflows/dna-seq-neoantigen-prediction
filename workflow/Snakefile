@@ -3,7 +3,7 @@
 
 #### setup config #####
 
-configfile: "config.yaml"
+configfile: "config/config.yaml"
 
 ##### setup report #####
 
@@ -25,6 +25,7 @@ include: "rules/microphaser.smk"
 include: "rules/MHC_binding.smk"
 include: "rules/star.smk"
 include: "rules/fusion.smk"
+include: "rules/ref.smk"
 
 
 print(contigs)

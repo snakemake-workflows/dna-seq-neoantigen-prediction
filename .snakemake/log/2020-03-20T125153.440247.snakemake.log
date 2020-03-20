@@ -1,0 +1,55 @@
+Building DAG of jobs...
+Creating conda environment https:/github.com/snakemake/snakemake-wrappers/raw/0.45.1/bio/samtools/faidx/environment.yaml...
+Downloading and installing remote packages.
+Environment for ../../../../tmp/tmp0mlrihz7.yaml created (location: .snakemake/conda/d708f871)
+Creating conda environment https:/github.com/snakemake/snakemake-wrappers/raw/0.45.1/bio/reference/ensembl-annotation/environment.yaml...
+Downloading and installing remote packages.
+Environment for ../../../../tmp/tmpgae8wby7.yaml created (location: .snakemake/conda/824e66c9)
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	genome_faidx
+	1	get_annotation
+	1	get_genome
+	1	split_annotation
+	4
+
+[Fri Mar 20 12:52:42 2020]
+rule get_genome:
+    output: refs/genome.fasta
+    jobid: 3
+
+[Fri Mar 20 12:52:42 2020]
+rule get_annotation:
+    output: refs/genome.gtf
+    log: logs/get_annotation.log
+    jobid: 2
+
+Activating conda environment: /home/forster/paschen_neoantigens/Neoantigen_Prediction/.snakemake/conda/824e66c9
+Activating conda environment: /home/forster/paschen_neoantigens/Neoantigen_Prediction/.snakemake/conda/824e66c9
+[Fri Mar 20 12:53:10 2020]
+Finished job 2.
+1 of 4 steps (25%) done
+
+[Fri Mar 20 12:53:10 2020]
+rule split_annotation:
+    input: refs/genome.gtf
+    output: refs/annotation
+    jobid: 0
+
+[Fri Mar 20 12:53:10 2020]
+Error in rule split_annotation:
+    jobid: 0
+    output: refs/annotation
+    shell:
+        awk '!/^#/{print >"refs/annotation/"$1".gtf"}' refs/genome.gtf
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Fri Mar 20 13:03:24 2020]
+Finished job 3.
+2 of 4 steps (50%) done
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /home/forster/paschen_neoantigens/Neoantigen_Prediction/.snakemake/log/2020-03-20T125153.440247.snakemake.log

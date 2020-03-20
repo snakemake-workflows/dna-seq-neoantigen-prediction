@@ -1,0 +1,3 @@
+WorkflowError in line 6 of /home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/Snakefile:
+Config file config.yaml not found.
+  File "/home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/Snakefile", line 6, in <module>

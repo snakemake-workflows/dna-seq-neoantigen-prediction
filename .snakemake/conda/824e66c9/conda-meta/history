@@ -1,0 +1,19 @@
+==> 2020-03-20 12:52:39 <==
+# cmd: /home/forster/miniconda3/bin/conda-env create --file /home/forster/paschen_neoantigens/Neoantigen_Prediction/.snakemake/conda/824e66c9.yaml --prefix /home/forster/paschen_neoantigens/Neoantigen_Prediction/.snakemake/conda/824e66c9
+# conda version: 4.7.12
++conda-forge::_libgcc_mutex-0.1-conda_forge
++conda-forge::_openmp_mutex-4.5-0_gnu
++conda-forge::ca-certificates-2019.11.28-hecc5488_0
++conda-forge::curl-7.68.0-hf8cf82a_0
++conda-forge::krb5-1.16.4-h2fd8d38_0
++conda-forge::libcurl-7.68.0-hda55be3_0
++conda-forge::libedit-3.1.20170329-hf8c457e_1001
++conda-forge::libgcc-ng-9.2.0-h24d8f2e_2
++conda-forge::libgomp-9.2.0-h24d8f2e_2
++conda-forge::libssh2-1.8.2-h22169c7_2
++conda-forge::libstdcxx-ng-9.2.0-hdf63c60_2
++conda-forge::ncurses-6.1-hf484d3e_1002
++conda-forge::openssl-1.1.1e-h516909a_0
++conda-forge::tk-8.6.10-hed695b0_0
++conda-forge::zlib-1.2.11-h516909a_1006
+# update specs: ['curl']
