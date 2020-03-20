@@ -67,6 +67,11 @@ params:
   microphaser:
     window_len:
         60
+    peptide_len:
+        mhc1:
+            9
+        mhc2:
+            15
   netMHCpan:
     "-BA -l 9 -s -xls"
   netMHCIIpan:

@@ -18,13 +18,12 @@ rule varlociraptor_preprocess:
         bam="bwa/{sample}.rmdup.bam",
         bai="bwa/{sample}.rmdup.bam.bai"
     output:
-        "observations/{pair}/{sample}.{caller}.{contig}.bcf"
+        "observations/{pair}/{sample}.{caller}.bcf"
     log:
-        "logs/varlociraptor/preprocess/{pair}/{sample}.{caller}.{contig}.log"
+        "logs/varlociraptor/preprocess/{pair}/{sample}.{caller}.log"
     conda:
         "../envs/varlociraptor.yaml"
     shell:
-        "bcftools view -Ou {input.candidates} {wildcards.contig} | "
         "varlociraptor preprocess variants "
         "{input.ref} --bam {input.bam} --output {output} 2> {log}"
 
@@ -33,7 +32,7 @@ rule varlociraptor_call:
         obs=get_pair_observations,
         scenario="scenarios/{pair}.yaml"
     output:
-        temp("calls/{pair}.{caller}.{contig}.bcf")
+        temp("calls/{pair}.{caller}.bcf")
     log:
         "logs/varlociraptor/call/{pair}.{caller}.{contig}.log"
     params:
@@ -48,18 +47,16 @@ rule varlociraptor_call:
 rule bcftools_concat:
     input:
         calls = expand(
-            "calls/{{pair}}.{caller}.{contig}.bcf",
-            caller=caller,
-            contig=contigs
+            "calls/{{pair}}.{caller}.bcf",
+            caller=caller
         ),
         indexes = expand(
-            "calls/{{pair}}.{caller}.{contig}.bcf.csi",
-            caller=caller,
-            contig=contigs
+            "calls/{{pair}}.{caller}.bcf.csi",
+            caller=caller
         ),
     output:
         "calls/{pair}.vcf"
     params:
-        "-a" # Check this
+        "-a -Ob" # Check this
     wrapper:
         "0.36.0/bio/bcftools/concat"

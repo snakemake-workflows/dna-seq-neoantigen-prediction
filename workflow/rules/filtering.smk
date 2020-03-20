@@ -1,3 +1,16 @@
+rule filter_by_annotation:
+    input:
+        get_annotated_bcf
+    output:
+        "calls/{group}.{filter}.filtered.bcf"
+    params:
+        filter=lambda w: config["calling"]["filter"][w.filter]
+    conda:
+        "../envs/snpsift.yaml"
+    shell:
+        "bcftools view {input} | SnpSift filter \"{params.filter}\" | bcftools view -Ob > {output}"
+
+
 rule control_fdr:
     input:
         "calls/{pair}.vcf"

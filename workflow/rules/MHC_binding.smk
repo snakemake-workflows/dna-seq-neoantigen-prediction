@@ -73,13 +73,13 @@ rule mhcflurry:
 
 rule netMHCpan:
     input:
-        peptides="microphaser/fasta/{sample}/filtered/{sample}.{chr}.{group}.fa",
+        peptides="microphaser/fasta/{sample}/filtered/mhc1/{sample}.{chr}.{group}.fa",
         alleles="optitype/{sample}/hla_alleles_{sample}.tsv",
         wt_alleles=get_germline_optitype
     output:
-        "netMHCpan/{sample}/{chr}/{sample}.{chr}.{group}.xls",
+        "mhc1/{sample}/{chr}/{sample}.{chr}.{group}.xls",
     log:
-        "logs/netMHCpan/{sample}/{chr}/{sample}.{chr}.{group}.log"
+        "logs/mhc1/{sample}/{chr}/{sample}.{chr}.{group}.log"
     params:
         extra = config["params"]["netMHCpan"]
     run:
@@ -93,13 +93,13 @@ rule netMHCpan:
 
 rule netMHC2:
     input:
-        peptides="microphaser/fasta/{sample}/filtered/{sample}.{chr}.{group}.fa",
+        peptides="microphaser/fasta/{sample}/filtered/mhc2/{sample}.{chr}.{group}.fa",
         alleles = "HLA-LA/hlaII_{sample}.tsv",
         wt_alleles=get_germline_hla
     output:
-        "netMHC2pan/{sample}/{chr}/{sample}.{chr}.{group}.xls",
+        "mhc2/{sample}/{chr}/{sample}.{chr}.{group}.xls",
     log:
-        "logs/netMHC2pan/{sample}/{chr}/{sample}.{chr}.{group}.log"
+        "logs/mhc2/{sample}/{chr}/{sample}.{chr}.{group}.log"
     params:
         extra=config["params"]["netMHCIIpan"]
     run:

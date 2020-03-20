@@ -26,6 +26,8 @@ include: "rules/MHC_binding.smk"
 include: "rules/star.smk"
 include: "rules/fusion.smk"
 include: "rules/ref.smk"
+include: "rules/tmb.smk"
+include: "rules/vega.smk"
 
 
 print(contigs)

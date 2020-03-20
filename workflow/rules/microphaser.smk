@@ -42,26 +42,30 @@ rule build_germline_proteome:
     input:
         "microphaser/fasta/germline/{normal}/reference_proteome.fa"
     output:
-        "microphaser/fasta/germline/{normal}/reference_proteome.bin"
+        "microphaser/fasta/germline/{normal}/{mhc}/reference_proteome.bin"
+    params:
+        length=lambda wildcards: config["params"]["microphaser"]["peptide_len"][wildcards.mhc]
     shell:
-        "../microphaser/target/release/microphaser build_reference -r {input} -o {output}"
+        "../microphaser/target/release/microphaser build_reference -r {input} -o {output} -l {params.length}"
 
 rule microphaser_filter:
     input:
         tsv="microphaser/info/{sample}/{sample}.{contig}.tsv",
         proteome=get_proteome
     output:
-        mt_fasta="microphaser/fasta/{sample}/filtered/{sample}.{contig}.mt.fa",
-        wt_fasta="microphaser/fasta/{sample}/filtered/{sample}.{contig}.wt.fa",
-        tsv="microphaser/info/{sample}/filtered/{sample}.{contig}.tsv"
+        mt_fasta="microphaser/fasta/{sample}/filtered/{mhc}/{sample}.{contig}.mt.fa",
+        wt_fasta="microphaser/fasta/{sample}/filtered/{mhc}/{sample}.{contig}.wt.fa",
+        tsv="microphaser/info/{sample}/filtered/{mhc}/{sample}.{contig}.tsv"
+    params:
+        length=lambda wildcards: config["params"]["microphaser"]["peptide_len"][wildcards.mhc]
     shell:
-        "../microphaser/target/release/microphaser filter -r {input.proteome} -t {input.tsv} -o {output.tsv} -n {output.wt_fasta} > {output.mt_fasta}"
+        "../microphaser/target/release/microphaser filter -r {input.proteome} -t {input.tsv} -o {output.tsv} -n {output.wt_fasta} -l {params.length} > {output.mt_fasta}"
 
 rule concat_tsvs:
     input:
-        expand("microphaser/info/{{sample}}/filtered/{{sample}}.{contig}.tsv", contig = contigs)
+        expand("microphaser/info/{{sample}}/filtered/{{mhc}}/{{sample}}.{contig}.tsv", contig = contigs)
     output:
-       "microphaser/info/{sample}/filtered/{sample}.tsv"
+       "microphaser/info/{sample}/filtered/{{mhc}/sample}.tsv"
     conda:
         "../envs/xsv.yaml"
     shell:

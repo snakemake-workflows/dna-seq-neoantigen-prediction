@@ -44,7 +44,7 @@ def get_seperate(sample, group):
     return units.loc[(sample, "DNA"), "fq" + str(group)]
 
 def get_proteome(wildcards):
-    return expand("microphaser/fasta/germline/{normal}/reference_proteome.bin", normal=get_normal(wildcards))#samples[samples["sample"] == wildcards.sample]["matched_normal"]))
+    return expand("microphaser/fasta/germline/{normal}/{mhc}/reference_proteome.bin", normal=get_normal(wildcards), mhc=wildcards.mhc)#samples[samples["sample"] == wildcards.sample]["matched_normal"]))
 
 def get_germline_optitype(wildcards):
     return expand("optitype/{germline}/hla_alleles_{germline}.tsv", germline=get_normal(wildcards))
@@ -65,8 +65,7 @@ def get_germline_variants_index(wildcards):
     return expand("strelka/germline/{germline}/results/variants/variants.reheader.bcf.csi", germline=get_normal(wildcards))
 
 def get_pair_observations(wildcards):
-    return expand("observations/{pair}/{sample}.{caller}.{contig}.bcf", 
-                  contig=wildcards.contig, 
+    return expand("observations/{pair}/{sample}.{caller}.bcf", 
                   caller=wildcards.caller, 
                   pair=wildcards.pair,
                   sample=get_paired_samples(wildcards))
@@ -77,7 +76,6 @@ def get_pair_aliases(wildcards):
 wildcard_constraints:
     pair="|".join(samples[samples.type == "tumor"]["sample"]),
     sample="|".join(samples["sample"]),
-    contig="|".join(contigs),
     caller="|".join(["freebayes", "delly"])
 
 def is_activated(xpath):
