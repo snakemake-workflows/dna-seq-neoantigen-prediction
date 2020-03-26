@@ -1,24 +1,26 @@
 rule get_genome:
     output:
-        "refs/genome.fasta"
+        "resources/genome.fasta"
     params:
         species=config["ref"]["species"],
         datatype="dna",
         build=config["ref"]["build"],
         release=config["ref"]["release"]
+    cache: True
     wrapper:
         "0.45.1/bio/reference/ensembl-sequence"
 
 
 rule get_annotation:
     output:
-        "refs/genome.gtf"
+        "resources/genome.gtf"
     params:
         species=config["ref"]["species"],
         fmt="gtf",
         build=config["ref"]["build"],
         release=config["ref"]["release"],
         flavor="" # optional, e.g. chr_patch_hapl_scaff, see Ensembl FTP.
+    cache: True
     log:
         "logs/get_annotation.log"
     wrapper:
@@ -27,29 +29,31 @@ rule get_annotation:
 
 rule split_annotation:
     input:
-        "refs/genome.gtf"
+        "resources/genome.gtf"
     output:
-        directory("refs/annotation")
+        directory("resources/annotation")
     shell:
         "mkdir {output} && awk '!/^#/{{print >\"{output}/\"$1\".gtf\"}}' {input}"
 
 
 rule genome_faidx:
     input:
-        "refs/genome.fasta"
+        "resources/genome.fasta"
     output:
-        "refs/genome.fasta.fai"
+        "resources/genome.fasta.fai"
+    cache: True
     wrapper:
         "0.45.1/bio/samtools/faidx"
 
 
 rule genome_dict:
     input:
-        "refs/genome.fasta"
+        "resources/genome.fasta"
     output:
-        "refs/genome.dict"
+        "resources/genome.dict"
     log:
         "logs/picard/create_dict.log"
+    cache: True
     wrapper:
         "0.45.1/bio/picard/createsequencedictionary"
 
@@ -57,49 +61,53 @@ rule genome_dict:
 rule get_known_variants:
     input:
         # use fai to annotate contig lengths for GATK BQSR
-        fai="refs/genome.fasta.fai"
+        fai="resources/genome.fasta.fai"
     output:
-        vcf="refs/variation.vcf.gz"
+        vcf="resources/variation.vcf.gz"
     params:
         species=config["ref"]["species"],
         release=config["ref"]["release"],
         type="all"
+    cache: True
     wrapper:
         "0.45.1/bio/reference/ensembl-variation"
 
 
 rule remove_iupac_codes:
     input:
-        "refs/variation.vcf.gz"
+        "resources/variation.vcf.gz"
     output:
-        "refs/variation.noiupac.vcf.gz"
+        "resources/variation.noiupac.vcf.gz"
     conda:
         "../envs/rbt.yaml"
+    cache: True
     shell:
         "rbt vcf-fix-iupac-alleles < {input} | bcftools view -Oz > {output}"
 
 
 rule tabix_known_variants:
     input:
-        "refs/{prefix}.vcf.gz"
+        "resources/{prefix}.vcf.gz"
     output:
-        "refs/{prefix}.vcf.gz.tbi"
+        "resources/{prefix}.vcf.gz.tbi"
     params:
         "-p vcf"
     log:
         "logs/tabix/{prefix}.log"
+    cache: True
     wrapper:
         "0.45.1/bio/tabix"
 
 
 rule bwa_index:
     input:
-        "refs/genome.fasta"
+        "resources/genome.fasta"
     output:
-        multiext("refs/genome", ".amb", ".ann", ".bwt", ".pac", ".sa")
+        multiext("resources/genome", ".amb", ".ann", ".bwt", ".pac", ".sa")
     log:
         "logs/bwa_index.log"
     params:
-        prefix="refs/genome"
+        prefix="resources/genome"
+    cache: True
     wrapper:
         "0.45.1/bio/bwa/index"

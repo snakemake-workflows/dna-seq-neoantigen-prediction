@@ -1,23 +1,23 @@
 rule HLA_LA:
     input:
-        bam="bwa/{sample}.rmdup.bam",
-        bai="bwa/{sample}.rmdup.bam.bai"
+        bam="results/bwa/{sample}.rmdup.bam",
+        bai="results/bwa/{sample}.rmdup.bam.bai"
     output:
-        "HLA-LA/output/{sample}/hla/R1_bestguess_G.txt"
+        "results/HLA-LA/output/{sample}/hla/R1_bestguess_G.txt"
     threads: 7
     params:
         graph="PRG_MHC_GRCh38_withIMGT",
-        graphdir="/vol/tiny/MaMel-Neoantigens/HLA-LA_graphs",
+        graphdir=config["reference"]["HLA_LA_graphs"],
         extra_refs="../HLA-LA_graphs/additionalReferences/PRG_MHC_GRCh38_withIMGT"
     shell:
-        "HLA-LA.pl --bam {input.bam} --sampleID {wildcards.sample} --graph {params.graph} --customGraphDir {params.graphdir} --workingDir HLA-LA/output --maxThreads {threads}"
+        "HLA-LA.pl --bam {input.bam} --sampleID {wildcards.sample} --graph {params.graph} --customGraphDir {params.graphdir} --workingDir results/HLA-LA/output --maxThreads {threads}"
 
 rule parse_HLA_LA:
     input:
-        "HLA-LA/output/{sample}/hla/R1_bestguess_G.txt"
+        "results/HLA-LA/output/{sample}/hla/R1_bestguess_G.txt"
     output:
-        report("HLA-LA/hlaI_{sample}.tsv", caption="../report/HLA-LA_Types.rst", category="HLA-Typing(HLA-LA)"),
-        report("HLA-LA/hlaII_{sample}.tsv", caption="../report/HLA-LA_Types.rst", category="HLA-Typing(HLA-LA)")
+        report("results/HLA-LA/hlaI_{sample}.tsv", caption="../report/HLA-LA_Types.rst", category="HLA-Typing(HLA-LA)"),
+        report("results/HLA-LA/hlaII_{sample}.tsv", caption="../report/HLA-LA_Types.rst", category="HLA-Typing(HLA-LA)")
     script:
         "../scripts/parse_HLA_types.py"
 
@@ -25,8 +25,8 @@ rule razers3:
     input:
         get_reads
     output:
-        bam="razers3/bam/{sample}_{group}.bam",
-        fastq="razers3/fastq/{sample}_{group}.fished.fastq"
+        bam="results/razers3/bam/{sample}_{group}.bam",
+        fastq="results/razers3/fastq/{sample}_{group}.fished.fastq"
     threads: 10
     params:
         hlaref=config["reference"]["hla_data"],
@@ -38,12 +38,12 @@ rule razers3:
 
 rule OptiType:
     input:
-        f1='razers3/fastq/{sample}_1.fished.fastq',
-        f2='razers3/fastq/{sample}_2.fished.fastq'
+        f1="results/razers3/fastq/{sample}_1.fished.fastq",
+        f2="results/razers3/fastq/{sample}_2.fished.fastq"
     output:
-        report("optitype/{sample}/hla_alleles_{sample}.tsv", caption="../report/HLA_Types.rst", category="HLA-Typing")
+        report("results/optitype/{sample}/hla_alleles_{sample}.tsv", caption="../report/HLA_Types.rst", category="HLA-Typing")
     params:
-        outdir="optitype/{sample}/",
+        outdir="results/optitype/{sample}/",
         conf=config["params"]["optitype"]
     conda:
         "../envs/optitype.yaml"
@@ -54,13 +54,13 @@ rule OptiType:
 
 rule mhcflurry:
     input:
-        peptides="microphaser/fasta/{sample}/filtered/{sample}.{chr}.{group}.fa",
-        alleles="optitype/{sample}/hla_alleles_{sample}.tsv",
+        peptides="results/microphaser/fasta/{sample}/filtered/{sample}.{chr}.{group}.fa",
+        alleles="results/optitype/{sample}/hla_alleles_{sample}.tsv",
         wt_alleles=get_germline_optitype
     output:
-        "mhcflurry/{sample}/{chr}/output.{group}.csv"
+        "results/mhcflurry/{sample}/{chr}/output.{group}.csv"
     log:
-        "logs/mhcflurry/{sample}/{chr}/log.{group}.txt"
+        "results/logs/mhcflurry/{sample}/{chr}/log.{group}.txt"
 #    conda:
 #        "../envs/mhctools.yaml"
     run:
@@ -73,13 +73,13 @@ rule mhcflurry:
 
 rule netMHCpan:
     input:
-        peptides="microphaser/fasta/{sample}/filtered/mhc1/{sample}.{chr}.{group}.fa",
-        alleles="optitype/{sample}/hla_alleles_{sample}.tsv",
+        peptides="results/microphaser/fasta/{sample}/filtered/mhc1/{sample}.{chr}.{group}.fa",
+        alleles="results/optitype/{sample}/hla_alleles_{sample}.tsv",
         wt_alleles=get_germline_optitype
     output:
-        "mhc1/{sample}/{chr}/{sample}.{chr}.{group}.xls",
+        "results/mhc1/{sample}/{chr}/{sample}.{chr}.{group}.xls",
     log:
-        "logs/mhc1/{sample}/{chr}/{sample}.{chr}.{group}.log"
+        "results/logs/mhc1/{sample}/{chr}/{sample}.{chr}.{group}.log"
     params:
         extra = config["params"]["netMHCpan"]
     run:
@@ -93,13 +93,13 @@ rule netMHCpan:
 
 rule netMHC2:
     input:
-        peptides="microphaser/fasta/{sample}/filtered/mhc2/{sample}.{chr}.{group}.fa",
-        alleles = "HLA-LA/hlaII_{sample}.tsv",
+        peptides="results/microphaser/fasta/{sample}/filtered/mhc2/{sample}.{chr}.{group}.fa",
+        alleles = "results/HLA-LA/hlaII_{sample}.tsv",
         wt_alleles=get_germline_hla
     output:
-        "mhc2/{sample}/{chr}/{sample}.{chr}.{group}.xls",
+        "results/mhc2/{sample}/{chr}/{sample}.{chr}.{group}.xls",
     log:
-        "logs/mhc2/{sample}/{chr}/{sample}.{chr}.{group}.log"
+        "results/logs/mhc2/{sample}/{chr}/{sample}.{chr}.{group}.log"
     params:
         extra=config["params"]["netMHCIIpan"]
     run:
@@ -112,9 +112,9 @@ rule netMHC2:
 
 rule parse_mhc_out:
     input:
-        expand("{{mhc}}/{{sample}}/{chr}/{{sample}}.{chr}.{{group}}.xls", chr=contigs)
+        expand("results/{{mhc}}/{{sample}}/{chr}/{{sample}}.{chr}.{{group}}.xls", chr=contigs)
     output:
-        "{mhc}/{sample}/{sample}.mhc.{group}.tsv"
+        "results/{mhc}/{sample}/{sample}.mhc.{group}.tsv"
     wildcard_constraints:
         group="wt|mt"
     script:
@@ -122,9 +122,9 @@ rule parse_mhc_out:
 
 rule parse_mhcflurry:
     input:
-        expand("mhcflurry/{{sample}}/{chr}/output.{{group}}.csv", chr=contigs)
+        expand("results/mhcflurry/{{sample}}/{chr}/output.{{group}}.csv", chr=contigs)
     output:
-        "mhcflurry/{sample}/{sample}.mhc.{group}.csv"
+        "results/mhcflurry/{sample}/{sample}.mhc.{group}.csv"
     wildcard_constraints:
         group="wt|mt"
     conda:
@@ -134,29 +134,29 @@ rule parse_mhcflurry:
 
 rule mhc_csv_table:
     input:
-        info="microphaser/info/{sample}/filtered/{sample}.tsv",
-        mt="{mhc}/{sample}/{sample}.mhc.mt.tsv",
-        wt="{mhc}/{sample}/{sample}.mhc.wt.tsv"
+        info="results/microphaser/info/{sample}/filtered/{sample}.tsv",
+        mt="results/{mhc}/{sample}/{sample}.mhc.mt.tsv",
+        wt="results/{mhc}/{sample}/{sample}.mhc.wt.tsv"
     output:
-        report("results/{mhc}/{sample}.WES.tsv", caption="../report/WES_results.rst", category="Results WES")
+        report("results/neoantigens/{mhc}/{sample}.WES.tsv", caption="../report/WES_results.rst", category="Results WES")
     script:
         "../scripts/merge_data.py"
 
 rule mhcflurry_table:
     input:
-        info="microphaser/info/{sample}/filtered/{sample}.tsv",
-        mt="mhcflurry/{sample}/{sample}.mhc.mt.tsv",
-        wt="mhcflurry/{sample}/{sample}.mhc.wt.tsv"
+        info="results/microphaser/info/{sample}/filtered/{sample}.tsv",
+        mt="results/mhcflurry/{sample}/{sample}.mhc.mt.tsv",
+        wt="results/mhcflurry/{sample}/{sample}.mhc.wt.tsv"
     output:
-        report("results/mhcflurry/{sample}.WES.tsv", caption="../report/WES_results.rst", category="Results WES")
+        report("results/neoantigens/mhcflurry/{sample}.WES.tsv", caption="../report/WES_results.rst", category="Results WES")
     script:
         "../scripts/merge_mhcflurry.py"
 
 rule add_RNA_info:
     input:
-        counts="transcriptome/kallisto/{sample}/abundance.tsv",
-        table="results/{mhc}/{sample}.WES.tsv"
+        counts="results/kallisto/{sample}/abundance.tsv",
+        table="results/neoantigens/{mhc}/{sample}.WES.tsv"
     output:
-        report("results/{mhc}/{sample}.RNA.tsv", caption="../report/RNA_results.rst", category="Results RNA")
+        report("results/neoantigens/{mhc}/{sample}.RNA.tsv", caption="../report/RNA_results.rst", category="Results RNA")
     script:
         "../scripts/add_rna_info.py"

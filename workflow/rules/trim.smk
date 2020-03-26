@@ -6,9 +6,9 @@ rule cutadapt_pe:
     input:
         get_fastq
     output:
-        fastq1="trimmed/{sample}-{unit}.1.fastq.gz",
-        fastq2="trimmed/{sample}-{unit}.2.fastq.gz",
-        qc="trimmed/{sample}-{unit}.qc.txt"
+        fastq1="results/trimmed/{sample}-{unit}.1.fastq.gz",
+        fastq2="results/trimmed/{sample}-{unit}.2.fastq.gz",
+        qc="results/trimmed/{sample}-{unit}.qc.txt"
     params:
         "-a {} {}".format(config["adapter"], config["params"]["cutadapt-pe"])
     log:
@@ -21,8 +21,8 @@ rule cutadapt:
     input:
         get_fastq
     output:
-        fastq="trimmed/{sample}-{unit}.fastq.gz",
-        qc="trimmed/{sample}-{unit}.qc.txt"
+        fastq="results/trimmed/{sample}-{unit}.fastq.gz",
+        qc="results/trimmed/{sample}-{unit}.qc.txt"
     params:
         "-a {} {}".format(config["adapter"], config["params"]["cutadapt-se"])
     log:

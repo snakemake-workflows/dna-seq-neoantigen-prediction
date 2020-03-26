@@ -1,27 +1,28 @@
 rule STAR_index:
     input:
-        fasta="refs/genome.fa",
-        gtf="refs/genome.gtf"
+        fasta="resources/genome.fa",
+        gtf="resources/genome.gtf"
     output:
-        directory("STAR_index")
+        directory("resources/STAR_index")
     params:
         sjdb_overhang="100",
         extra=""#"--sjdbGTFfile {} --sjdbOverhang 100".format(config["ref"]["annotation"])
     log:
         "logs/star/index.log"
     threads: 32
+    cache: True
     wrapper:
         "0.42.0/bio/star/index"
 
 rule align:
     input:
-        "STAR_index",
+        "resources/STAR_index",
         fq1=lambda wc: units.loc[(wc.sample, "RNA"), "fq1"],
         fq2=lambda wc: units.loc[(wc.sample, "RNA"), "fq2"]
     output:
         # see STAR manual for additional output files
-        "star/{sample}/Aligned.out.bam",
-        "star/{sample}/ReadsPerGene.out.tab"
+        "results/star/{sample}/Aligned.out.bam",
+        "results/star/{sample}/ReadsPerGene.out.tab"
     log:
         "logs/star/{sample}.log"
     params:

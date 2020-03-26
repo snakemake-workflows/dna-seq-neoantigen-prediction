@@ -29,10 +29,10 @@ def get_paired_samples(wildcards):
     return [samples.loc[(wildcards.pair), "matched_normal"], samples.loc[wildcards.pair, "sample"]]
 
 def get_paired_bams(wildcards):
-    return expand("bwa/{sample}.rmdup.bam", sample=get_paired_samples(wildcards))
+    return expand("results/bwa/{sample}.rmdup.bam", sample=get_paired_samples(wildcards))
 
 def get_paired_bais(wildcards):
-    return expand("bwa/{sample}.rmdup.bam.bai", sample=get_paired_samples(wildcards))
+    return expand("results/bwa/{sample}.rmdup.bam.bai", sample=get_paired_samples(wildcards))
 
 def get_normal(wildcards):
     return samples.loc[(wildcards.sample), "matched_normal"]
@@ -44,28 +44,28 @@ def get_seperate(sample, group):
     return units.loc[(sample, "DNA"), "fq" + str(group)]
 
 def get_proteome(wildcards):
-    return expand("microphaser/fasta/germline/{normal}/{mhc}/reference_proteome.bin", normal=get_normal(wildcards), mhc=wildcards.mhc)#samples[samples["sample"] == wildcards.sample]["matched_normal"]))
+    return expand("results/microphaser/fasta/germline/{normal}/{mhc}/reference_proteome.bin", normal=get_normal(wildcards), mhc=wildcards.mhc)
 
 def get_germline_optitype(wildcards):
-    return expand("optitype/{germline}/hla_alleles_{germline}.tsv", germline=get_normal(wildcards))
+    return expand("results/optitype/{germline}/hla_alleles_{germline}.tsv", germline=get_normal(wildcards))
 
 def get_germline_hla(wildcards):
-    return expand("HLA-LA/hlaII_{germline}.tsv", germline=get_normal(wildcards))
+    return expand("results/HLA-LA/hlaII_{germline}.tsv", germline=get_normal(wildcards))
 
 def get_normal_bam(wildcards):
-    return expand("bwa/{normal}.rmdup.bam", normal=get_normal(wildcards))
+    return expand("results/bwa/{normal}.rmdup.bam", normal=get_normal(wildcards))
 
 def get_normal_bai(wildcards):
-    return expand("bwa/{normal}.rmdup.bam.bai", normal=get_normal(wildcards))
+    return expand("results/bwa/{normal}.rmdup.bam.bai", normal=get_normal(wildcards))
 
 def get_germline_variants(wildcards):
-    return expand("strelka/germline/{germline}/results/variants/variants.reheader.bcf", germline=get_normal(wildcards))
+    return expand("results/strelka/germline/{germline}/results/variants/variants.reheader.bcf", germline=get_normal(wildcards))
 
 def get_germline_variants_index(wildcards):
-    return expand("strelka/germline/{germline}/results/variants/variants.reheader.bcf.csi", germline=get_normal(wildcards))
+    return expand("results/strelka/germline/{germline}/results/variants/variants.reheader.bcf.csi", germline=get_normal(wildcards))
 
 def get_pair_observations(wildcards):
-    return expand("observations/{pair}/{sample}.{caller}.bcf", 
+    return expand("results/observations/{pair}/{sample}.{caller}.bcf", 
                   caller=wildcards.caller, 
                   pair=wildcards.pair,
                   sample=get_paired_samples(wildcards))

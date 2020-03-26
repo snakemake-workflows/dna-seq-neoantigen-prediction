@@ -2,7 +2,7 @@ rule filter_by_annotation:
     input:
         get_annotated_bcf
     output:
-        "calls/{group}.{filter}.filtered.bcf"
+        "results/calls/{group}.{filter}.filtered.bcf"
     params:
         filter=lambda w: config["calling"]["filter"][w.filter]
     conda:
@@ -13,9 +13,9 @@ rule filter_by_annotation:
 
 rule control_fdr:
     input:
-        "calls/{pair}.vcf"
+        "results/calls/{pair}.vcf"
     output:
-        "calls/{pair}.{event}.{vartype}.fdr-controlled.bcf"
+        "results/calls/{pair}.{event}.{vartype}.fdr-controlled.bcf"
     params:
         threshold=config["calling"]["fdr-control"]["threshold"],
         events=lambda wc: config["calling"]["fdr-control"]["events"][wc.event]["varlociraptor"]
@@ -27,8 +27,8 @@ rule control_fdr:
 
 rule concat_vartypes:
     input:
-        calls=expand("calls/{{pair}}.{{event}}.{vartype}.fdr-controlled.bcf", vartype=["SNV", "DEL", "INS"]),
-        indexes=expand("calls/{{pair}}.{{event}}.{vartype}.fdr-controlled.bcf.csi", vartype=["SNV", "DEL", "INS"])
+        calls=expand("results/calls/{{pair}}.{{event}}.{vartype}.fdr-controlled.bcf", vartype=["SNV", "DEL", "INS"]),
+        indexes=expand("results/calls/{{pair}}.{{event}}.{vartype}.fdr-controlled.bcf.csi", vartype=["SNV", "DEL", "INS"])
     output:
         "calls/{pair}.{event}.fdr-controlled.vcf"
     params:

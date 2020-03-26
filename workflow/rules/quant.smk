@@ -9,9 +9,9 @@ rule kallisto_index:
     input:
         config["reference"]["transcriptome"]
     output:
-        "transcriptome/kallisto/transcripts.idx"
+        "resources/kallisto/transcripts.idx"
     log:
-        "logs/kallisto/index.log"
+        "results/logs/kallisto/index.log"
     conda:
         "../envs/kallisto.yaml"
     shell:
@@ -34,15 +34,15 @@ def kallisto_params(wildcards, input):
 rule kallisto_quant:
     input:
         fq=get_fastqs,
-        idx="transcriptome/kallisto/transcripts.idx"
+        idx="resources/kallisto/transcripts.idx"
     output:
-        abundance="transcriptome/kallisto/{sample}/abundance.tsv"
+        abundance="results//kallisto/{sample}/abundance.tsv"
     log:
-        "logs/kallisto/quant/{sample}.log"
+        "results/logs/kallisto/quant/{sample}.log"
     params:
         extra=kallisto_params
     conda:
         "../envs/kallisto.yaml"
     shell:
-        "kallisto quant -i {input.idx} -o transcriptome/kallisto/{wildcards.sample} "
+        "kallisto quant -i {input.idx} -o results/kallisto/{wildcards.sample} "
         "{params.extra} {input.fq} 2> {log}"

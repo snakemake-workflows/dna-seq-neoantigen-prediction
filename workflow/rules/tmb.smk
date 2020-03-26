@@ -1,9 +1,9 @@
 if config["tmb"]["activate"]:
     rule estimate_tmb:
         input:
-            "calls/{pair}.annotated.vcf"
+            "results/calls/{pair}.annotated.vcf"
         output:
-            "plots/tmb/{pair}.tmb.vl.json"
+            "results/plots/tmb/{pair}.tmb.vl.json"
         conda:
             "../envs/varlociraptor.yaml"
         params:

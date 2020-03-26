@@ -1,15 +1,15 @@
 rule arriba:
     input:
-        bam="star/{sample}/Aligned.out.bam"
+        bam="results/star/{sample}/Aligned.out.bam"
     output:
-        fusions="arriba/{sample}.fusions.tsv",
-        discarded="arriba/{sample}.fusions.discarded.tsv"
+        fusions="results/arriba/{sample}.fusions.tsv",
+        discarded="results/arriba/{sample}.fusions.discarded.tsv"
     params:
         genome=config["reference"]["genome"],
         annotation=config["reference"]["annotation"],
         blacklist=config["fusion"]["arriba"]["blacklist"]
     log:
-        "logs/arriba/{sample}.log"
+        "results/logs/arriba/{sample}.log"
     conda:
         "../envs/arriba.yaml"
     threads:

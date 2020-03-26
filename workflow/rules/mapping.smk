@@ -2,9 +2,9 @@ rule map:
     input:
         reads=get_DNA_reads
     output:
-        "bwa/{sample}.bam"
+        "results/bwa/{sample}.bam"
     log:
-        "logs/bwa_mem/{sample}.log"
+        "results/logs/bwa_mem/{sample}.log"
     params:
         index=config["reference"]["genome"],
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
@@ -17,12 +17,12 @@ rule map:
 
 rule mark_duplicates:
     input:
-        "bwa/{sample}.bam"
+        "results/bwa/{sample}.bam"
     output:
-        bam="bwa/{sample}.rmdup.bam",
-        metrics="dedup/{sample}.metrics.txt"
+        bam="results/bwa/{sample}.rmdup.bam",
+        metrics="results/dedup/{sample}.metrics.txt"
     log:
-        "logs/picard/dedup/{sample}.log"
+        "results/logs/picard/dedup/{sample}.log"
     params:
         "REMOVE_DUPLICATES=true"
     wrapper:
@@ -30,9 +30,9 @@ rule mark_duplicates:
 
 rule index:
     input:
-        bam="bwa/{sample}.rmdup.bam"
+        bam="results/bwa/{sample}.rmdup.bam"
     output:
-        bam="bwa/{sample}.rmdup.bam.bai"
+        bam="results/bwa/{sample}.rmdup.bam.bai"
     params: ""
     wrapper:
         "0.31.1/bio/samtools/index"

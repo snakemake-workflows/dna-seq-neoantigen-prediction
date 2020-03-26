@@ -2,9 +2,9 @@ rule render_scenario:
     input:
         config["calling"]["scenario"]
     output:
-        report("scenarios/{pair}.yaml", caption="../report/scenario.rst", category="Variant calling scenarios")
+        report("results/scenarios/{pair}.yaml", caption="../report/scenario.rst", category="Variant calling scenarios")
     params:
-        samples = samples
+        samples=samples
     conda:
         "../envs/render_scenario.yaml"
     script:
@@ -13,12 +13,12 @@ rule render_scenario:
 rule varlociraptor_preprocess:
     input:
         ref=config["reference"]["genome"],
-        candidates="candidate-calls/{pair}.{caller}.bcf",
-        bcf_index = "candidate-calls/{pair}.{caller}.bcf.csi",
-        bam="bwa/{sample}.rmdup.bam",
-        bai="bwa/{sample}.rmdup.bam.bai"
+        candidates="results/candidate-calls/{pair}.{caller}.bcf",
+        bcf_index = "results/candidate-calls/{pair}.{caller}.bcf.csi",
+        bam="results/bwa/{sample}.rmdup.bam",
+        bai="results/bwa/{sample}.rmdup.bam.bai"
     output:
-        "observations/{pair}/{sample}.{caller}.bcf"
+        "results/observations/{pair}/{sample}.{caller}.bcf"
     log:
         "logs/varlociraptor/preprocess/{pair}/{sample}.{caller}.log"
     conda:
@@ -30,9 +30,9 @@ rule varlociraptor_preprocess:
 rule varlociraptor_call:
     input:
         obs=get_pair_observations,
-        scenario="scenarios/{pair}.yaml"
+        scenario="results/scenarios/{pair}.yaml"
     output:
-        temp("calls/{pair}.{caller}.bcf")
+        temp("results/calls/{pair}.{caller}.bcf")
     log:
         "logs/varlociraptor/call/{pair}.{caller}.{contig}.log"
     params:
@@ -47,15 +47,15 @@ rule varlociraptor_call:
 rule bcftools_concat:
     input:
         calls = expand(
-            "calls/{{pair}}.{caller}.bcf",
+            "results/calls/{{pair}}.{caller}.bcf",
             caller=caller
         ),
         indexes = expand(
-            "calls/{{pair}}.{caller}.bcf.csi",
+            "results/calls/{{pair}}.{caller}.bcf.csi",
             caller=caller
         ),
     output:
-        "calls/{pair}.vcf"
+        "results/calls/{pair}.vcf"
     params:
         "-a -Ob" # Check this
     wrapper:
