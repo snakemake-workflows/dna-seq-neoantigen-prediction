@@ -1,3 +1,0 @@
-SyntaxError in line 21 of /home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/rules/ref.smk:
-invalid syntax
-  File "/home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/Snakefile", line 28, in <module>

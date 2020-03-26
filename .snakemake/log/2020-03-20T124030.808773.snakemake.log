@@ -1,4 +1,0 @@
-NameError in line 32 of /home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/rules/ref.smk:
-name 'dictonary' is not defined
-  File "/home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/Snakefile", line 28, in <module>
-  File "/home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/rules/ref.smk", line 32, in <module>

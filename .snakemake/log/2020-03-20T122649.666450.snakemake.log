@@ -1,4 +1,0 @@
-NameError in line 53 of /home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/rules/varlociraptor.smk:
-name 'contigs' is not defined
-  File "/home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/Snakefile", line 22, in <module>
-  File "/home/forster/paschen_neoantigens/Neoantigen_Prediction/workflow/rules/varlociraptor.smk", line 53, in <module>
