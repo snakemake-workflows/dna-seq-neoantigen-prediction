@@ -1,21 +1,21 @@
-rule filter_by_annotation:
-    input:
-        get_annotated_bcf
-    output:
-        "results/calls/{group}.{filter}.filtered.bcf"
-    params:
-        filter=lambda w: config["calling"]["filter"][w.filter]
-    conda:
-        "../envs/snpsift.yaml"
-    shell:
-        "bcftools view {input} | SnpSift filter \"{params.filter}\" | bcftools view -Ob > {output}"
+# rule filter_by_annotation:
+#     input:
+#         get_annotated_bcf
+#     output:
+#         "results/calls/{group}.{filter}.filtered.bcf"
+#     params:
+#         filter=lambda w: config["calling"]["filter"][w.filter]
+#     conda:
+#         "../envs/snpsift.yaml"
+#     shell:
+#         "bcftools view {input} | SnpSift filter \"{params.filter}\" | bcftools view -Ob > {output}"
 
 
 rule control_fdr:
     input:
-        "results/calls/{pair}.vcf"
+        get_annotated_bcf
     output:
-        "results/calls/{pair}.{event}.{vartype}.fdr-controlled.bcf"
+        "results/calls/{pair}.{vartype}.{event}.fdr-controlled.bcf"
     params:
         threshold=config["calling"]["fdr-control"]["threshold"],
         events=lambda wc: config["calling"]["fdr-control"]["events"][wc.event]["varlociraptor"]
@@ -25,13 +25,23 @@ rule control_fdr:
         "varlociraptor filter-calls control-fdr {input} --var {wildcards.vartype} "
         "--events {params.events} --fdr {params.threshold} > {output}"
 
-rule concat_vartypes:
+
+def get_merge_input(ext=".bcf"):
+    def inner(wildcards):
+        return expand("results/calls/{{pair}}.{vartype}.{{event}}.fdr-controlled{ext}",
+                      ext=ext,
+                      vartype=["SNV", "INS", "DEL", "MNV"],
+                      filter=config["calling"]["fdr-control"]["events"][wildcards.event])
+    return inner
+
+
+rule merge_calls:
     input:
-        calls=expand("results/calls/{{pair}}.{{event}}.{vartype}.fdr-controlled.bcf", vartype=["SNV", "DEL", "INS"]),
-        indexes=expand("results/calls/{{pair}}.{{event}}.{vartype}.fdr-controlled.bcf.csi", vartype=["SNV", "DEL", "INS"])
+        calls=get_merge_input(".bcf"),
+        idx=get_merge_input(".bcf.csi")
     output:
-        "calls/{pair}.{event}.fdr-controlled.vcf"
+        "results/merged-calls/{pair}.{event}.fdr-controlled.bcf"
     params:
-        "-a" # Check this
+        "-a -Ob"
     wrapper:
-        "0.35.2/bio/bcftools/concat"
+        "0.37.1/bio/bcftools/concat"

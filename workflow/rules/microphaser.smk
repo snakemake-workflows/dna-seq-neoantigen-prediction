@@ -4,15 +4,15 @@ rule microphaser_somatic:
         bam="results/bwa/{sample}.rmdup.bam",
         bai="results/bwa/{sample}.rmdup.bam.bai",
         track="resources/annotation/{contig}.gtf",
+        ref="resources/genome.fasta"
     output:
         mt_fasta="results/microphaser/fasta/{sample}/{sample}.{contig}.mt.fa",
         wt_fasta="results/microphaser/fasta/{sample}/{sample}.{contig}.wt.fa",
-        tsv=temp("results/microphaser/info/{sample}/{sample}.{contig}.tsv")
+        tsv="results/microphaser/info/{sample}/{sample}.{contig}.tsv"
     params:
-        ref=config["reference"]["genome"],
         window_length=config["params"]["microphaser"]["window_len"]
     shell:
-        "../microphaser/target/release/microphaser somatic {input.bam} --variants {input.vcf} --ref {params.ref} --tsv {output.tsv} -n {output.wt_fasta} -w {params.window_length} "
+        "../microphaser/target/release/microphaser somatic {input.bam} --variants {input.vcf} --ref {input.ref} --tsv {output.tsv} -n {output.wt_fasta} -w {params.window_length} "
         "< {input.track} > {output.mt_fasta}"
 
 rule microphaser_germline:
@@ -21,13 +21,13 @@ rule microphaser_germline:
         bam="results/bwa/{normal}.rmdup.bam",
         bai="results/bwa/{normal}.rmdup.bam.bai",
         track="resources/annotation/{contig}.gtf",
+        ref="resources/genome.fasta"
     output:
         wt_fasta="results/microphaser/fasta/germline/{normal}/{normal}.germline.{contig}.fa"
     params:
-        ref=config["reference"]["genome"],
         window_length=config["params"]["microphaser"]["window_len"]
     shell:
-        "../microphaser/target/release/microphaser normal {input.bam} --variants {input.vcf} --ref {params.ref} -w {params.window_length} "
+        "../microphaser/target/release/microphaser normal {input.bam} --variants {input.vcf} --ref {input.ref} -w {params.window_length} "
         "< {input.track} > {output.wt_fasta}"
 
 rule concat_proteome:
@@ -65,9 +65,8 @@ rule concat_tsvs:
     input:
         expand("results/microphaser/info/{{sample}}/filtered/{{mhc}}/{{sample}}.{contig}.tsv", contig = contigs)
     output:
-       "results/microphaser/info/{sample}/filtered/{{mhc}/sample}.tsv"
+       "results/microphaser/info/{sample}/filtered/{mhc}/{sample}.tsv"
     conda:
         "../envs/xsv.yaml"
     shell:
         "xsv cat rows -d '\t' {input} | xsv fmt -t '\t' -d ',' > {output}"
-

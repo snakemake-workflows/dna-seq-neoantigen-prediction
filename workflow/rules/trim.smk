@@ -12,7 +12,7 @@ rule cutadapt_pe:
     params:
         "-a {} {}".format(config["adapter"], config["params"]["cutadapt-pe"])
     log:
-        "logs/cutadapt/{sample}-{unit}.log"
+        "results/logs/cutadapt/{sample}-{unit}.log"
     wrapper:
         "0.17.4/bio/cutadapt/pe"
 
@@ -26,6 +26,6 @@ rule cutadapt:
     params:
         "-a {} {}".format(config["adapter"], config["params"]["cutadapt-se"])
     log:
-        "logs/cutadapt/{sample}-{unit}.log"
+        "results/logs/cutadapt/{sample}-{unit}.log"
     wrapper:
         "0.17.4/bio/cutadapt/se"

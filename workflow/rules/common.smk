@@ -13,12 +13,31 @@ print(units)
 #validate(units, schema="schemas/units.schema.yaml")
 
 contigs = pd.read_csv(
-    config["reference"]["genome"] + ".fai",
+    "resources/genome.fasta.fai",
     header=None, usecols=[0], squeeze=True, dtype=str, sep="\t"
 )
 
 # Use this to ignore decoy and unplaced contigs.
-contigs = contigs[contigs.str.contains("_|M") == False]
+contigs = contigs[contigs.str.contains("_|M|G|K|U") == False]
+
+def get_oncoprint_batch(wildcards):
+    if wildcards.batch == "all":
+        groups = samples[samples["type"] == "tumor"]["sample"].unique()
+    else:
+        groups = samples.loc[samples[config["oncoprint"]["stratify"]["by-column"]] == wildcards.batch, "group"].unique()
+    return expand("merged-calls/{group}.{{event}}.fdr-controlled.bcf", group=groups)
+
+def get_annotated_bcf(wildcards, pair=None):
+    if pair is None:
+        pair = wildcards.pair
+    selection = ".annotated"
+    return "calls/{pair}{selection}.bcf".format(pair=pair, selection=selection)
+
+def get_read_group(wildcards):
+    """Denote sample name and platform in read group."""
+    return r"-R '@RG\tID:{sample}\tSM:{sample}\tPL:{platform}'".format(
+        sample=wildcards.sample,
+        platform=samples.loc[wildcards.sample, "platform"])
 
 def get_DNA_reads(wildcards):
     if config["trimming"]["skip"]:
@@ -29,10 +48,10 @@ def get_paired_samples(wildcards):
     return [samples.loc[(wildcards.pair), "matched_normal"], samples.loc[wildcards.pair, "sample"]]
 
 def get_paired_bams(wildcards):
-    return expand("results/bwa/{sample}.rmdup.bam", sample=get_paired_samples(wildcards))
+    return expand("results/recal/{sample}.sorted.bam", sample=get_paired_samples(wildcards))
 
 def get_paired_bais(wildcards):
-    return expand("results/bwa/{sample}.rmdup.bam.bai", sample=get_paired_samples(wildcards))
+    return expand("results/recal/{sample}.sorted.bam.bai", sample=get_paired_samples(wildcards))
 
 def get_normal(wildcards):
     return samples.loc[(wildcards.sample), "matched_normal"]
@@ -47,16 +66,16 @@ def get_proteome(wildcards):
     return expand("results/microphaser/fasta/germline/{normal}/{mhc}/reference_proteome.bin", normal=get_normal(wildcards), mhc=wildcards.mhc)
 
 def get_germline_optitype(wildcards):
-    return expand("results/optitype/{germline}/hla_alleles_{germline}.tsv", germline=get_normal(wildcards))
+    return expand("results/optitype/{germline}/hla_alleles_{germline}.tsv", germline=get_normal(wildcards))[0]
 
 def get_germline_hla(wildcards):
-    return expand("results/HLA-LA/hlaII_{germline}.tsv", germline=get_normal(wildcards))
+    return expand("results/HLA-LA/hlaII_{germline}.tsv", germline=get_normal(wildcards))[0]
 
 def get_normal_bam(wildcards):
-    return expand("results/bwa/{normal}.rmdup.bam", normal=get_normal(wildcards))
+    return expand("results/recal/{normal}.sorted.bam", normal=get_normal(wildcards))
 
 def get_normal_bai(wildcards):
-    return expand("results/bwa/{normal}.rmdup.bam.bai", normal=get_normal(wildcards))
+    return expand("results/recal/{normal}.sorted.bam.bai", normal=get_normal(wildcards))
 
 def get_germline_variants(wildcards):
     return expand("results/strelka/germline/{germline}/results/variants/variants.reheader.bcf", germline=get_normal(wildcards))

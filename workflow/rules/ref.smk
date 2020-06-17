@@ -31,9 +31,10 @@ rule split_annotation:
     input:
         "resources/genome.gtf"
     output:
-        directory("resources/annotation")
+        "resources/annotation/{contig}.gtf"
     shell:
-        "mkdir {output} && awk '!/^#/{{print >\"{output}/\"$1\".gtf\"}}' {input}"
+       "grep {wildcards.contig} {input} > {output}"
+        #"awk '!/^#/{{print >\"{output}/\"$1\".gtf\"}}' {input}"
 
 
 rule genome_faidx:
@@ -103,11 +104,23 @@ rule bwa_index:
     input:
         "resources/genome.fasta"
     output:
-        multiext("resources/genome", ".amb", ".ann", ".bwt", ".pac", ".sa")
+        multiext("resources/genome.fasta", ".amb", ".ann", ".bwt", ".pac", ".sa")
     log:
         "logs/bwa_index.log"
-    params:
-        prefix="resources/genome"
     cache: True
     wrapper:
         "0.45.1/bio/bwa/index"
+
+
+rule get_snpeff_data:
+    output:
+        directory("resources/snpEff/GRCh38.86")
+    log:
+        "logs/snpEff_download.log"
+    cache: True
+    params:
+        data_dir=lambda _, output: str(Path(output[0]).parent.resolve())
+    conda:
+        "../envs/snpeff.yaml"
+    shell:
+        "snpEff download -dataDir {params.data_dir} GRCh38.86 2> {log}"

@@ -2,5 +2,5 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - r-base =3.5.1
-  - r-phangorn =2.4
+  - pysam =0.15
+  - pandas =0.25

@@ -8,7 +8,9 @@ rule HLA_LA:
     params:
         graph="PRG_MHC_GRCh38_withIMGT",
         graphdir=config["reference"]["HLA_LA_graphs"],
-        extra_refs="../HLA-LA_graphs/additionalReferences/PRG_MHC_GRCh38_withIMGT"
+        #extra_refs="/vol/tiny/MaMel-Neoantigens/HLA-LA_graphs/additionalReferences/PRG_MHC_GRCh38_withIMGT"
+    conda:
+        "../envs/hla_la.yaml"
     shell:
         "HLA-LA.pl --bam {input.bam} --sampleID {wildcards.sample} --graph {params.graph} --customGraphDir {params.graphdir} --workingDir results/HLA-LA/output --maxThreads {threads}"
 
@@ -134,7 +136,7 @@ rule parse_mhcflurry:
 
 rule mhc_csv_table:
     input:
-        info="results/microphaser/info/{sample}/filtered/{sample}.tsv",
+        info="results/microphaser/info/{sample}/filtered/{mhc}/{sample}.tsv",
         mt="results/{mhc}/{sample}/{sample}.mhc.mt.tsv",
         wt="results/{mhc}/{sample}/{sample}.mhc.wt.tsv"
     output:
@@ -144,7 +146,7 @@ rule mhc_csv_table:
 
 rule mhcflurry_table:
     input:
-        info="results/microphaser/info/{sample}/filtered/{sample}.tsv",
+        info="results/microphaser/info/{sample}/filtered/mhc1/{sample}.tsv",
         mt="results/mhcflurry/{sample}/{sample}.mhc.mt.tsv",
         wt="results/mhcflurry/{sample}/{sample}.mhc.wt.tsv"
     output:

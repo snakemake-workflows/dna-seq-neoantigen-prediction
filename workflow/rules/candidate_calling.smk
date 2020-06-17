@@ -1,6 +1,6 @@
 rule freebayes:
     input:
-        ref=config["reference"]["genome"],
+        ref="resources/genome.fasta",
         # you can have a list of samples here
         samples=get_paired_bams
     output:
@@ -16,7 +16,7 @@ rule freebayes:
 
 rule delly:
     input:
-        ref=config["reference"]["genome"],
+        ref=resources/genome.fasta,
         samples=get_paired_bams,
         index=get_paired_bais,
     output:

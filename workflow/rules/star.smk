@@ -1,6 +1,6 @@
 rule STAR_index:
     input:
-        fasta="resources/genome.fa",
+        fasta="resources/genome.fasta",
         gtf="resources/genome.gtf"
     output:
         directory("resources/STAR_index")
