@@ -9,6 +9,19 @@ rule get_genome:
     cache: True
     wrapper:
         "0.45.1/bio/reference/ensembl-sequence"
+        
+
+rule get_cdna:
+    output:
+        "resources/genome.cdna.fasta"
+    params:
+        species=config["ref"]["species"],
+        datatype="cdna",
+        build=config["ref"]["build"],
+        release=config["ref"]["release"]
+    cache: True
+    wrapper:
+        "0.45.1/bio/reference/ensembl-sequence"
 
 
 rule get_annotation:

@@ -7,15 +7,16 @@ def get_fastqs(wildcards):
 
 rule kallisto_index:
     input:
-        config["reference"]["transcriptome"]
+        "resources/genome.cdna.fasta"
     output:
         "resources/kallisto/transcripts.idx"
+    params:
+        extra=""
     log:
         "results/logs/kallisto/index.log"
-    conda:
-        "../envs/kallisto.yaml"
-    shell:
-        "kallisto index -i {output} {input} 2> {log}"
+    cache: True
+    wrapper:
+        "0.60.1/bio/kallisto/index"
 
 
 def kallisto_params(wildcards, input):
@@ -33,16 +34,13 @@ def kallisto_params(wildcards, input):
 
 rule kallisto_quant:
     input:
-        fq=get_fastqs,
-        idx="resources/kallisto/transcripts.idx"
+        fastq=get_fastqs,
+        index="resources/kallisto/transcripts.idx"
     output:
-        abundance="results//kallisto/{sample}/abundance.tsv"
-    log:
-        "results/logs/kallisto/quant/{sample}.log"
+        directory("results//kallisto/{sample}"}
     params:
         extra=kallisto_params
-    conda:
-        "../envs/kallisto.yaml"
-    shell:
-        "kallisto quant -i {input.idx} -o results/kallisto/{wildcards.sample} "
-        "{params.extra} {input.fq} 2> {log}"
+    log:
+        "results/logs/kallisto/quant/{sample}.log"
+    wrapper:
+        "0.60.1/bio/kallisto/quant"

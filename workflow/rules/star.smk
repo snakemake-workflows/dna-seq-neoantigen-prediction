@@ -32,8 +32,8 @@ rule align:
         extra="--outSAMtype BAM Unsorted --chimSegmentMin 10 --chimOutType WithinBAM SoftClip "
             " --chimJunctionOverhangMin 10 --chimScoreMin 1 --chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0 "
             " --chimScoreSeparation 1 --alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3 "
-            "--quantMode GeneCounts --sjdbGTFfile {} {}".format(
-              config["reference"]["annotation"], config["params"]["star"])
+            "--quantMode GeneCounts --sjdbGTFfile resources/genome.gtf {}".format(
+            config["params"]["star"])
     threads: 8
     wrapper:
         "0.42.0/bio/star/align"
