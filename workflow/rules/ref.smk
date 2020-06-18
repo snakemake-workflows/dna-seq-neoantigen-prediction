@@ -9,7 +9,7 @@ rule get_genome:
     cache: True
     wrapper:
         "0.45.1/bio/reference/ensembl-sequence"
-        
+
 
 rule get_cdna:
     output:
@@ -70,6 +70,17 @@ rule genome_dict:
     cache: True
     wrapper:
         "0.45.1/bio/picard/createsequencedictionary"
+
+rule get_callregions:
+    input:
+        "resources/genome.fasta.fai",
+    output:
+        "resources/genome.callregions.bed"
+    params:
+        n_contigs = config["ref"]["n_chromosomes"]
+    shell:
+        "paste <(cut -f1 {input}) <(yes 0 | head -n {params.n_contigs}) <(cut -f2 {input})"
+        " | head -n {params.n_contigs} > {output}"
 
 
 rule get_known_variants:

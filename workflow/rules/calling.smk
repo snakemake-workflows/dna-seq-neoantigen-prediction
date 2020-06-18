@@ -12,8 +12,7 @@ rule strelka_somatic:
     log:
         "results/log/calling/strelka_somatic/{sample}.log"
     params:
-        config_extra="--callRegions {} {}".format(config["reference"]["call_regions"], 
-config["params"]["strelka"]),
+        config_extra="--callRegions resources/genome.callregions.bed {}".format(config["params"]["strelka"]),
         run_extra=""
     threads: 22
     wrapper:
@@ -30,8 +29,7 @@ rule strelka_germline:
     log:
         "results/log/calling/strelka_germline/{normal}.log"
     params:
-        config_extra="--callRegions {} {}".format(config["reference"]["call_regions"], 
-config["params"]["strelka"]),
+        config_extra="--callRegions resources/genome.callregions.bed {}".format(config["params"]["strelka"]),
         run_extra=""
     threads: 22
     wrapper:

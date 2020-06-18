@@ -14,11 +14,8 @@ print(units)
 
 contigs = pd.read_csv(
     "resources/genome.fasta.fai",
-    header=None, usecols=[0], squeeze=True, dtype=str, sep="\t"
+    header=None, usecols=[0], squeeze=True, dtype=str, sep="\t", nrows=config["ref"]["n_chromosomes"]
 )
-
-# Use this to ignore decoy and unplaced contigs.
-contigs = contigs[contigs.str.contains("_|M|G|K|U") == False]
 
 def get_oncoprint_batch(wildcards):
     if wildcards.batch == "all":
