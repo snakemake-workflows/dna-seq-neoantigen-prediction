@@ -138,13 +138,11 @@ rule bwa_index:
 
 rule get_snpeff_data:
     output:
-        directory("resources/snpEff/GRCh38.86")
+        directory("resources/snpEff/{reference}")
     log:
-        "logs/snpEff_download.log"
+        "logs/snpeff/download/{reference}.log"
     cache: True
     params:
-        data_dir=lambda _, output: str(Path(output[0]).parent.resolve())
-    conda:
-        "../envs/snpeff.yaml"
-    shell:
-        "snpEff download -dataDir {params.data_dir} GRCh38.86 2> {log}"
+        reference="{reference}"
+    wrapper:
+        "0.60.1/bio/snpeff/download"

@@ -1,23 +1,21 @@
 rule arriba:
     input:
         bam="results/star/{sample}/Aligned.out.bam"
+        genome="resources/genome.fasta",
+        annotation="resources/genome.gtf"
     output:
         fusions="results/arriba/{sample}.fusions.tsv",
         discarded="results/arriba/{sample}.fusions.discarded.tsv"
     params:
-        genome=config["reference"]["genome"],
-        annotation=config["reference"]["annotation"],
-        blacklist=config["fusion"]["arriba"]["blacklist"]
+        blacklist=config["fusion"]["arriba"]["blacklist"].
+        extra=config["fusion"]["arriba"]["params"]
     log:
         "results/logs/arriba/{sample}.log"
-    conda:
-        "../envs/arriba.yaml"
     threads:
         1
-    shell:
-        "arriba -x {input.bam} -O {output.discarded} -o {output.fusions} "
-        "-a {params.genome} -g {params.annotation} -b {params.blacklist} -T -P > {log} 2>&1" #TODO: wrapper
-
+    wrapper:
+        "0.60.1/bio/arriba"
+        
 ## TODO: Update
 #rule fusioncatcher:
 #    input:
