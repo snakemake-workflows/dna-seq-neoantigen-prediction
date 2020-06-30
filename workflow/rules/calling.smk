@@ -53,7 +53,7 @@ rule index_bcf:
     params:
         extra=""
     wrapper:
-        "0.60.0/bio/bcftools/index""
+        "0.60.0/bio/bcftools/index"
 
 
 rule concat_somatic:

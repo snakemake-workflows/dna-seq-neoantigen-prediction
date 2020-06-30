@@ -18,8 +18,8 @@ rule parse_HLA_LA:
     input:
         "results/HLA-LA/output/{sample}/hla/R1_bestguess_G.txt"
     output:
-        report("results/HLA-LA/hlaI_{sample}.tsv", caption="../report/HLA-LA_Types.rst", category="HLA-Typing(HLA-LA)"),
-        report("results/HLA-LA/hlaII_{sample}.tsv", caption="../report/HLA-LA_Types.rst", category="HLA-Typing(HLA-LA)")
+        report("results/HLA-LA/hlaI_{sample}.tsv", caption="../report/HLA_Types.rst", category="HLA-Typing(HLA-LA)"),
+        report("results/HLA-LA/hlaII_{sample}.tsv", caption="../report/HLA_Types.rst", category="HLA-Typing(HLA-LA)")
     script:
         "../scripts/parse_HLA_types.py"
 
@@ -27,33 +27,48 @@ rule razers3:
     input:
         get_reads
     output:
-        bam="results/razers3/bam/{sample}_{group}.bam",
-        fastq="results/razers3/fastq/{sample}_{group}.fished.fastq"
-    threads: 10
+        bam="results/razers3/bam/{sample}_{group}.bam"
+    threads: 8
     params:
-        hlaref=config["reference"]["hla_data"],
+        genome=config["reference"]["hla_data"],
         extra=config["params"]["razers3"]
-    conda:
-        "../envs/optitype.yaml"
-    shell:
-        "razers3 -tc {threads} {params.extra} {params.hlaref} {input} -o {output.bam} && samtools bam2fq {output.bam} > {output.fastq}"
+    wrapper:
+        "0.61.0/bio/razers3"
+
+rule bam2fq:
+    input:
+        "results/razers3/bam/{sample}_{group}.bam"
+    output:
+        "results/razers3/fastq/{sample}_{group}.fished.fastq"
+    params:
+        ""
+    threads: 1
+    wrapper:
+        "0.61.0/bio/samtools/bam2fq/interleaved"
 
 rule OptiType:
     input:
-        f1="results/razers3/fastq/{sample}_1.fished.fastq",
-        f2="results/razers3/fastq/{sample}_2.fished.fastq"
+        reads=expand("results/razers3/fastq/{{sample}}_{fq}.fished.fastq", fq=[1,2])        
     output:
-        report("results/optitype/{sample}/hla_alleles_{sample}.tsv", caption="../report/HLA_Types.rst", category="HLA-Typing")
+        multiext("results/optitype/{sample}", "_coverage_plot.pdf", "_result.tsv")
     params:
-        outdir="results/optitype/{sample}/",
-        conf=config["params"]["optitype"]
+        extra=config["params"]["optitype"],
+        sequencing_type="dna"
     conda:
         "../envs/optitype.yaml"
     shell:
-        "OptiTypePipeline.py -i {input.f1} {input.f2} --dna --outdir {params.outdir} -c {params.conf} "
-        "&& cat {params.outdir}*/*_result.tsv | cut - -f2-7 | awk 'NR == 1 {{print}} NR>1 {{for (i = 1; i<=6; ++i) sub(/^/, \"&HLA-\", $i); print}}' "
-        "| sed -e s/[*,:]/''/g | sed s/' '/'\t'/g > {output}"
+        "OptiTypePipeline.py -i {input.reads} --outdir results/optitype --prefix {wildcards.sample}"
+        
 
+rule parse_Optitype:
+    input:
+        "results/optitype/{sample}_result.tsv"
+    output:
+        report("results/optitype/{sample}/hla_alleles_{sample}.tsv", caption="../report/HLA_Types.rst", category="HLA-Typing(Optitype)")
+    shell:
+        "cut {input} -f2-7 | awk 'NR == 1 {{print}} NR>1 {{for (i = 1; i<=6; ++i) sub(/^/, \"&HLA-\", $i); print}}' "
+        "| sed -e s/[*,:]/''/g | sed s/' '/'\t'/g > {output}"
+        
 rule mhcflurry:
     input:
         peptides="results/microphaser/fasta/{sample}/filtered/{sample}.{chr}.{group}.fa",
@@ -140,7 +155,7 @@ rule mhc_csv_table:
         mt="results/{mhc}/{sample}/{sample}.mhc.mt.tsv",
         wt="results/{mhc}/{sample}/{sample}.mhc.wt.tsv"
     output:
-        report("results/neoantigens/{mhc}/{sample}.WES.tsv", caption="../report/WES_results.rst", category="Results WES")
+        report("results/neoantigens/{mhc}/{sample}.WES.tsv", caption="../report/WES_results.rst", category="Results WES (netMHC)")
     script:
         "../scripts/merge_data.py"
 
@@ -150,7 +165,7 @@ rule mhcflurry_table:
         mt="results/mhcflurry/{sample}/{sample}.mhc.mt.tsv",
         wt="results/mhcflurry/{sample}/{sample}.mhc.wt.tsv"
     output:
-        report("results/neoantigens/mhcflurry/{sample}.WES.tsv", caption="../report/WES_results.rst", category="Results WES")
+        report("results/neoantigens/mhcflurry/{sample}.WES.tsv", caption="../report/WES_results.rst", category="Results WES (MHCFlurry)")
     script:
         "../scripts/merge_mhcflurry.py"
 

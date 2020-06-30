@@ -2,7 +2,5 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - samtools =1.9
-  - optitype =1.3
-  - razers3 =3.5
-  - coincbc =2.10
+  - optitype ==1.3.4
+

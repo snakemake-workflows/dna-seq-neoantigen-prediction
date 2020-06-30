@@ -3,7 +3,7 @@ if config["tmb"]["activate"]:
         input:
             "results/calls/{pair}.annotated.vcf"
         output:
-            "results/plots/tmb/{pair}.tmb.vl.json"
+            "results/plots/tmb/{pair}.{plotmode}.tmb.vl.json",
         conda:
             "../envs/varlociraptor.yaml"
         params:

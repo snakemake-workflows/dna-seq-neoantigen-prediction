@@ -2,7 +2,7 @@ rule vg2svg:
     input:
         "{prefix}.vl.json"
     output:
-        "{prefix}.svg"
+        output("{prefix}.svg", caption="../report/tmb.rst", category="Tumor Mutational Burden")
     conda:
         "../envs/vega.yaml"
     shell:
