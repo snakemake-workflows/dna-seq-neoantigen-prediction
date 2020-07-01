@@ -1,13 +1,13 @@
 rule arriba:
     input:
-        bam="results/star/{sample}/Aligned.out.bam"
+        bam="results/star/{sample}/Aligned.out.bam",
         genome="resources/genome.fasta",
         annotation="resources/genome.gtf"
     output:
         fusions="results/arriba/{sample}.fusions.tsv",
         discarded="results/arriba/{sample}.fusions.discarded.tsv"
     params:
-        blacklist=config["fusion"]["arriba"]["blacklist"].
+        blacklist=config["fusion"]["arriba"]["blacklist"],
         extra=config["fusion"]["arriba"]["params"]
     log:
         "results/logs/arriba/{sample}.log"

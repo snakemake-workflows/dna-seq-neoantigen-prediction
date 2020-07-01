@@ -16,7 +16,7 @@ rule freebayes:
 
 rule delly:
     input:
-        ref=resources/genome.fasta,
+        ref="resources/genome.fasta",
         samples=get_paired_bams,
         index=get_paired_bais,
     output:

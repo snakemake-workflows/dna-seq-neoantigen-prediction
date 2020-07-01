@@ -12,7 +12,7 @@ rule render_scenario:
 
 rule varlociraptor_preprocess:
     input:
-        ref=config["reference"]["genome"],
+        ref="resources/genome.fasta",
         candidates="results/candidate-calls/{pair}.{caller}.bcf",
         bcf_index = "results/candidate-calls/{pair}.{caller}.bcf.csi",
         bam="results/bwa/{sample}.rmdup.bam",
@@ -34,7 +34,7 @@ rule varlociraptor_call:
     output:
         temp("results/calls/{pair}.{caller}.bcf")
     log:
-        "logs/varlociraptor/call/{pair}.{caller}.{contig}.log"
+        "logs/varlociraptor/call/{pair}.{caller}.log"
     params:
         obs=lambda w, input: ["{}={}".format(s, f) for s, f in zip(get_pair_aliases(w), input.obs)]
     conda:

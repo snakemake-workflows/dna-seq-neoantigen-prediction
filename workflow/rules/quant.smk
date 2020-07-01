@@ -37,7 +37,7 @@ rule kallisto_quant:
         fastq=get_fastqs,
         index="resources/kallisto/transcripts.idx"
     output:
-        directory("results//kallisto/{sample}"}
+        directory("results/kallisto/{sample}")
     params:
         extra=kallisto_params
     log:

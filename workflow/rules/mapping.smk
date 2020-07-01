@@ -44,7 +44,7 @@ rule recalibrate_base_qualities:
         bam="results/dedup/{sample}.sorted.bam",
         bai="results/dedup/{sample}.sorted.bam.bai",
         ref="resources/genome.fasta",
-        ref_dict="recources/genome.dict",
+        ref_dict="resources/genome.dict",
         known="resources/variation.noiupac.vcf.gz",
         tbi="resources/variation.noiupac.vcf.gz.tbi",
     output:
