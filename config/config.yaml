@@ -60,6 +60,11 @@ reference:
 params:
   bwa:
     "-M"
+  picard:
+    MarkDuplicates:
+      "VALIDATION_STRINGENCY=LENIENT"
+  gatk:
+    BaseRecalibrator: ""
   strelka:
     "--exome"
   razers3:
