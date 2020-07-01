@@ -10,6 +10,7 @@ if config["tmb"]["activate"]:
             **config["tmb"]
         shell:
             "varlociraptor estimate tmb "
+            " --plot-mode {wildcards.plotmode} "
             "--coding-genome-size {params.coding_genome_size} "
             "--somatic-tumor-events {params.somatic_events} "
             "--tumor-sample {params.tumor_sample} "
