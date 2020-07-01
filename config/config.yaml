@@ -7,7 +7,7 @@ trimming:
 
 calling:
   delly:
-    activate: true
+    activate: false
   freebayes:
     activate: true
   # See https://varlociraptor.github.io/docs/calling/#generic-variant-calling
@@ -32,6 +32,8 @@ fusion:
   arriba:
     blacklist:
      "arriba_blacklist"
+    params:
+      "-T -P"
 
 ref:
   # Number of chromosomes to consider for calling.
@@ -47,15 +49,7 @@ ref:
   build: GRCh38
 
 reference:
-  assembly: hg38
-  genome: test/genome.fa
-  call_regions: "config/call_regions.bed.gz"
   hla_data: "config/HLA_Data/hla_reference_dna.fasta"
-  transcriptome: "path/to/transcript_reference"
-  gtfs: path/to/gtfs
-  annotation: complete.gtf
-  n_chromosomes: 25
-  snpeff: GRCh38.86
 
 params:
   bwa:
