@@ -1,7 +1,7 @@
 rule HLA_LA:
     input:
-        bam="results/bwa/{sample}.rmdup.bam",
-        bai="results/bwa/{sample}.rmdup.bam.bai"
+        bam="results/recal/{sample}.sorted.bam",
+        bai="results/recal/{sample}.sorted.bam.bai"
     output:
         "results/HLA-LA/output/{sample}/hla/R1_bestguess_G.txt"
     threads: 7

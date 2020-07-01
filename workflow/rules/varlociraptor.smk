@@ -15,8 +15,8 @@ rule varlociraptor_preprocess:
         ref="resources/genome.fasta",
         candidates="results/candidate-calls/{pair}.{caller}.bcf",
         bcf_index = "results/candidate-calls/{pair}.{caller}.bcf.csi",
-        bam="results/bwa/{sample}.rmdup.bam",
-        bai="results/bwa/{sample}.rmdup.bam.bai"
+        bam="results/recal/{sample}.sorted.bam",
+        bai="results/recal/{sample}.sorted.bam.bai"
     output:
         "results/observations/{pair}/{sample}.{caller}.bcf"
     log:
