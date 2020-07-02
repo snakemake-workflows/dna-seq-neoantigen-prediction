@@ -50,7 +50,7 @@ rule recalibrate_base_qualities:
     output:
         recal_table=("results/recal/{sample}.grp")
     params:
-        extra=config["params"]["gatk"]["BaseRecalibrator"]
+        extra=config["params"]["gatk"]["BaseRecalibrator"],
         java_opts=""
     log:
         "logs/gatk/baserecalibrator/{sample}.log"
