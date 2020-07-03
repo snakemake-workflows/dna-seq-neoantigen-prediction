@@ -55,7 +55,7 @@ rule bcftools_concat:
             caller=caller
         ),
     output:
-        "results/calls/{pair}.vcf"
+        "results/calls/{pair}.bcf"
     params:
         "-a -Ob" # Check this
     wrapper:

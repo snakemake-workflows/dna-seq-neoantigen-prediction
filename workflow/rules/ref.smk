@@ -146,3 +146,26 @@ rule get_snpeff_data:
         reference="{reference}"
     wrapper:
         "0.60.1/bio/snpeff/download"
+
+rule get_vep_cache:
+    output:
+        directory("resources/vep/cache")
+    params:
+        species=config["ref"]["species"],
+        build=config["ref"]["build"],
+        release=config["ref"]["release"]
+    log:
+        "logs/vep/cache.log"
+    wrapper:
+        "0.59.2/bio/vep/cache"
+
+
+rule get_vep_plugins:
+    output:
+        directory("resources/vep/plugins")
+    params:
+        release=config["ref"]["release"]
+    log:
+        "logs/vep/plugins.log"
+    wrapper:
+        "0.59.2/bio/vep/plugins"

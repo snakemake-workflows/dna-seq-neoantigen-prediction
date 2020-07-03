@@ -60,6 +60,22 @@ reference:
   hla_data: "config/HLA_Data/hla_reference_dna.fasta"
   HLA_LA_graphs: "path/to/hla_la_graphdir"
 
+annotations:
+  vcfs:
+    activate: false
+    # annotate with known variants from ensembl
+    known: resources/variation.vcf.gz
+    # add more external VCFs as needed
+    # cosmic path/to/cosmic.vcf.gz
+  dgidb:
+    activate: false
+  vep:
+    params: --everything
+    plugins:
+      # Add any plugin from https://www.ensembl.org/info/docs/tools/vep/script/vep_plugins.html
+      # Plugin args can be passed as well, e.g. "LoFtool,path/to/custom/scores.txt".
+      - LoFtool
+
 params:
   bwa:
     "-M"
