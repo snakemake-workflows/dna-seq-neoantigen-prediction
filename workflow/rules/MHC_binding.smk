@@ -90,7 +90,7 @@ rule mhcflurry:
 
 rule netMHCpan:
     input:
-        peptides="results/microphaser/fasta/{sample}/filtered/mhc1/{sample}.{chr}.{group}.fa",
+        peptides="results/microphaser/fasta/{sample}/filtered/netMHCpan/{sample}.{chr}.{group}.fa",
         alleles="results/optitype/{sample}/hla_alleles_{sample}.tsv",
         wt_alleles=get_germline_optitype
     output:
@@ -110,8 +110,8 @@ rule netMHCpan:
 
 rule netMHC2:
     input:
-        peptides="results/microphaser/fasta/{sample}/filtered/mhc2/{sample}.{chr}.{group}.fa",
-        alleles = "results/HLA-LA/hlaII_{sample}.tsv",
+        peptides="results/microphaser/fasta/{sample}/filtered/netMHC2pan/{sample}.{chr}.{group}.fa",
+        alleles="results/HLA-LA/hlaII_{sample}.tsv",
         wt_alleles=get_germline_hla
     output:
         "results/netMHC2pan/{sample}/{chr}/{sample}.{chr}.{group}.xls",
@@ -161,7 +161,7 @@ rule mhc_csv_table:
 
 rule mhcflurry_table:
     input:
-        info="results/microphaser/info/{sample}/filtered/mhc1/{sample}.tsv",
+        info="results/microphaser/info/{sample}/filtered/mhcflurry/{sample}.tsv",
         mt="results/mhcflurry/{sample}/{sample}.mhc.mt.tsv",
         wt="results/mhcflurry/{sample}/{sample}.mhc.wt.tsv"
     output:
