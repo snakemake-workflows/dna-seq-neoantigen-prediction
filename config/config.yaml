@@ -92,9 +92,9 @@ params:
     window_len:
         60
     peptide_len:
-        mhc1:
+        netMHCpan:
             9
-        mhc2:
+        netMHC2pan:
             15
   netMHCpan:
     "-BA -l 9 -s -xls"
