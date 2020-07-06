@@ -24,6 +24,7 @@ include: "rules/varlociraptor.smk"
 include: "rules/annotation.smk"
 include: "rules/filtering.smk"
 include: "rules/microphaser.smk"
+include: "rules/HLAtyping.smk"
 include: "rules/MHC_binding.smk"
 include: "rules/star.smk"
 include: "rules/fusion.smk"
@@ -37,12 +38,12 @@ rule all:
     input:
         expand("results/plots/tmb/{pair}.{plotmode}.svg", 
             pair=samples[samples.type == "tumor"]["sample"],
-            plotmode=["curve", "hist"])
+            plotmode=["curve", "hist"]),
 #        expand("calls/{pair}.{event}.fdr-controlled.vcf",
 #            pair=samples[samples.type == "tumor"]["sample"],
 #            event="complete"),
-#        expand("results/{mhc}/{sample}.WES.tsv",
-#            sample=samples[samples.type == "tumor"]["sample"],
-#            mhc=["netMHCpan", "netMHC2pan"]),
+        expand("results/neoantigens/{mhc}/{sample}.WES.tsv",
+            sample=samples[samples.type == "tumor"]["sample"],
+            mhc=["netMHCpan", "netMHC2pan"]),
 #        expand("arriba/{sample}.fusions.tsv",
 #            sample=samples[samples.type == "tumor"][samples.has_RNA == "Yes"]["sample"])
