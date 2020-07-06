@@ -2,8 +2,8 @@ rule strelka_somatic:
     input:
         normal=get_normal_bam,
         normal_index=get_normal_bai,
-        tumor="results/bwa/{sample}.rmdup.bam",
-        tumor_index="results/bwa/{sample}.rmdup.bam.bai",
+        tumor="results/recal/{sample}.sorted.bam",
+        tumor_index="results/recal/{sample}.sorted.bam.bai",
         fasta="resources/genome.fasta",
         fasta_index="resources/genome.fasta.fai"
     output:
@@ -20,8 +20,8 @@ rule strelka_somatic:
 
 rule strelka_germline:
     input:
-        bam="results/bwa/{normal}.rmdup.bam",
-        normal_index="results/bwa/{normal}.rmdup.bam.bai",
+        bam="results/recal/{normal}.sorted.bam",
+        normal_index="results/recal/{normal}.sorted.bam.bai",
         fasta="resources/genome.fasta",
         fasta_index="resources/genome.fasta.fai"
     output:

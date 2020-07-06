@@ -2,7 +2,7 @@ rule microphaser_somatic:
     input:
         vcf="results/strelka/merged/{sample}/all_variants.prepy.bcf",
         bam="results/recal/{sample}.sorted.bam",
-        bai="results/recal/{sample}.sorted.bam.bai"
+        bai="results/recal/{sample}.sorted.bam.bai",
         track="resources/annotation/{contig}.gtf",
         ref="resources/genome.fasta"
     output:
@@ -19,7 +19,7 @@ rule microphaser_germline:
     input:
         vcf="results/strelka/germline/{normal}/results/variants/variants.reheader.prepy.bcf",
         bam="results/recal/{sample}.sorted.bam",
-        bai="results/recal/{sample}.sorted.bam.bai"
+        bai="results/recal/{sample}.sorted.bam.bai",
         track="resources/annotation/{contig}.gtf",
         ref="resources/genome.fasta"
     output:
