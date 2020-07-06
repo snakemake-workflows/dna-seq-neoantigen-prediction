@@ -94,9 +94,9 @@ rule netMHCpan:
         alleles="results/optitype/{sample}/hla_alleles_{sample}.tsv",
         wt_alleles=get_germline_optitype
     output:
-        "results/mhc1/{sample}/{chr}/{sample}.{chr}.{group}.xls",
+        "results/netMHCpan/{sample}/{chr}/{sample}.{chr}.{group}.xls",
     log:
-        "results/logs/mhc1/{sample}/{chr}/{sample}.{chr}.{group}.log"
+        "results/logs/netMHCpan/{sample}/{chr}/{sample}.{chr}.{group}.log"
     params:
         extra = config["params"]["netMHCpan"]
     run:
@@ -114,9 +114,9 @@ rule netMHC2:
         alleles = "results/HLA-LA/hlaII_{sample}.tsv",
         wt_alleles=get_germline_hla
     output:
-        "results/mhc2/{sample}/{chr}/{sample}.{chr}.{group}.xls",
+        "results/netMHC2pan/{sample}/{chr}/{sample}.{chr}.{group}.xls",
     log:
-        "results/logs/mhc2/{sample}/{chr}/{sample}.{chr}.{group}.log"
+        "results/logs/netMHC2pan/{sample}/{chr}/{sample}.{chr}.{group}.log"
     params:
         extra=config["params"]["netMHCIIpan"]
     run:
