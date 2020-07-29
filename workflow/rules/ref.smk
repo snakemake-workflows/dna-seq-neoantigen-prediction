@@ -46,7 +46,7 @@ rule split_annotation:
     output:
         "resources/annotation/{contig}.gtf"
     shell:
-       "grep {wildcards.contig} {input} > {output}"
+       "grep '^{wildcards.contig}' {input} > {output}"
         #"awk '!/^#/{{print >\"{output}/\"$1\".gtf\"}}' {input}"
 
 
@@ -75,12 +75,14 @@ rule get_callregions:
     input:
         "resources/genome.fasta.fai",
     output:
-        "resources/genome.callregions.bed"
+        "resources/genome.callregions.bed.gz"
     params:
-        n_contigs = config["ref"]["n_chromosomes"]
+        n_contigs=config["ref"]["n_chromosomes"]
+    conda:
+        "../envs/index.yaml"
     shell:
         "paste <(cut -f1 {input}) <(yes 0 | head -n {params.n_contigs}) <(cut -f2 {input})"
-        " | head -n {params.n_contigs} > {output}"
+        " | head -n {params.n_contigs} | bgzip -c > {output} && tabix -p bed {output}"
 
 
 rule get_known_variants:

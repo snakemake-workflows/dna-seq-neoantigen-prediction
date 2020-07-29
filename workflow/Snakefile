@@ -44,6 +44,6 @@ rule all:
 #            event="complete"),
         expand("results/neoantigens/{mhc}/{sample}.WES.tsv",
             sample=samples[samples.type == "tumor"]["sample"],
-            mhc=["netMHCpan", "netMHC2pan"]),
+            mhc=["netMHCpan"]),
 #        expand("arriba/{sample}.fusions.tsv",
 #            sample=samples[samples.type == "tumor"][samples.has_RNA == "Yes"]["sample"])

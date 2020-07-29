@@ -101,7 +101,7 @@ params:
   netMHCIIpan:
     "-length 15 -s -xls"
   optitype:
-    "ref/optitype.config.ini"
+    ""
   kallisto:
     "-b 100"
   star:

@@ -56,7 +56,7 @@ rule recalibrate_base_qualities:
         "logs/gatk/baserecalibrator/{sample}.log"
     threads: 8
     wrapper:
-        "0.62.0/bio/gatk/baserecalibrator"
+        "0.62.0/bio/gatk/baserecalibratorspark"
 
 rule apply_bqsr:
     input:
