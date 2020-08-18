@@ -2,5 +2,4 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - varlociraptor =2.1.0
-  - bcftools =1.10
+  - fusioncatcher =1.0

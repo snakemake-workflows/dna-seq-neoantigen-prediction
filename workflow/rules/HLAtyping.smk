@@ -25,7 +25,7 @@ rule parse_HLA_LA:
 
 rule razers3:
     input:
-        get_reads
+        reads=get_reads
     output:
         bam="results/razers3/bam/{sample}_{group}.bam"
     threads: 8
@@ -48,21 +48,21 @@ rule bam2fq:
 
 rule OptiType:
     input:
-        reads=expand("results/razers3/fastq/{{sample}}_{fq}.fished.fastq", fq=[1,2])        
+        reads=expand("results/razers3/fastq/{{sample}}_{fq}.fished.fastq", fq=[1,2])
     output:
-        multiext("results/optitype/{sample}", "_coverage_plot.pdf", "_result.tsv")
+        multiext("results/optitype/{sample}/{sample}", "_coverage_plot.pdf", "_result.tsv")
+    log:
+        "logs/optitype/{sample}.log"
     params:
         extra=config["params"]["optitype"],
         sequencing_type="dna"
-    conda:
-        "../envs/optitype.yaml"
     wrapper:
-        "0.62.0/bio/optitype"
+        "0.63.0/bio/optitype"
         
 
 rule parse_Optitype:
     input:
-        "results/optitype/{sample}_result.tsv"
+        "results/optitype/{sample}/{sample}_result.tsv"
     output:
         report("results/optitype/{sample}/hla_alleles_{sample}.tsv", caption="../report/HLA_Types.rst", category="HLA-Typing(Optitype)")
     shell:

@@ -1,27 +1,29 @@
-Neoantigen Prediction from Whole Exome/Genome Sequencing (and RNA-Seq)
+Neoantigen Prediction from Whole Exome Sequencing (and RNA-Seq)
 
-This workflow predicts tumor-specific neoantigens towards HLA class I and II from NGS data. It incorporates SNVs, MNVs and short InDels.
-Adapters were removed with Cutadapt_. Reads were mapped with `BWA MEM`_, PCR and optical duplicates were removed with Picard_.
-Variants are called two-fold. Traditional variant calling (somatic and germline) was perfromed using Strelka_. Furthermore, candidate variant discovery was performed with Freebayes_. Statisticall assessment of those candidate variants was conducted with Varlociraptor_.
+Neoantigen candidate prediction from WES data on six melanoma samples with one healthy normal sample.
+RNA information was available for Samples Mel-103a and Mel-103b. For those samples, neoantigens can be filtered by TPM (Transcript per Million) value.
+
+
+Reads were mapped onto {{ snakemake.config["reference"]["build"] }} with `BWA mem`_, and both optical and PCR duplicates were removed with Picard_.
+The Strelka_ variant caller was used to call somatic and germline variants for all melanoma samples. Germline variants were also called for the normal sample.
 Somatic variants were annotated using SnpEff_ to predict and report variant effects.
-Neopeptide generation was performed using the small-scale phasing approach from Microphaser_.
-HLA typing was conducted using Optitype_ and HLA_LA_.
-MHC binding affinity scores were predicted using netMHCpan_ and netMHCIIpan_.
 
-Transcript expression levels were analysed using kallisto_ on available RNASeq data.
+The variant calls were phased on every melanoma sample using Microphaser_. Resulting neopeptides with a lenght of nine aminoacids were filtered for self-similarity against all normal peptides.
 
+HLA-types of all samples were predicted using OptiType_.
 
-.. _Varlociraptor: https://varlociraptor.github.io
-.. _Cutadapt: https://cutadapt.readthedocs.io
-.. _Picard: https://broadinstitute.github.io/picard
-.. _Freebayes: https://github.com/ekg/freebayes
+The MHC binding affinity for all neoantigen candidates and their unmutated counterparts was predicted using netMHCpan_. The developers define cut-off values for binding peptides as percentage-rank < 0.5% for strong binders and percentage-rank < 2% for weak binders.
+
+For available RNA-Seq data, quantification was performed using kallisto_. The TPM values for every transcript were added to the output table.
+
 .. _BWA mem: http://bio-bwa.sourceforge.net/
 .. _SnpEff: http://snpeff.sourceforge.net
 .. _MultiQC: http://multiqc.info/
 .. _Strelka: https://github.com/Illumina/strelka
+.. _Picard: https://broadinstitute.github.io/picard/
+.. _FastQC: https://www.bioinformatics.babraham.ac.uk/projects/fastqc/
 .. _netMHCpan: http://www.cbs.dtu.dk/services/NetMHCpan/index.php
-.. _netMHCIIpan: http://www.cbs.dtu.dk/services/NetMHCIIpan/index.php
 .. _OptiType: https://github.com/FRED-2/OptiType
 .. _Microphaser: https://github.com/koesterlab/microphaser
 .. _kallisto: https://pachterlab.github.io/kallisto/
-.. _HLA_LA: https://github.com/DiltheyLab/HLA-LA
+

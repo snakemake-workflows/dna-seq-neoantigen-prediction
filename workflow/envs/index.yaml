@@ -2,5 +2,5 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - varlociraptor =2.1.0
-  - bcftools =1.10
+  - tabix =0.2.6
+  

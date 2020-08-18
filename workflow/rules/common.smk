@@ -12,23 +12,32 @@ units = pd.read_csv(config["units"], dtype=str, sep='\t').set_index(["sample", "
 print(units)
 #validate(units, schema="schemas/units.schema.yaml")
 
-contigs = pd.read_csv(
-    "resources/genome.fasta.fai",
-    header=None, usecols=[0], squeeze=True, dtype=str, sep="\t", nrows=config["ref"]["n_chromosomes"]
-)
+#contigs = pd.read_csv(
+#    "resources/genome.fasta.fai",
+#    header=None, usecols=[0], squeeze=True, dtype=str, sep="\t", nrows=config["ref"]["n_chromosomes"]
+#)
+contigs = [c for c in range(1, 23)]
+contigs.extend(["X", "Y"])
 
 def get_oncoprint_batch(wildcards):
     if wildcards.batch == "all":
         groups = samples[samples["type"] == "tumor"]["sample"].unique()
     else:
         groups = samples.loc[samples[config["oncoprint"]["stratify"]["by-column"]] == wildcards.batch, "group"].unique()
-    return expand("merged-calls/{group}.{{event}}.fdr-controlled.bcf", group=groups)
+    return expand("results/merged-calls/{group}.{{event}}.fdr-controlled.bcf", group=groups)
+
+def get_recalibrate_quality_input(wildcards, bai=False):
+    ext = ".bai" if bai else ""
+    if is_activated("remove_duplicates"):
+        return "results/dedup/{}.sorted.bam{}".format(wildcards.sample, ext)
+    else:
+        return "results/mapped/{}.sorted.bam{}".format(wildcards.sample, ext)
 
 def get_annotated_bcf(wildcards, pair=None):
     if pair is None:
         pair = wildcards.pair
     selection = ".annotated"
-    return "calls/{pair}{selection}.bcf".format(pair=pair, selection=selection)
+    return "results/calls/{pair}{selection}.bcf".format(pair=pair, selection=selection)
 
 def get_read_group(wildcards):
     """Denote sample name and platform in read group."""

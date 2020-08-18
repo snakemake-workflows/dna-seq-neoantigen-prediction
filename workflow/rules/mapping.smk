@@ -39,16 +39,18 @@ rule mark_duplicates:
         "0.39.0/bio/picard/markduplicates"
 
 
+
 rule recalibrate_base_qualities:
     input:
-        bam="results/dedup/{sample}.sorted.bam",
-        bai="results/dedup/{sample}.sorted.bam.bai",
+        bam=get_recalibrate_quality_input,
+        bai=lambda w: get_recalibrate_quality_input(w, bai=True),
         ref="resources/genome.fasta",
-        dict="resources/genome.dict",
+        ref_dict="resources/genome.dict",
+        ref_fai="resources/genome.fasta.fai",
         known="resources/variation.noiupac.vcf.gz",
         tbi="resources/variation.noiupac.vcf.gz.tbi",
     output:
-        recal_table=("results/recal/{sample}.grp")
+        recal_table=temp("results/recal/{sample}.grp")
     params:
         extra=config["params"]["gatk"]["BaseRecalibrator"],
         java_opts=""
@@ -56,21 +58,23 @@ rule recalibrate_base_qualities:
         "logs/gatk/baserecalibrator/{sample}.log"
     threads: 8
     wrapper:
-        "0.62.0/bio/gatk/baserecalibrator"
+        "0.62.0/bio/gatk/baserecalibratorspark"
+
 
 rule apply_bqsr:
     input:
-        bam="results/dedup/{sample}.sorted.bam",
-        bai="results/dedup/{sample}.sorted.bam.bai",
+        bam=get_recalibrate_quality_input,
+        bai=lambda w: get_recalibrate_quality_input(w, bai=True),
         ref="resources/genome.fasta",
-        dict="resources/genome.dict",
+        ref_dict="resources/genome.dict",
+        ref_fai="resources/genome.fasta.fai",
         recal_table="results/recal/{sample}.grp"
     output:
-        bam="results/recal/{sample}.sorted.bam"
+        bam=protected("results/recal/{sample}.sorted.bam")
     log:
         "logs/gatk/gatk_applybqsr/{sample}.log"
     params:
-        extra="",  # optional
+        extra=config["params"]["gatk"]["applyBQSR"],  # optional
         java_opts="", # optional
     wrapper:
         "0.62.0/bio/gatk/applybqsr"

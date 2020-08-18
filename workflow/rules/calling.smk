@@ -5,31 +5,48 @@ rule strelka_somatic:
         tumor="results/recal/{sample}.sorted.bam",
         tumor_index="results/recal/{sample}.sorted.bam.bai",
         fasta="resources/genome.fasta",
-        fasta_index="resources/genome.fasta.fai"
+        fasta_index="resources/genome.fasta.fai",
+        callregions="resources/genome.callregions.bed.gz"
     output:
         "results/strelka/somatic/{sample}/results/variants/somatic.snvs.vcf.gz",
         "results/strelka/somatic/{sample}/results/variants/somatic.indels.vcf.gz"
     log:
-        "results/log/calling/strelka_somatic/{sample}.log"
+        "logs/calling/strelka_somatic/{sample}.log"
+    conda:
+        "../envs/strelka.yaml"
     params:
-        config_extra="--callRegions resources/genome.callregions.bed {}".format(config["params"]["strelka"]),
+        config_extra="--callRegions resources/genome.callregions.bed.gz {}".format(config["params"]["strelka"]),
         run_extra=""
     threads: 22
-    wrapper:
-        "0.60.0/bio/strelka/somatic"
+    shell:
+        "(configureStrelkaSomaticWorkflow.py "  # Configuration script
+        "--normalBam {input.normal} "  # Path to normal bam (if any)
+        "--tumorBam {input.tumor} "  # Path to tumor bam
+        "--referenceFasta {input.fasta} "  # Path to fasta file
+        "--runDir results/strelka/somatic/{wildcards.sample} "  # Path to output directory
+        "{params.config_extra} "  # Extra parametersfor configuration
+        " && "
+        "results/strelka/somatic/{wildcards.sample}/runWorkflow.py "  # Run the pipeline
+        "--mode local "  # Stop internal job submission
+        "--jobs {threads} "  # Nomber of threads
+        "{params.run_extra}) "  # Extra parameters for runWorkflow
+        "> {log} 2>&1"  # Logging behaviour"
+    # wrapper:
+        # "f834d6c44eaa4b534a0467cf1620f998ad289667/bio/strelka/somatic"
 
 rule strelka_germline:
     input:
         bam="results/recal/{normal}.sorted.bam",
         normal_index="results/recal/{normal}.sorted.bam.bai",
         fasta="resources/genome.fasta",
-        fasta_index="resources/genome.fasta.fai"
+        fasta_index="resources/genome.fasta.fai",
+        callregions="resources/genome.callregions.bed.gz"
     output:
         "results/strelka/germline/{normal}/results/variants/variants.vcf.gz"
     log:
-        "results/log/calling/strelka_germline/{normal}.log"
+        "logs/calling/strelka_germline/{normal}.log"
     params:
-        config_extra="--callRegions resources/genome.callregions.bed {}".format(config["params"]["strelka"]),
+        config_extra="--callRegions resources/genome.callregions.bed.gz {}".format(config["params"]["strelka"]),
         run_extra=""
     threads: 22
     wrapper:

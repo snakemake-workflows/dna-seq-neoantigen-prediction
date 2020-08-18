@@ -5,6 +5,9 @@ units: "config/units.tsv"
 trimming:
   skip: true
 
+remove_duplicates:
+  activate: true
+
 calling:
   delly:
     activate: false
@@ -49,10 +52,8 @@ ref:
   n_chromosomes: 25
   # Ensembl species name
   species: homo_sapiens
-  # Ensembl release (make sure to take one where snpeff data is available, check 'snpEff databases' output)
-  release: 98
-  # Ensembl release to use for SnpEff annotation (sometimes, the latest Ensembl release is not available in SnpEff)
-  snpeff_release: 86
+  # Ensembl release
+  release: 100
   # Genome build
   build: GRCh38
 
@@ -83,7 +84,8 @@ params:
     MarkDuplicates:
       "VALIDATION_STRINGENCY=LENIENT"
   gatk:
-    BaseRecalibrator: ""
+    BaseRecalibrator: "--tmp-dir tmp"
+    applyBQSR: ""
   strelka:
     "--exome"
   razers3:

@@ -55,7 +55,7 @@ rule bcftools_concat:
             caller=caller
         ),
     output:
-        "results/calls/{pair}.bcf"
+        "results/merged-calls/{pair}.{event}.fdr-controlled.bcf"
     params:
         "-a -Ob" # Check this
     wrapper:
