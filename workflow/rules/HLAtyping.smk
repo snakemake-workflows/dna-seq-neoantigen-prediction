@@ -8,7 +8,6 @@ rule HLA_LA:
     params:
         graph="PRG_MHC_GRCh38_withIMGT",
         graphdir=config["reference"]["HLA_LA_graphs"],
-        #extra_refs="/vol/tiny/MaMel-Neoantigens/HLA-LA_graphs/additionalReferences/PRG_MHC_GRCh38_withIMGT"
     conda:
         "../envs/hla_la.yaml"
     shell:
@@ -25,7 +24,7 @@ rule parse_HLA_LA:
 
 rule razers3:
     input:
-        reads=get_reads
+        reads=get_map_reads_input
     output:
         bam="results/razers3/bam/{sample}_{group}.bam"
     threads: 8
@@ -68,4 +67,3 @@ rule parse_Optitype:
     shell:
         "cut {input} -f2-7 | awk 'NR == 1 {{print}} NR>1 {{for (i = 1; i<=6; ++i) sub(/^/, \"&HLA-\", $i); print}}' "
         "| sed -e s/[*,:]/''/g | sed s/' '/'\t'/g > {output}"
-        

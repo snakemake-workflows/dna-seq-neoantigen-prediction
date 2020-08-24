@@ -12,27 +12,27 @@ rule strelka_somatic:
         "results/strelka/somatic/{sample}/results/variants/somatic.indels.vcf.gz"
     log:
         "logs/calling/strelka_somatic/{sample}.log"
-    conda:
-        "../envs/strelka.yaml"
+    # conda:
+    #     "../envs/strelka.yaml"
     params:
-        config_extra="--callRegions resources/genome.callregions.bed.gz {}".format(config["params"]["strelka"]),
-        run_extra=""
+        config_extra="--callRegions {} {}".format("resources/genome.callregions.bed.gz", config["params"]["strelka"]["config"]),
+        run_extra=config["params"]["strelka"]["run"]
     threads: 22
-    shell:
-        "(configureStrelkaSomaticWorkflow.py "  # Configuration script
-        "--normalBam {input.normal} "  # Path to normal bam (if any)
-        "--tumorBam {input.tumor} "  # Path to tumor bam
-        "--referenceFasta {input.fasta} "  # Path to fasta file
-        "--runDir results/strelka/somatic/{wildcards.sample} "  # Path to output directory
-        "{params.config_extra} "  # Extra parametersfor configuration
-        " && "
-        "results/strelka/somatic/{wildcards.sample}/runWorkflow.py "  # Run the pipeline
-        "--mode local "  # Stop internal job submission
-        "--jobs {threads} "  # Nomber of threads
-        "{params.run_extra}) "  # Extra parameters for runWorkflow
-        "> {log} 2>&1"  # Logging behaviour"
-    # wrapper:
-        # "f834d6c44eaa4b534a0467cf1620f998ad289667/bio/strelka/somatic"
+    #shell:
+        # "(configureStrelkaSomaticWorkflow.py "  # Configuration script
+        # "--normalBam {input.normal} "  # Path to normal bam (if any)
+        # "--tumorBam {input.tumor} "  # Path to tumor bam
+        # "--referenceFasta {input.fasta} "  # Path to fasta file
+        # "--runDir results/strelka/somatic/{wildcards.sample} "  # Path to output directory
+        # "{params.config_extra} "  # Extra parametersfor configuration
+        # " && "
+        # "results/strelka/somatic/{wildcards.sample}/runWorkflow.py "  # Run the pipeline
+        # "--mode local "  # Stop internal job submission
+        # "--jobs {threads} "  # Nomber of threads
+        # "{params.run_extra}) "  # Extra parameters for runWorkflow
+        # "> {log} 2>&1"  # Logging behaviour"
+    wrapper:
+        "0.60.0/bio/strelka/somatic"
 
 rule strelka_germline:
     input:
@@ -46,7 +46,7 @@ rule strelka_germline:
     log:
         "logs/calling/strelka_germline/{normal}.log"
     params:
-        config_extra="--callRegions resources/genome.callregions.bed.gz {}".format(config["params"]["strelka"]),
+        config_extra="--callRegions {} {}".format("resources/genome.callregions.bed.gz", config["params"]["strelka"]["config"]),
         run_extra=""
     threads: 22
     wrapper:
@@ -57,20 +57,12 @@ rule vcf_to_bcf:
         "{variants}.vcf.gz"
     output:
         "{variants}.output.bcf"
+    log:
+        "logs/bcftools/to-bcf/{variants}.log"
     params:
         "-O b -f PASS"
     wrapper:
         "0.60.0/bio/bcftools/view"
-
-rule index_bcf:
-    input:
-        "{variants}.bcf"
-    output:
-        "{variants}.bcf.csi"
-    params:
-        extra=""
-    wrapper:
-        "0.60.0/bio/bcftools/index"
 
 
 rule concat_somatic:
@@ -79,6 +71,8 @@ rule concat_somatic:
         indices=expand("results/strelka/somatic/{{sample}}/results/variants/somatic.{type}.output.bcf.csi", type=["snvs","indels"])
     output:
         "results/strelka/somatic/{sample}/results/variants/somatic.complete.bcf"
+    log:
+        "bcftools/concat-somatic/{sample}.log"
     params:
         "-O b -a"
     wrapper:
@@ -89,17 +83,21 @@ rule get_tumor_from_somatic:
         "results/strelka/somatic/{sample}/results/variants/somatic.complete.bcf"
     output:
         "results/strelka/somatic/{sample}/results/variants/somatic.complete.tumor.bcf"
+    log:
+        "logs/bcftools/view-TUMOR/{sample}.log"
     params:
         "-O b -s TUMOR"
     wrapper:
         "0.60.0/bio/bcftools/view"
 
-rule clean_germline:
+rule reheader_germline:
     input:
         vcf="{germline}/variants.output.bcf",
         samples="config/newsamples.txt"
     output:
         "{germline}/variants.reheader.bcf"
+    log:
+        "logs/bcftools/reheader/{germline}.log"
     params:
         extra="",
         view_extra="-O b"
@@ -108,20 +106,36 @@ rule clean_germline:
 
 rule concat_variants:
     input:
-        germline=get_germline_variants,
-        index_g=get_germline_variants_index,
-        somatic="results/strelka/somatic/{sample}/results/variants/somatic.complete.tumor.bcf",
-        index_s="results/strelka/somatic/{sample}/results/variants/somatic.complete.tumor.bcf.csi",
-        db="resources/snpEff/GRCh38.86"
+        # germline=get_germline_variants,
+        # index_g=get_germline_variants_index,
+        # somatic="results/strelka/somatic/{sample}/results/variants/somatic.complete.tumor.bcf",
+        # index_s="results/strelka/somatic/{sample}/results/variants/somatic.complete.tumor.bcf.csi",
+        calls=lambda w: get_pair_variants(w, index=False),
+        index=lambda w: get_pair_variants(w, index=True)
+        #db="resources/snpEff/GRCh38.86"
     output:
         "results/strelka/merged/{sample}/all_variants.bcf"
+    log:
+        "bcftools/concat-all/{sample}.log"
     params:
-        data_dir=lambda _, input: Path(input.db).parent.resolve(),
-        extra="-O v"
-    conda:
-        "../envs/variant_handling.yaml"
-    shell:
-        "bcftools concat {params.extra} -a {input.somatic} {input.germline} | snpEff -Xmx4g -nodownload -dataDir {params.data_dir} GRCh38.86 - | bcftools view -O u - > {output}"
+        extra="-O b"
+    wrapper:
+        "0.64.0/bio/bcftools/concat"
+
+rule annotate_strelka:
+    input:
+        calls="results/strelka/merged/{sample}/all_variants.bcf",
+        db="resources/snpEff/GRCh38.86"
+    output:
+        calls="results/strelka/merged/{sample}/all_variants.annotated.bcf"
+    log:
+        "logs/snpeff/{sample}.log"
+    params:
+        #data_dir=lambda w, input: Path(input.db).parent.resolve(),
+        #release=config["ref"]["snpeff"],
+        extra="-Xmx4g -nodownload"
+    wrapper:
+        "0.64.0/bio/snpeff/annotate"
 
 rule preprocess_variants:
     input:
@@ -134,3 +148,16 @@ rule preprocess_variants:
     threads: 2
     wrapper:
         "0.60.0/bio/hap.py/pre.py"
+
+# rule norm_vcf:
+#     input:
+#         "{prefix}.bcf",
+#         genome="resources/genome.fasta"
+#     output:
+#         "{prefix}.norm.bcf"
+#     log:
+#         "logs/bcftools/norm/{prefix}.log"
+#     params:
+#         "-f {} -O b".format("resources/genome.fasta")  # optional parameters for bcftools norm (except -o)
+#     wrapper:
+#         "0.64.0/bio/bcftools/norm"

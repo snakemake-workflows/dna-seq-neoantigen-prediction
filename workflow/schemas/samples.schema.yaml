@@ -1,0 +1,32 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+
+description: an entry in the sample sheet
+properties:
+  sample:
+    type: string
+    description: sample name/identifier
+  type:
+    type: string
+    description: healthy or tumor sample
+  matched_normal:
+    type: string
+    description: the corresponding healthy control to this tumor sample
+  purity:
+    type: number
+    minimum: 0.0
+    maximum: 1.0
+    description: Purity to use for tumor/normal groups.
+  platform:
+    type: string
+    enum: ["CAPILLARY", "LS454", "ILLUMINA", "SOLID", "HELICOS", "IONTORRENT", "ONT", "PACBIO"]
+  has_RNA:
+    type: string
+    enum: ["Yes", "No"]
+    description: Does matching transcriptome information exist for this sample
+
+  
+
+required:
+  - sample
+  - type
+  - platform

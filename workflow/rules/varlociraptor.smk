@@ -24,7 +24,7 @@ rule varlociraptor_preprocess:
     conda:
         "../envs/varlociraptor.yaml"
     shell:
-        "varlociraptor preprocess variants "
+        "varlociraptor preprocess variants --candidates {input.candidates} "
         "{input.ref} --bam {input.bam} --output {output} 2> {log}"
 
 rule varlociraptor_call:
@@ -55,7 +55,7 @@ rule bcftools_concat:
             caller=caller
         ),
     output:
-        "results/merged-calls/{pair}.{event}.fdr-controlled.bcf"
+        "results/calls/{pair}.bcf"
     params:
         "-a -Ob" # Check this
     wrapper:

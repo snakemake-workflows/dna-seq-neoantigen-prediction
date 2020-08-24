@@ -1,5 +1,7 @@
 channels:
   - conda-forge
   - bioconda
+  - jafors
 dependencies:
-  - hla-la ==1.0.1
+  - hla-la ==1.0.3
+  - samtools ==1.9

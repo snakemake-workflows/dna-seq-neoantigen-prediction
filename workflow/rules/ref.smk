@@ -1,6 +1,8 @@
 rule get_genome:
     output:
         "resources/genome.fasta"
+    log:
+        "logs/get-genome.log"
     params:
         species=config["ref"]["species"],
         datatype="dna",
@@ -14,6 +16,8 @@ rule get_genome:
 rule get_cdna:
     output:
         "resources/genome.cdna.fasta"
+    log:
+        "logs/get-cdna.log"
     params:
         species=config["ref"]["species"],
         datatype="cdna",
@@ -22,6 +26,20 @@ rule get_cdna:
     cache: True
     wrapper:
         "0.45.1/bio/reference/ensembl-sequence"
+
+
+rule kallisto_index:
+    input:
+        "resources/genome.cdna.fasta"
+    output:
+        "resources/kallisto/transcripts.idx"
+    params:
+        extra=""
+    log:
+        "logs/kallisto/index.log"
+    cache: True
+    wrapper:
+        "0.60.1/bio/kallisto/index"
 
 
 rule get_annotation:
@@ -35,7 +53,7 @@ rule get_annotation:
         flavor="" # optional, e.g. chr_patch_hapl_scaff, see Ensembl FTP.
     cache: True
     log:
-        "logs/get_annotation.log"
+        "logs/get-annotation.log"
     wrapper:
         "0.45.1/bio/reference/ensembl-annotation"
 
@@ -45,6 +63,9 @@ rule split_annotation:
         "resources/genome.gtf"
     output:
         "resources/annotation/{contig}.gtf"
+    log:
+        "logs/split-annotation.{contig}.log"
+    cache: True
     shell:
        "grep '^{wildcards.contig}' {input} > {output}"
         #"awk '!/^#/{{print >\"{output}/\"$1\".gtf\"}}' {input}"
@@ -55,6 +76,8 @@ rule genome_faidx:
         "resources/genome.fasta"
     output:
         "resources/genome.fasta.fai"
+    log:
+        "logs/genome-faidx.log"
     cache: True
     wrapper:
         "0.45.1/bio/samtools/faidx"
@@ -66,7 +89,7 @@ rule genome_dict:
     output:
         "resources/genome.dict"
     log:
-        "logs/picard/create_dict.log"
+        "logs/picard/create-dict.log"
     cache: True
     wrapper:
         "0.45.1/bio/picard/createsequencedictionary"
@@ -76,6 +99,8 @@ rule get_callregions:
         "resources/genome.fasta.fai",
     output:
         "resources/genome.callregions.bed.gz"
+    log:
+        "logs/get-callregions.log"
     params:
         n_contigs=config["ref"]["n_chromosomes"]
     conda:
@@ -85,45 +110,36 @@ rule get_callregions:
         " | head -n {params.n_contigs} | bgzip -c > {output} && tabix -p bed {output}"
 
 
-#rule get_known_variants:
-#    input:
-#        # use fai to annotate contig lengths for GATK BQSR
-#        fai="resources/genome.fasta.fai"
-#    output:
-#        vcf="resources/variation.vcf.gz"
-#    params:
-#        species=config["ref"]["species"],
-#        release=config["ref"]["release"],
-#        type="all"
-#    cache: True
-#    wrapper:
-#        "0.45.1/bio/reference/ensembl-variation"
+rule get_known_variants:
+    input:
+        # use fai to annotate contig lengths for GATK BQSR
+        fai="resources/genome.fasta.fai"
+    output:
+        vcf="resources/variation.vcf.gz"
+    log:
+        "logs/get-known-variants.log"
+    params:
+        species=config["ref"]["species"],
+        release=config["ref"]["release"],
+        build=config["ref"]["build"],
+        type="all"
+    cache: True
+    wrapper:
+        "0.59.2/bio/reference/ensembl-variation"
 
 
-#rule remove_iupac_codes:
-#    input:
-#        "resources/variation.vcf.gz"
-#    output:
-#        "resources/variation.noiupac.vcf.gz"
-#    conda:
-#        "../envs/rbt.yaml"
-#    cache: True
-#    shell:
-#        "rbt vcf-fix-iupac-alleles < {input} | bcftools view -Oz > {output}"
-
-
-#rule tabix_known_variants:
-#    input:
-#        "resources/{prefix}.vcf.gz"
-#    output:
-#        "resources/{prefix}.vcf.gz.tbi"
-#    params:
-#        "-p vcf"
-#    log:
-#        "logs/tabix/{prefix}.log"
-#    cache: True
-#    wrapper:
-#        "0.45.1/bio/tabix"
+rule remove_iupac_codes:
+    input:
+        "resources/variation.vcf.gz"
+    output:
+        "resources/variation.noiupac.vcf.gz"
+    log:
+        "logs/fix-iupac-alleles.log"
+    conda:
+        "../envs/rbt.yaml"
+    cache: True
+    shell:
+        "rbt vcf-fix-iupac-alleles < {input} | bcftools view -Oz > {output}"
 
 
 rule bwa_index:
@@ -148,6 +164,7 @@ rule get_snpeff_data:
         reference="{reference}"
     wrapper:
         "0.60.1/bio/snpeff/download"
+
 
 rule get_vep_cache:
     output:

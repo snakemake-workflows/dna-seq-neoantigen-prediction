@@ -1,27 +1,6 @@
-def get_fastqs(wildcards):
-    """Get raw FASTQ files from unit sheet."""
-#    if not pd.isnull(units.loc[(wildcards.sample), "rna_fq1"]):
-#        return units.loc[
-#            (wildcards.sample), ["rna_fq1", "rna_fq2"]].dropna()
-    return get(wildcards.sample, "RNA")
-
-rule kallisto_index:
-    input:
-        "resources/genome.cdna.fasta"
-    output:
-        "resources/kallisto/transcripts.idx"
-    params:
-        extra=""
-    log:
-        "results/logs/kallisto/index.log"
-    cache: True
-    wrapper:
-        "0.60.1/bio/kallisto/index"
-
-
 def kallisto_params(wildcards, input):
     extra = config["params"]["kallisto"]
-    if len(input.fq) == 1:
+    if len(input.fastq) == 1:
         extra += " --single"
         extra += (" --fragment-length {unit.fragment_len_mean} "
                   "--sd {unit.fragment_len_sd}").format(
@@ -34,7 +13,7 @@ def kallisto_params(wildcards, input):
 
 rule kallisto_quant:
     input:
-        fastq=get_fastqs,
+        fastq=get_quant_reads_input,
         index="resources/kallisto/transcripts.idx"
     output:
         directory("results/kallisto/{sample}")

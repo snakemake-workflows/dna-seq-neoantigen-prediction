@@ -13,18 +13,3 @@ rule freebayes:
     threads: 60
     wrapper:
         "0.42.0/bio/freebayes"
-
-rule delly:
-    input:
-        ref="resources/genome.fasta",
-        samples=get_paired_bams,
-        index=get_paired_bais,
-    output:
-        "results/candidate-calls/{pair}.delly.bcf"
-    params:
-        extra=config["params"].get("delly", "")
-    log:
-        "results/log/delly/{pair}.log"
-    threads: 1 # Should number of threads scale by samples?
-    wrapper:
-        "0.42.0/bio/delly"

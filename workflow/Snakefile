@@ -15,9 +15,11 @@ singularity: "docker://continuumio/miniconda3"
 ##### load rules #####
 
 include: "rules/common.smk"
+include: "rules/utils.smk"
+include: "rules/trim.smk"
 include: "rules/ref.smk"
 include: "rules/quant.smk"
-include: "rules/mapping.smk"
+#include: "rules/mapping.smk"
 include: "rules/calling.smk"
 include: "rules/candidate_calling.smk"
 include: "rules/varlociraptor.smk"
@@ -36,14 +38,6 @@ print(contigs)
 
 rule all:
     input:
-#        expand("results/plots/tmb/{pair}.{plotmode}.svg", 
-#            pair=samples[samples.type == "tumor"]["sample"],
-#            plotmode=["curve", "hist"]),
-        expand("results/merged-calls/{pair}.{event}.fdr-controlled.bcf",
-            pair=samples[samples.type == "tumor"]["sample"],
-            event=["complete", "somatic", "germline"]),
-#        expand("results/neoantigens/{mhc}/{sample}.WES.tsv",
-#            sample=samples[samples.type == "tumor"]["sample"],
-#            mhc=["netMHCpan"]),
-#        expand("arriba/{sample}.fusions.tsv",
-#            sample=samples[samples.type == "tumor"][samples.has_RNA == "Yes"]["sample"])
+        get_final_output(),
+        get_fusion_output(),
+        get_tmb_targets()

@@ -1,21 +1,21 @@
-rule mhcflurry:
-    input:
-        peptides="results/microphaser/fasta/{sample}/filtered/{sample}.{chr}.{group}.fa",
-        alleles="results/optitype/{sample}/hla_alleles_{sample}.tsv",
-        wt_alleles=get_germline_optitype
-    output:
-        "results/mhcflurry/{sample}/{chr}/output.{group}.csv"
-    log:
-        "results/logs/mhcflurry/{sample}/{chr}/log.{group}.txt"
-#    conda:
-#        "../envs/mhctools.yaml"
-    run:
-        if "wt" in input.peptides:
-            alleles = ",".join(pd.read_csv(input.wt_alleles, sep="\t").iloc[0])
-        else:
-            alleles = ",".join(pd.read_csv(input.alleles, sep="\t").iloc[0])
-        cmd = "if [ -s {input.peptides} ]; then mhctools --mhc-predictor mhcflurry --mhc-alleles {alleles} --input-fasta-file {input.peptides} --output-csv {output} > {log}; else touch {output}; fi"
-        shell(cmd)
+# rule mhcflurry:
+#     input:
+#         peptides="results/microphaser/fasta/{sample}/filtered/{sample}.{chr}.{group}.fa",
+#         alleles="results/optitype/{sample}/hla_alleles_{sample}.tsv",
+#         wt_alleles=get_germline_optitype
+#     output:
+#         "results/mhcflurry/{sample}/{chr}/output.{group}.csv"
+#     log:
+#         "results/logs/mhcflurry/{sample}/{chr}/log.{group}.txt"
+# #    conda:
+# #        "../envs/mhctools.yaml"
+#     run:
+#         if "wt" in input.peptides:
+#             alleles = ",".join(pd.read_csv(input.wt_alleles, sep="\t").iloc[0])
+#         else:
+#             alleles = ",".join(pd.read_csv(input.alleles, sep="\t").iloc[0])
+#         cmd = "if [ -s {input.peptides} ]; then mhctools --mhc-predictor mhcflurry --mhc-alleles {alleles} --input-fasta-file {input.peptides} --output-csv {output} > {log}; else touch {output}; fi"
+#         shell(cmd)
 
 rule netMHCpan:
     input:
@@ -37,15 +37,15 @@ rule netMHCpan:
         shell(cmd)
 
 
-rule netMHC2:
+rule netMHCIIpan:
     input:
-        peptides="results/microphaser/fasta/{sample}/filtered/netMHC2pan/{sample}.{chr}.{group}.fa",
+        peptides="results/microphaser/fasta/{sample}/filtered/netMHCIIpan/{sample}.{chr}.{group}.fa",
         alleles="results/HLA-LA/hlaII_{sample}.tsv",
         wt_alleles=get_germline_hla
     output:
-        "results/netMHC2pan/{sample}/{chr}/{sample}.{chr}.{group}.xls",
+        "results/netMHCIIpan/{sample}/{chr}/{sample}.{chr}.{group}.xls",
     log:
-        "results/logs/netMHC2pan/{sample}/{chr}/{sample}.{chr}.{group}.log"
+        "results/logs/netMHCIIpan/{sample}/{chr}/{sample}.{chr}.{group}.log"
     params:
         extra=config["params"]["netMHCIIpan"]
     run:
@@ -66,17 +66,17 @@ rule parse_mhc_out:
     script:
         "../scripts/group_mhc_output.py"
 
-rule parse_mhcflurry:
-    input:
-        expand("results/mhcflurry/{{sample}}/{chr}/output.{{group}}.csv", chr=contigs)
-    output:
-        "results/mhcflurry/{sample}/{sample}.mhc.{group}.csv"
-    wildcard_constraints:
-        group="wt|mt"
-    conda:
-        "../envs/xsv.yaml"
-    shell:
-        "xsv cat rows -d ',' {input} | cut --complement -f2,7,8 > {output}"
+# rule parse_mhcflurry:
+#     input:
+#         expand("results/mhcflurry/{{sample}}/{chr}/output.{{group}}.csv", chr=contigs)
+#     output:
+#         "results/mhcflurry/{sample}/{sample}.mhc.{group}.csv"
+#     wildcard_constraints:
+#         group="wt|mt"
+#     conda:
+#         "../envs/xsv.yaml"
+#     shell:
+#         "xsv cat rows -d ',' {input} | cut --complement -f2,7,8 > {output}"
 
 rule mhc_csv_table:
     input:
@@ -88,15 +88,15 @@ rule mhc_csv_table:
     script:
         "../scripts/merge_data.py"
 
-rule mhcflurry_table:
-    input:
-        info="results/microphaser/info/{sample}/filtered/mhcflurry/{sample}.tsv",
-        mt="results/mhcflurry/{sample}/{sample}.mhc.mt.tsv",
-        wt="results/mhcflurry/{sample}/{sample}.mhc.wt.tsv"
-    output:
-        report("results/neoantigens/mhcflurry/{sample}.WES.tsv", caption="../report/WES_results.rst", category="Results WES (MHCFlurry)")
-    script:
-        "../scripts/merge_mhcflurry.py"
+# rule mhcflurry_table:
+#     input:
+#         info="results/microphaser/info/{sample}/filtered/mhcflurry/{sample}.tsv",
+#         mt="results/mhcflurry/{sample}/{sample}.mhc.mt.tsv",
+#         wt="results/mhcflurry/{sample}/{sample}.mhc.wt.tsv"
+#     output:
+#         report("results/neoantigens/mhcflurry/{sample}.WES.tsv", caption="../report/WES_results.rst", category="Results WES (MHCFlurry)")
+#     script:
+#         "../scripts/merge_mhcflurry.py"
 
 rule add_RNA_info:
     input:
