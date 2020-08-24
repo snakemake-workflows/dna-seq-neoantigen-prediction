@@ -104,6 +104,8 @@ params:
     "-BA -l 9 -s -xls"
   netMHCIIpan:
     "-length 15 -s -xls"
+  optitype:
+    ""
   kallisto:
     "-b 100"
   star:

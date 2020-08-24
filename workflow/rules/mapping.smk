@@ -49,7 +49,10 @@ rule recalibrate_base_qualities:
     threads: 8
     wrapper:
         "0.62.0/bio/gatk/baserecalibratorspark"
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4e102890e012866db43c665e45a29eb9df7197e7
 
 rule apply_bqsr:
     input:
