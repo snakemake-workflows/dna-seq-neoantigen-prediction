@@ -1,14 +1,15 @@
 rule HLA_LA:
     input:
         bam="results/recal/{sample}.sorted.bam",
-        bai="results/recal/{sample}.sorted.bam.bai"
+        bai="results/recal/{sample}.sorted.bam.bai",
+        index="resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH"
     output:
         "results/HLA-LA/output/{sample}/hla/R1_bestguess_G.txt"
     threads: 7
     log: "logs/HLA-LA/{sample}.log"
     params:
         graph="PRG_MHC_GRCh38_withIMGT",
-        graphdir=config["reference"]["HLA_LA_graphs"],
+        graphdir="resources/graphs,
     conda:
         "../envs/hla_la.yaml"
     shell:

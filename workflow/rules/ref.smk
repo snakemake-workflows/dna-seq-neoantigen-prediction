@@ -155,26 +155,26 @@ rule bwa_index:
 
 rule download_HLALA_graph:
     output:
-        directory("resources/PRG_MHC_GRCh38_withIMGT/PRG"),
-        directory("resources/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome"),
-        directory("resources/PRG_MHC_GRCh38_withIMGT/knownReferences"),
-        directory("resources/PRG_MHC_GRCh38_withIMGT/mapping"),
-        directory("resources/PRG_MHC_GRCh38_withIMGT/mapping_PRGonly"),
-        directory("resources/PRG_MHC_GRCh38_withIMGT/referenceGenomeSimulations"),
-        directory("resources/PRG_MHC_GRCh38_withIMGT/sampledReferenceGenomes"),
-        directory("resources/PRG_MHC_GRCh38_withIMGT/translation"),
-        "resources/PRG_MHC_GRCh38_withIMGT/sequences.txt"
+        directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/PRG"),
+        directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome"),
+        directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/knownReferences"),
+        directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/mapping"),
+        directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/mapping_PRGonly"),
+        directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/referenceGenomeSimulations"),
+        directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/sampledReferenceGenomes"),
+        directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/translation"),
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/sequences.txt"
     cache: True
     shell:
-        "cd resources/ && wget  http://www.well.ox.ac.uk/downloads/PRG_MHC_GRCh38_withIMGT.tar.gz "
+        "cd resources/graphs && wget  http://www.well.ox.ac.uk/downloads/PRG_MHC_GRCh38_withIMGT.tar.gz "
         "&& tar -xvzf PRG_MHC_GRCh38_withIMGT.tar.gz"
 
 
 rule index_HLALA:
     input:
-        "resources/PRG_MHC_GRCh38_withIMGT/sequences.txt"
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/sequences.txt"
     output:
-        multiext("resources/PRG_MHC_GRCh38_withIMGT/serializedGRAPH", "", "_preGapPathindex")
+        multiext("resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH", "", "_preGapPathindex")
     cache: True
     conda: "../envs/hla_la.yaml"
     params:
