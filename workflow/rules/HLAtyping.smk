@@ -5,13 +5,14 @@ rule HLA_LA:
     output:
         "results/HLA-LA/output/{sample}/hla/R1_bestguess_G.txt"
     threads: 7
+    log: "logs/HLA-LA/{sample}.log"
     params:
         graph="PRG_MHC_GRCh38_withIMGT",
         graphdir=config["reference"]["HLA_LA_graphs"],
     conda:
         "../envs/hla_la.yaml"
     shell:
-        "HLA-LA.pl --bam {input.bam} --sampleID {wildcards.sample} --graph {params.graph} --customGraphDir {params.graphdir} --workingDir results/HLA-LA/output --maxThreads {threads}"
+        "HLA-LA.pl --bam {input.bam} --sampleID {wildcards.sample} --graph {params.graph} --customGraphDir {params.graphdir} --workingDir results/HLA-LA/output --maxThreads {threads} > {log} 2>&1"
 
 rule parse_HLA_LA:
     input:
@@ -28,6 +29,7 @@ rule razers3:
     output:
         bam="results/razers3/bam/{sample}_{group}.bam"
     threads: 8
+    log: "logs/razors/{sample}_{group}.log"
     params:
         genome=config["reference"]["hla_data"],
         extra=config["params"]["razers3"]
