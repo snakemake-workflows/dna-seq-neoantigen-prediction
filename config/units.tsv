@@ -1,5 +1,5 @@
-sample	sequencing_type	fq1	fq2
-A_normal	DNA	A_normal_1.fastq.gz	A_normal_2.fastq.gz
-A_tumor	DNA	A_tumor_1.fastq.gz	A_tumor_2.fastq.gz
-B_tumor	DNA	B_tumor_1.fastq.gz	B_tumor_2.fastq.gz
-B_tumor	RNA	B_tumor_RNA_1.fastq.gz	B_tumor_RNA_2.fastq.gz
+sample	sequencing_type	unit	fq1	fq2	sra	adapters
+A_normal	DNA	lane1	A_normal_1.fastq.gz	A_normal_2.fastq.gz		
+A_tumor	DNA	lane2	A_tumor_1.fastq.gz	A_tumor_2.fastq.gz		
+B_tumor	DNA	lane1	B_tumor_1.fastq.gz	B_tumor_2.fastq.gz		
+B_tumor	RNA	lane1	B_tumor_RNA_1.fastq.gz	B_tumor_RNA_2.fastq.gz		

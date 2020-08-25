@@ -3,5 +3,5 @@ channels:
   - bioconda
   - jafors
 dependencies:
-  - hla-la ==1.0.3
-  - samtools ==1.9
+  - hla-la ==1.0.4
+  - samtools ==1.10
