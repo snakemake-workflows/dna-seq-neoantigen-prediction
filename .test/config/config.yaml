@@ -63,7 +63,6 @@ ref:
 
 reference:
   hla_data: "config/HLA_Data/hla_reference_dna.fasta"
-  HLA_LA_graphs: "path/to/graphs"
 
 annotations:
   vep:
