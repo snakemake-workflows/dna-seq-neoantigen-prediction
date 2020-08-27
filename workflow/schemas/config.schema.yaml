@@ -50,8 +50,6 @@ properties:
     properties:
       hla_data:
         type: string
-      HLA_LA_graphs:
-        type: string
 
   oncoprint:
     type: object
