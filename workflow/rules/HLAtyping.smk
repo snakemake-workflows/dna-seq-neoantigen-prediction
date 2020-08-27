@@ -9,7 +9,7 @@ rule HLA_LA:
     log: "logs/HLA-LA/{sample}.log"
     params:
         graph="PRG_MHC_GRCh38_withIMGT",
-        graphdir="resources/graphs,
+        graphdir="resources/graphs",
     conda:
         "../envs/hla_la.yaml"
     shell:
