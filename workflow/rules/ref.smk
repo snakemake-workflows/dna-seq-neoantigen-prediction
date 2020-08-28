@@ -180,10 +180,11 @@ rule index_HLALA:
     cache: True
     conda: "../envs/hla_la.yaml"
     params:
-        path=lambda wc, input: os.path.dirname(input[0])
+        path=lambda wc, input: os.path.dirname(os.path.dirname(input[0])),
+        graph=lambda wc, input: os.path.basename(os.path.dirname(input[0]))
     log: "logs/index-HLA-LA-graph.log"
     shell:
-        "HLA-LA.pl --prepareGraph 1 --customGraphDir <(dirname {params.path}) --graph <(basename {params.path})"
+        "HLA-LA.pl --prepareGraph 1 --customGraphDir {params.path} --graph {params.graph}"
 
 rule get_snpeff_data:
     output:
