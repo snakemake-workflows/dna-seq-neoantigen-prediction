@@ -169,7 +169,7 @@ rule download_HLALA_graph:
     cache: True
     shell:
         "cd resources/graphs && wget  http://www.well.ox.ac.uk/downloads/PRG_MHC_GRCh38_withIMGT.tar.gz "
-        "&& tar -xvzf PRG_MHC_GRCh38_withIMGT.tar.gz"
+        "&& tar -xvzf PRG_MHC_GRCh38_withIMGT.tar.gz > {log} 2>&1"
 
 
 rule index_HLALA:
@@ -184,7 +184,7 @@ rule index_HLALA:
         graph=lambda wc, input: os.path.basename(os.path.dirname(input[0]))
     log: "logs/index-HLA-LA-graph.log"
     shell:
-        "HLA-LA.pl --prepareGraph 1 --customGraphDir {params.path} --graph {params.graph}"
+        "HLA-LA.pl --prepareGraph 1 --customGraphDir {params.path} --graph {params.graph} > {log} 2>&1"
 
 rule get_snpeff_data:
     output:
