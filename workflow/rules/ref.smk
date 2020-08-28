@@ -183,7 +183,7 @@ rule index_HLALA:
         path=lambda wc, input: os.path.dirname(input[0])
     log: "logs/index-HLA-LA-graph.log"
     shell:
-        "HLA-LA.pl prepareGraph 1 --customGraphDir <(dirname {params.path}) --graph <(basename {params.path})"
+        "HLA-LA.pl --prepareGraph 1 --customGraphDir <(dirname {params.path}) --graph <(basename {params.path})"
 
 rule get_snpeff_data:
     output:
