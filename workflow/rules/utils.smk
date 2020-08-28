@@ -40,5 +40,7 @@ rule gzip_fastq:
         "{prefix}.fastq"
     output:
         "{prefix}.fastq.gz"
+    log:
+        "logs/gz-fastq/{prefix}.log"
     shell:
         "gzip < {input} > {output}"
