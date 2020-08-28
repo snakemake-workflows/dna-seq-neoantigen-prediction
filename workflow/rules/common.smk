@@ -240,8 +240,12 @@ def get_final_output():
             sample=samples[(samples.type == "tumor")]["sample"],
             mhc=list(filter(None, ["netMHCpan" if is_activated("affinity/netMHCpan") else None, "netMHCIIpan" if is_activated("affinity/netMHCIIpan") else None])))
     else:
-        final_output = expand(["results/optitype/{sample}/hla_alleles_{sample}.tsv", "results/HLA-LA/hlaI_{sample}.tsv", "results/HLA-LA/hlaII_{sample}.tsv"],
-            sample=samples["sample"])
+        if config["HLAtyping"]["HLA_LA"]["activate"]:
+            final_output = expand(["results/optitype/{sample}/hla_alleles_{sample}.tsv", "results/HLA-LA/hlaI_{sample}.tsv", "results/HLA-LA/hlaII_{sample}.tsv"],
+                sample=samples["sample"])
+        else:
+             final_output = expand("results/optitype/{sample}/hla_alleles_{sample}.tsv",
+                sample=samples["sample"])
     return final_output
 
 def get_fusion_output():
