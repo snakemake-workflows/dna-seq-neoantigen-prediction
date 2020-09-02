@@ -25,9 +25,27 @@ rule varlociraptor_preprocess:
         "logs/varlociraptor/preprocess/{pair}/{sample}.{caller}.log"
     conda:
         "../envs/varlociraptor.yaml"
+    threads: 8
     shell:
         "varlociraptor preprocess variants --candidates {input.candidates} "
-        "{input.ref} --bam {input.bam} --output {output} 2> {log}"
+        "{input.ref} --bam {input.bam} --output {output} --threads {threads} 2> {log}"
+        
+
+rule sort_observations:
+    input:
+       "results/observations/{pair}/{sample}.{caller}.bcf"
+    output:
+        "results/observations/{pair}/{sample}.{caller}.sorted.bcf"
+    log:
+        "logs/sort-observations/{pair}.{sample}.{caller}.log"
+    conda:
+        "../envs/bcftools.yaml"
+    resources:
+        mem_mb=8000
+    shell:
+        "bcftools sort --max-mem {resources.mem_mb}M --temp-dir `mktemp -d` "
+        "-Ob {input} > {output} 2> {log}"
+
 
 rule varlociraptor_call:
     input:

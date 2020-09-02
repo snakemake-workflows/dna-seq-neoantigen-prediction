@@ -195,7 +195,7 @@ def get_pair_variants(wildcards, index):
     return(variants)
 
 def get_pair_observations(wildcards):
-    return expand("results/observations/{pair}/{sample}.{caller}.bcf", 
+    return expand("results/observations/{pair}/{sample}.{caller}.sorted.bcf", 
                   caller=wildcards.caller, 
                   pair=wildcards.pair,
                   sample=get_paired_samples(wildcards))
@@ -209,8 +209,7 @@ def get_merge_input(ext=".bcf"):
     return inner
 
 def get_pair_aliases(wildcards):
-    return samples.loc[(samples["sample"] == wildcards.pair) | (samples["sample"] == samples.loc[wildcards.pair, "matched_normal"])]["type"]
-
+    return [samples.loc[samples.loc[wildcards.pair, "matched_normal"], "type"], samples.loc[wildcards.pair, "type"]]
 
 def get_tabix_params(wildcards):
     if wildcards.format == "vcf":
