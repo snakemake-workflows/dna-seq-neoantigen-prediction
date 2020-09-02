@@ -10,7 +10,7 @@ rule HLA_LA:
         "logs/HLA-LA/{sample}.log"
     params:
         graph=lambda w, input: os.path.basename(os.path.dirname(input.index)),
-        graphdir=lambda w, input: os.path.basename(os.path.basename(input.index)),
+        graphdir=lambda w, input: os.path.dirname(os.path.dirname(input.index)),
     conda:
         "../envs/hla_la.yaml"
     shell:
