@@ -6,9 +6,7 @@
 #     output:
 #         "results/mhcflurry/{sample}/{chr}/output.{group}.csv"
 #     log:
-#         "results/logs/mhcflurry/{sample}/{chr}/log.{group}.txt"
-# #    conda:
-# #        "../envs/mhctools.yaml"
+#         "logs/mhcflurry/{sample}-{chr}-{group}.log"
 #     run:
 #         if "wt" in input.peptides:
 #             alleles = ",".join(pd.read_csv(input.wt_alleles, sep="\t").iloc[0])
@@ -20,19 +18,15 @@
 rule netMHCpan:
     input:
         peptides="results/microphaser/fasta/{sample}/filtered/netMHCpan/{sample}.{chr}.{group}.fa",
-        alleles="results/optitype/{sample}/hla_alleles_{sample}.tsv",
-        wt_alleles=get_germline_optitype
+        alleles=get_alleles_MHCI
     output:
         "results/netMHCpan/{sample}/{chr}/{sample}.{chr}.{group}.xls",
     log:
-        "results/logs/netMHCpan/{sample}/{chr}/{sample}.{chr}.{group}.log"
+        "logs/netMHCpan/{sample}-{chr}-{group}.log"
     params:
         extra = config["params"]["netMHCpan"]
     run:
-        if "wt" in input.peptides:
-            alleles = ",".join(pd.read_csv(input.wt_alleles, sep="\t").iloc[0])
-        else:
-            alleles = ",".join(pd.read_csv(input.alleles, sep="\t").iloc[0])
+        alleles = ",".join(pd.read_csv(input.alleles, sep="\t").iloc[0])
         cmd = "if [ -s {input.peptides} ]; then ../netMHCpan-4.0/netMHCpan {params.extra} -xlsfile {output} -a {alleles} -f {input.peptides} > {log}; else touch {output}; fi"
         shell(cmd)
 
@@ -40,19 +34,15 @@ rule netMHCpan:
 rule netMHCIIpan:
     input:
         peptides="results/microphaser/fasta/{sample}/filtered/netMHCIIpan/{sample}.{chr}.{group}.fa",
-        alleles="results/HLA-LA/hlaII_{sample}.tsv",
-        wt_alleles=get_germline_hla
+        alleles=get_alleles_MHCII
     output:
         "results/netMHCIIpan/{sample}/{chr}/{sample}.{chr}.{group}.xls",
     log:
-        "results/logs/netMHCIIpan/{sample}/{chr}/{sample}.{chr}.{group}.log"
+        "logs/netMHCIIpan/{sample}-{chr}-{group}.log"
     params:
         extra=config["params"]["netMHCIIpan"]
     run:
-        if "wt" in input.peptides:
-            alleles = ",".join(pd.read_csv(input.wt_alleles, sep="\t")["Allele"].tolist())
-        else:
-            alleles = ",".join(pd.read_csv(input.alleles, sep="\t")["Allele"].tolist())
+        alleles = ",".join(pd.read_csv(input.alleles, sep="\t")["Allele"].tolist())
         cmd = "if [ -s {input.peptides} ]; then ../netMHCIIpan-3.2/netMHCIIpan {params.extra} -xlsfile {output} -a {alleles} -f {input.peptides} > {log}; else touch {output}; fi"
         shell(cmd)
 
@@ -61,6 +51,8 @@ rule parse_mhc_out:
         expand("results/{{mhc}}/{{sample}}/{chr}/{{sample}}.{chr}.{{group}}.xls", chr=contigs)
     output:
         "results/{mhc}/{sample}/{sample}.mhc.{group}.tsv"
+    log:
+        "logs/parse-mhc/{mhc}-{sample}-{group}.log"
     wildcard_constraints:
         group="wt|mt"
     script:
@@ -73,6 +65,8 @@ rule parse_mhc_out:
 #         "results/mhcflurry/{sample}/{sample}.mhc.{group}.csv"
 #     wildcard_constraints:
 #         group="wt|mt"
+#     log:
+#         "logs/parse-mhc/mhcflurry-{sample}-{group}.log"
 #     conda:
 #         "../envs/xsv.yaml"
 #     shell:
@@ -85,6 +79,8 @@ rule mhc_csv_table:
         wt="results/{mhc}/{sample}/{sample}.mhc.wt.tsv"
     output:
         report("results/neoantigens/{mhc}/{sample}.WES.tsv", caption="../report/WES_results.rst", category="Results WES (netMHC)")
+    log:
+        "logs/create-mhc-table/{mhc}-{sample}.log"
     script:
         "../scripts/merge_data.py"
 
@@ -104,5 +100,7 @@ rule add_RNA_info:
         table="results/neoantigens/{mhc}/{sample}.WES.tsv"
     output:
         report("results/neoantigens/{mhc}/{sample}.RNA.tsv", caption="../report/RNA_results.rst", category="Results RNA")
+    log:
+        "logs/add-RNA/{mhc}-{sample}.log"
     script:
         "../scripts/add_rna_info.py"

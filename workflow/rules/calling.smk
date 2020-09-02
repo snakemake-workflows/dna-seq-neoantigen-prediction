@@ -145,6 +145,8 @@ rule preprocess_variants:
     params:
         extra="-L --somatic",
         genome="resources/genome.fasta",
+    log:
+        "logs/prepy/{variants}.log"
     threads: 2
     wrapper:
         "0.60.0/bio/hap.py/pre.py"

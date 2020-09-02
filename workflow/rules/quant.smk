@@ -1,16 +1,3 @@
-def kallisto_params(wildcards, input):
-    extra = config["params"]["kallisto"]
-    if len(input.fastq) == 1:
-        extra += " --single"
-        extra += (" --fragment-length {unit.fragment_len_mean} "
-                  "--sd {unit.fragment_len_sd}").format(
-                    unit=units.loc[
-                        (wildcards.sample, wildcards.unit)])
-    else:
-        extra += " --fusion"
-    return extra
-
-
 rule kallisto_quant:
     input:
         fastq=get_quant_reads_input,

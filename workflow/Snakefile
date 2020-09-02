@@ -10,7 +10,7 @@ configfile: "config/config.yaml"
 report: "report/workflow.rst"
 
 # Allow users to fix the underlying OS via singularity.
-singularity: "docker://continuumio/miniconda3"
+container: "docker://continuumio/miniconda3"
 
 ##### load rules #####
 
@@ -33,8 +33,6 @@ include: "rules/fusion.smk"
 include: "rules/tmb.smk"
 include: "rules/vega.smk"
 
-
-print(contigs)
 
 rule all:
     input:

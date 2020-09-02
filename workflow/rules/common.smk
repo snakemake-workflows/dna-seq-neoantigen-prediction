@@ -77,7 +77,6 @@ def get_cutadapt_pipe_input(wildcards):
 
 
 def is_paired_end(sample, seqtype):
-    #print(units)
     sample_units = units.loc[sample].loc[seqtype]
     fq2_null = sample_units["fq2"].isnull()
     sra_null = sample_units["sra"].isnull()
@@ -95,11 +94,30 @@ def get_map_reads_input(wildcards):
     return "results/merged/DNA/{sample}_single.fastq.gz"
 
 
+def get_optitype_reads_input(wildcards):
+    if is_paired_end(wildcards.sample, "DNA"):
+        return expand("results/razers3/fastq/{sample}_{fq}.fished.fastq", sample=wildcards.sample, fq=["R1", "R2"])
+    return "results/razers3/fastq/{sample}_single.fastq"
+
+
 def get_quant_reads_input(wildcards):
     if is_paired_end(wildcards.sample, "RNA"):
         return ["results/merged/RNA/{sample}_R1.fastq.gz",
                 "results/merged/RNA/{sample}_R2.fastq.gz"]
     return "results/merged/RNA/{sample}_single.fastq.gz"
+
+def kallisto_params(wildcards, input):
+    extra = config["params"]["kallisto"]
+    if len(input.fastq) == 1:
+        extra += " --single"
+        extra += (" --fragment-length {unit.fragment_len_mean} "
+                  "--sd {unit.fragment_len_sd}").format(
+                    unit=units.loc[
+                        (wildcards.sample, wildcards.unit)])
+    else:
+        extra += " --fusion"
+    return extra
+
 
 
 def get_fastqs(wc):
@@ -112,7 +130,6 @@ def get_fastqs(wc):
         accession = unit["sra"]
         return expand("sra/{accession}_{read}.fastq", accession=accession, read=wc.read[-1])
     fq = "fq{}".format(wc.read[-1])
-    print(units.loc[wc.sample].loc[wc.seqtype, fq].tolist())
     return units.loc[wc.sample].loc[wc.seqtype, fq].tolist()
 
 
@@ -132,16 +149,29 @@ def get_reads(wildcards):
     return get_seperate(wildcards.sample, wildcards.group)
 
 def get_seperate(sample, group):
-    return units.loc[(sample, "DNA"), "fq" + str(group)]
+    return units.loc[(sample, "DNA"), "fq{}".format(str(group))]
 
 def get_proteome(wildcards):
     return expand("results/microphaser/fasta/germline/{normal}/{mhc}/reference_proteome.bin", normal=get_normal(wildcards), mhc=wildcards.mhc)
 
-def get_germline_optitype(wildcards):
-    return expand("results/optitype/{germline}/hla_alleles_{germline}.tsv", germline=get_normal(wildcards))[0]
+def get_alleles_MHCI(wildcards):
+    if wildcards.group == "wt":
+        return expand("results/optitype/{S}/hla_alleles_{S}.tsv", S=get_normal(wildcards))
+    else:
+        return expand("results/optitype/{S}/hla_alleles_{S}.tsv", S=wildcards.sample)
 
-def get_germline_hla(wildcards):
-    return expand("results/HLA-LA/hlaII_{germline}.tsv", germline=get_normal(wildcards))[0]
+def get_alleles_MHCII(wildcards):
+    if wildcards.group == "wt":
+        return expand("results/HLA-LA/hlaI_{S}.tsv", S=get_normal(wildcards))
+    else:
+        return expand("results/HLA-LA/hlaI_{S}.tsv", S=wildcards.sample)
+        
+
+# def get_germline_optitype(wildcards):
+#     return expand("results/optitype/{germline}/hla_alleles_{germline}.tsv", germline=get_normal(wildcards))[0]
+
+# def get_germline_hla(wildcards):
+#     return expand("results/HLA-LA/hlaII_{germline}.tsv", germline=get_normal(wildcards))[0]
 
 def get_normal_bam(wildcards):
     return expand("results/recal/{normal}.sorted.bam", normal=get_normal(wildcards))
@@ -149,11 +179,11 @@ def get_normal_bam(wildcards):
 def get_normal_bai(wildcards):
     return expand("results/recal/{normal}.sorted.bam.bai", normal=get_normal(wildcards))
 
-def get_germline_variants(wildcards):
-    return expand("results/strelka/germline/{germline}/results/variants/variants.reheader.bcf", germline=get_normal(wildcards))
+# def get_germline_variants(wildcards):
+#     return expand("results/strelka/germline/{germline}/results/variants/variants.reheader.bcf", germline=get_normal(wildcards))
 
-def get_germline_variants_index(wildcards):
-    return expand("results/strelka/germline/{germline}/results/variants/variants.reheader.bcf.csi", germline=get_normal(wildcards))
+# def get_germline_variants_index(wildcards):
+#     return expand("results/strelka/germline/{germline}/results/variants/variants.reheader.bcf.csi", germline=get_normal(wildcards))
 
 def get_pair_variants(wildcards, index):
     if index:
@@ -210,8 +240,12 @@ def get_final_output():
             sample=samples[(samples.type == "tumor")]["sample"],
             mhc=list(filter(None, ["netMHCpan" if is_activated("affinity/netMHCpan") else None, "netMHCIIpan" if is_activated("affinity/netMHCIIpan") else None])))
     else:
-        final_output = expand(["results/optitype/{sample}/hla_alleles_{sample}.tsv", "results/HLA-LA/hlaI_{sample}.tsv", "results/HLA-LA/hlaII_{sample}.tsv"],
-            sample=samples["sample"])
+        if config["HLAtyping"]["HLA_LA"]["activate"]:
+            final_output = expand(["results/optitype/{sample}/hla_alleles_{sample}.tsv", "results/HLA-LA/hlaI_{sample}.tsv", "results/HLA-LA/hlaII_{sample}.tsv"],
+                sample=samples["sample"])
+        else:
+             final_output = expand("results/optitype/{sample}/hla_alleles_{sample}.tsv",
+                sample=samples["sample"])
     return final_output
 
 def get_fusion_output():

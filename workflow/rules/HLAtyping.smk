@@ -6,10 +6,11 @@ rule HLA_LA:
     output:
         "results/HLA-LA/output/{sample}/hla/R1_bestguess_G.txt"
     threads: 7
-    log: "logs/HLA-LA/{sample}.log"
+    log: 
+        "logs/HLA-LA/{sample}.log"
     params:
-        graph="PRG_MHC_GRCh38_withIMGT",
-        graphdir="resources/graphs",
+        graph=lambda w, input: os.path.basename(os.path.dirname(input.index)),
+        graphdir=lambda w, input: os.path.dirname(os.path.dirname(input.index)),
     conda:
         "../envs/hla_la.yaml"
     shell:
@@ -21,16 +22,19 @@ rule parse_HLA_LA:
     output:
         report("results/HLA-LA/hlaI_{sample}.tsv", caption="../report/HLA_Types.rst", category="HLA-Typing(HLA-LA)"),
         report("results/HLA-LA/hlaII_{sample}.tsv", caption="../report/HLA_Types.rst", category="HLA-Typing(HLA-LA)")
+    log:
+        "logs/parse-HLA-LA/{sample}.log"
     script:
         "../scripts/parse_HLA_types.py"
 
 rule razers3:
     input:
-        reads=get_map_reads_input
+        reads="results/merged/DNA/{sample}_{fq}.fastq.gz"
     output:
-        bam="results/razers3/bam/{sample}_{group}.bam"
+        bam="results/razers3/bam/{sample}_{fq}.bam"
     threads: 8
-    log: "logs/razors/{sample}_{group}.log"
+    log:
+        "logs/razors/{sample}_{fq}.log"
     params:
         genome=config["reference"]["hla_data"],
         extra=config["params"]["razers3"]
@@ -39,18 +43,20 @@ rule razers3:
 
 rule bam2fq:
     input:
-        "results/razers3/bam/{sample}_{group}.bam"
+        "results/razers3/bam/{sample}_{fq}.bam"
     output:
-        "results/razers3/fastq/{sample}_{group}.fished.fastq"
+        "results/razers3/fastq/{sample}_{fq}.fished.fastq"
     params:
         ""
+    log:
+        "logs/razers3-bam2fq/{sample}-{fq}.log"
     threads: 1
     wrapper:
         "0.61.0/bio/samtools/bam2fq/interleaved"
 
 rule OptiType:
     input:
-        reads=expand("results/razers3/fastq/{{sample}}_{fq}.fished.fastq", fq=[1,2])
+        reads=get_optitype_reads_input
     output:
         multiext("results/optitype/{sample}/{sample}", "_coverage_plot.pdf", "_result.tsv")
     log:
@@ -67,6 +73,8 @@ rule parse_Optitype:
         "results/optitype/{sample}/{sample}_result.tsv"
     output:
         report("results/optitype/{sample}/hla_alleles_{sample}.tsv", caption="../report/HLA_Types.rst", category="HLA-Typing(Optitype)")
+    log:
+        "logs/parse-optitype/{sample}.log"
     shell:
         "cut {input} -f2-7 | awk 'NR == 1 {{print}} NR>1 {{for (i = 1; i<=6; ++i) sub(/^/, \"&HLA-\", $i); print}}' "
-        "| sed -e s/[*,:]/''/g | sed s/' '/'\t'/g > {output}"
+        "| sed -e s/[*,:]//g | sed \"s/ /'\t'/g\" > {output} 2> {log}"

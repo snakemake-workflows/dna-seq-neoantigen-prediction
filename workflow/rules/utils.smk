@@ -34,3 +34,13 @@ rule tabix_known_variants:
     cache: True
     wrapper:
         "0.59.2/bio/tabix"
+
+rule gzip_fastq:
+    input:
+        "{prefix}.fastq"
+    output:
+        "{prefix}.fastq.gz"
+    log:
+        "logs/gz-fastq/{prefix}.log"
+    shell:
+        "gzip < {input} > {output}"

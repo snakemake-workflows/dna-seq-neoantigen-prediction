@@ -132,6 +132,15 @@ properties:
       activate:
         type: boolean
 
+  HLAtyping:
+    type: object
+    properties:
+      HLA_LA:
+        type: object
+        properties:
+          activate:
+            type: boolean
+
   annotations:
     type: object
     properties:

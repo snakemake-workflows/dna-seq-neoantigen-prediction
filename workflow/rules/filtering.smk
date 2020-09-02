@@ -19,6 +19,8 @@ rule control_fdr:
     params:
         threshold=config["calling"]["fdr-control"]["threshold"],
         events=lambda wc: config["calling"]["fdr-control"]["events"][wc.event]["varlociraptor"]
+    log:
+        "logs/control-fdr/{pair}-{vartype}-{event}.log"
     conda:
         "../envs/varlociraptor.yaml"
     shell:
@@ -32,6 +34,8 @@ rule merge_calls:
         idx=get_merge_input(".bcf.csi")
     output:
         "results/merged-calls/{pair}.{event}.fdr-controlled.bcf"
+    log:
+        "logs/merge-calls/{pair}-{event}.log"
     params:
         "-a -Ob"
     wrapper:
