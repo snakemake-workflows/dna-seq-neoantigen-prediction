@@ -48,6 +48,15 @@ epitope_prediction:
   activate: false
 
 
+affinity:
+  netMHCpan:
+    activated: false
+    params: "-BA -l 9 -s -xls"
+  netMHCIIpan:
+    activated: false
+    params: "-length 15 -s -xls"
+
+
 HLAtyping:
   HLA_LA:
     activate: true
@@ -105,10 +114,6 @@ params:
             9
         netMHCIIpan:
             15
-  netMHCpan:
-    "-BA -l 9 -s -xls"
-  netMHCIIpan:
-    "-length 15 -s -xls"
   optitype:
     ""
   kallisto:

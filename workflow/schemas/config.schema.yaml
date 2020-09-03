@@ -131,6 +131,24 @@ properties:
     properties:
       activate:
         type: boolean
+  
+  affinity:
+    type: object:
+      properties:
+        netMHCpan:
+          type: object
+          properties:
+            activate:
+              type: boolean
+            params:
+              type: string
+        netMHCIIpan:
+          type: object
+          properties:
+            activate:
+              type: boolean
+            params:
+              type: string
 
   HLAtyping:
     type: object
@@ -218,10 +236,6 @@ properties:
                 type: integer
               netMHCIIpan:
                 type: integer
-      netMHCpan:
-        type: string
-      netMHCIIpan:
-        type: string
       kallisto:
         type: string
       star:
@@ -233,8 +247,6 @@ properties:
       - strelka
       - razers3
       - microphaser
-      - netMHCpan
-      - netMHCIIpan
       - optitype
 
 required:
@@ -245,3 +257,5 @@ required:
   - calling
   - params
   - annotations
+  - epitope_prediction
+  - affinity

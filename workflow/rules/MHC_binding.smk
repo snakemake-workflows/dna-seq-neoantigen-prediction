@@ -24,7 +24,7 @@ rule netMHCpan:
     log:
         "logs/netMHCpan/{sample}-{chr}-{group}.log"
     params:
-        extra = config["params"]["netMHCpan"]
+        extra = config["affinity"]["netMHCpan"]["params"]
     run:
         alleles = ",".join(pd.read_csv(input.alleles, sep="\t").iloc[0])
         cmd = "if [ -s {input.peptides} ]; then ../netMHCpan-4.0/netMHCpan {params.extra} -xlsfile {output} -a {alleles} -f {input.peptides} > {log}; else touch {output}; fi"
@@ -40,7 +40,7 @@ rule netMHCIIpan:
     log:
         "logs/netMHCIIpan/{sample}-{chr}-{group}.log"
     params:
-        extra=config["params"]["netMHCIIpan"]
+        extra=config["affinity"]["netMHCIIpan"]["params"]
     run:
         alleles = ",".join(pd.read_csv(input.alleles, sep="\t")["Allele"].tolist())
         cmd = "if [ -s {input.peptides} ]; then ../netMHCIIpan-3.2/netMHCIIpan {params.extra} -xlsfile {output} -a {alleles} -f {input.peptides} > {log}; else touch {output}; fi"
