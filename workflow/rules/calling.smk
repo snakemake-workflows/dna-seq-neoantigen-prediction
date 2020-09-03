@@ -32,7 +32,7 @@ rule strelka_somatic:
         # "{params.run_extra}) "  # Extra parameters for runWorkflow
         # "> {log} 2>&1"  # Logging behaviour"
     wrapper:
-        "0.60.0/bio/strelka/somatic"
+        "0.65.0/bio/strelka/somatic"
 
 rule strelka_germline:
     input:
@@ -50,7 +50,7 @@ rule strelka_germline:
         run_extra=""
     threads: 22
     wrapper:
-        "0.60.0/bio/strelka/germline"
+        "0.65.0/bio/strelka/germline"
 
 rule vcf_to_bcf:
     input:
