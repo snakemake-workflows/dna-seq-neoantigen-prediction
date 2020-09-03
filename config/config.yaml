@@ -50,10 +50,10 @@ epitope_prediction:
 
 affinity:
   netMHCpan:
-    activated: false
+    activate: false
     params: "-BA -l 9 -s -xls"
   netMHCIIpan:
-    activated: false
+    activate: false
     params: "-length 15 -s -xls"
 
 
@@ -114,8 +114,6 @@ params:
             9
         netMHCIIpan:
             15
-  optitype:
-    ""
   kallisto:
     "-b 100"
   star:

@@ -134,21 +134,21 @@ properties:
   
   affinity:
     type: object:
-      properties:
-        netMHCpan:
-          type: object
-          properties:
-            activate:
-              type: boolean
-            params:
-              type: string
-        netMHCIIpan:
-          type: object
-          properties:
-            activate:
-              type: boolean
-            params:
-              type: string
+    properties:
+      netMHCpan:
+        type: object
+        properties:
+          activate:
+            type: boolean
+          params:
+            type: string
+      netMHCIIpan:
+        type: object
+        properties:
+          activate:
+            type: boolean
+          params:
+            type: string
 
   HLAtyping:
     type: object
