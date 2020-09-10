@@ -65,9 +65,8 @@ rule split_annotation:
         "resources/annotation/{contig}.gtf"
     log:
         "logs/split-annotation.{contig}.log"
-    cache: True
     shell:
-        "awk '!/^#/{{print >\"{output}/\"$1\".gtf\"}}' {input}"
+        "grep '^{wildcards.contig}\t' {input} > {output}"
 
 
 rule genome_faidx:
