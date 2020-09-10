@@ -156,15 +156,15 @@ def get_proteome(wildcards):
 
 def get_alleles_MHCI(wildcards):
     if wildcards.group == "wt":
-        return expand("results/optitype/{S}/hla_alleles_{S}.tsv", S=get_normal(wildcards))
+        return "results/optitype/{S}/hla_alleles_{S}.tsv".format(S=get_normal(wildcards))
     else:
-        return expand("results/optitype/{S}/hla_alleles_{S}.tsv", S=wildcards.sample)
+        return "results/optitype/{S}/hla_alleles_{S}.tsv".format(S=wildcards.sample)
 
 def get_alleles_MHCII(wildcards):
     if wildcards.group == "wt":
-        return expand("results/HLA-LA/hlaI_{S}.tsv", S=get_normal(wildcards))
+        return "results/HLA-LA/hlaI_{S}.tsv".format(S=get_normal(wildcards))
     else:
-        return expand("results/HLA-LA/hlaI_{S}.tsv", S=wildcards.sample)
+        return "results/HLA-LA/hlaI_{S}.tsv".format(S=wildcards.sample)
         
 
 # def get_germline_optitype(wildcards):
