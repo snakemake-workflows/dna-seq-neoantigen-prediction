@@ -133,7 +133,7 @@ properties:
         type: boolean
   
   affinity:
-    type: object:
+    type: object
     properties:
       netMHCpan:
         type: object
