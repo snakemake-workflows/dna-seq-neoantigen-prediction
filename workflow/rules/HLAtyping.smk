@@ -77,4 +77,4 @@ rule parse_Optitype:
         "logs/parse-optitype/{sample}.log"
     shell:
         "cut {input} -f2-7 | awk 'NR == 1 {{print}} NR>1 {{for (i = 1; i<=6; ++i) sub(/^/, \"&HLA-\", $i); print}}' "
-        "| sed -e s/[*,:]//g | sed \"s/ /'\t'/g\" > {output} 2> {log}"
+        "| sed -e s/[*,:]//g | sed \"s/ /\t/g\" > {output} 2> {log}"
