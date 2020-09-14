@@ -2,18 +2,36 @@
 #     input:
 #         get_annotated_bcf
 #     output:
-#         "results/calls/{group}.{filter}.filtered.bcf"
+#         "results/calls/{group}.{filter}.filtered_ann.bcf"
+#     log:
+#         "logs/filter-calls/annotation/{group}.{filter}.log"
 #     params:
 #         filter=lambda w: config["calling"]["filter"][w.filter]
 #     conda:
-#         "../envs/snpsift.yaml"
+#         "../envs/vembrane.yaml"
 #     shell:
-#         "bcftools view {input} | SnpSift filter \"{params.filter}\" | bcftools view -Ob > {output}"
+#         "vembrane {params.filter:q} {input} --output-fmt bcf --output {output} &> {log}"
+
+
+rule filter_odds:
+    input:
+        get_annotated_bcf
+    output:
+        "results/calls/{pair}.{event}.filtered_odds.bcf"
+    params:
+        events=lambda wc: config["calling"]["fdr-control"]["events"][wc.event]["varlociraptor"]
+    log:
+        "logs/filter-calls/posterior_odds/{pair}.{event}.log"
+    conda:
+        "../envs/varlociraptor.yaml"
+    shell:
+        "varlociraptor filter-calls posterior-odds --events {params.events} --odds barely < {input} > {output} 2> {log}"
+
 
 
 rule control_fdr:
     input:
-        get_annotated_bcf
+        "results/calls/{pair}.{event}.filtered_odds.bcf"
     output:
         "results/calls/{pair}.{vartype}.{event}.fdr-controlled.bcf"
     params:

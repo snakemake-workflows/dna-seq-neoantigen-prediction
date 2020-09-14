@@ -5,8 +5,6 @@ rule render_scenario:
         report("results/scenarios/{pair}.yaml", caption="../report/scenario.rst", category="Variant calling scenarios")
     params:
         samples=samples
-    log:
-        "logs/render-scenario/{pair}.log"
     conda:
         "../envs/render_scenario.yaml"
     script:

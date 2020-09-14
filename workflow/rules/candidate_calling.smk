@@ -12,4 +12,4 @@ rule freebayes:
         chunksize=100000
     threads: 60
     wrapper:
-        "0.42.0/bio/freebayes"
+        "0.65.0/bio/freebayes"
