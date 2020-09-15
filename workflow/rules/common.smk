@@ -257,8 +257,8 @@ def get_fusion_output():
 
 def get_tmb_targets():
     if is_activated("tmb"):
-        return expand("results/plots/tmb/{group}.{mode}.tmb.svg",
-                      group=groups,
+        return expand("results/plots/tmb/{group}.{mode}.svg",
+                      group=samples[(samples.type == "tumor")]["sample"],
                       mode=config["tmb"].get("mode", "curve"))
     else:
         return []
