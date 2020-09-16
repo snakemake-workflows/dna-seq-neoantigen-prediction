@@ -118,7 +118,7 @@ rule concat_variants:
     log:
         "bcftools/concat-all/{sample}.log"
     params:
-        extra="-O b"
+        extra="-O b -a"
     wrapper:
         "0.64.0/bio/bcftools/concat"
 
