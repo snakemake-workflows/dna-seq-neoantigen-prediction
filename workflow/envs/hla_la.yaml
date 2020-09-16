@@ -5,3 +5,4 @@ channels:
 dependencies:
   - hla-la ==1.0.4
   - samtools ==1.10
+  - boost-cpp ==1.73.0
