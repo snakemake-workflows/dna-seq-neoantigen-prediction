@@ -1,6 +1,6 @@
 rule microphaser_somatic:
     input:
-        vcf="results/strelka/merged/{sample}/all_variants.prepy.bcf",
+        vcf="results/strelka/merged/{sample}/all_variants.norm.annotated.bcf",
         bam="results/recal/{sample}.sorted.bam",
         bai="results/recal/{sample}.sorted.bam.bai",
         track="resources/annotation/{contig}.gtf",

@@ -151,15 +151,15 @@ rule preprocess_variants:
     wrapper:
         "0.60.0/bio/hap.py/pre.py"
 
-# rule norm_vcf:
-#     input:
-#         "{prefix}.bcf",
-#         genome="resources/genome.fasta"
-#     output:
-#         "{prefix}.norm.bcf"
-#     log:
-#         "logs/bcftools/norm/{prefix}.log"
-#     params:
-#         "-f {} -O b".format("resources/genome.fasta")  # optional parameters for bcftools norm (except -o)
-#     wrapper:
-#         "0.64.0/bio/bcftools/norm"
+rule norm_vcf:
+    input:
+        "{prefix}.bcf",
+        genome="resources/genome.fasta"
+    output:
+        "{prefix}.norm.bcf"
+    log:
+        "logs/bcftools/norm/{prefix}.log"
+    params:
+        "-f {} -O b -m-".format("resources/genome.fasta")  # optional parameters for bcftools norm (except -o)
+    wrapper:
+        "0.65.0/bio/bcftools/norm"

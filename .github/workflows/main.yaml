@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Lint workflow
-      uses: snakemake/snakemake-github-action@v1.9.0
+      uses: snakemake/snakemake-github-action@v1.10.0
       with:
         directory: .
         snakefile: workflow/Snakefile
@@ -31,7 +31,7 @@ jobs:
       uses: textbook/git-checkout-submodule-action@2.0.0
 
     - name: Test workflow (local FASTQs)
-      uses: snakemake/snakemake-github-action@v1.9.0
+      uses: snakemake/snakemake-github-action@v1.10.0
       with:
         directory: .test
         snakefile: workflow/Snakefile

@@ -167,14 +167,15 @@ rule download_HLALA_graph:
     cache: True
     shell:
         "cd resources/graphs && wget  http://www.well.ox.ac.uk/downloads/PRG_MHC_GRCh38_withIMGT.tar.gz "
-        "&& tar -xvzf PRG_MHC_GRCh38_withIMGT.tar.gz > {log} 2>&1"
+        "&& tar -xvzf PRG_MHC_GRCh38_withIMGT.tar.gz"
 
 
 rule index_HLALA:
     input:
         "resources/graphs/PRG_MHC_GRCh38_withIMGT/sequences.txt"
     output:
-        multiext("resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH", "", "_preGapPathindex")
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH",
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH_preGapPathindex"
     cache: True
     conda: "../envs/hla_la.yaml"
     params:
