@@ -49,7 +49,7 @@ def merge(info, tumor, normal, outfile):
     "Top_rank_HLA_tumor","Top_affinity_HLA_tumor","Peptide_normal","BindingHLAs_normal",
     "Rank_min_normal","Aff_min_normal","Top_rank_HLA_normal","Top_affinity_HLA_normal"]
 
-    data = data[data.BindingHLAs_tumor > 0]
+    #data = data[data.BindingHLAs_tumor > 0]
     # data = data[(data.NB_normal.isna()) | (data.NB_normal == 0)]
     #data = data[(data.BindingHLAs_normal == 0)]
 

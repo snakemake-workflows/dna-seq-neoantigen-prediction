@@ -63,13 +63,14 @@ rule microphaser_filter:
     output:
         mt_fasta="results/microphaser/fasta/{sample}/filtered/{mhc}/{sample}.{contig}.mt.fa",
         wt_fasta="results/microphaser/fasta/{sample}/filtered/{mhc}/{sample}.{contig}.wt.fa",
-        tsv="results/microphaser/info/{sample}/filtered/{mhc}/{sample}.{contig}.tsv"
+        tsv="results/microphaser/info/{sample}/filtered/{mhc}/{sample}.{contig}.tsv",
+        removed="results/microphaser/info/{sample}/removed/{mhc}/{sample}.{contig}.tsv"
     log:
         "logs/microphaser/filter/{sample}-{mhc}-{contig}.log"
     params:
         length=lambda wildcards: config["params"]["microphaser"]["peptide_len"][wildcards.mhc]
     shell:
-        "../microphaser/target/release/microphaser filter -r {input.proteome} -t {input.tsv} -o {output.tsv} -n {output.wt_fasta} -l {params.length} > {output.mt_fasta} 2>{log}"
+        "../microphaser/target/release/microphaser filter -r {input.proteome} -t {input.tsv} -o {output.tsv} -s {output.removed} -n {output.wt_fasta} -l {params.length} > {output.mt_fasta} 2>{log}"
 
 rule concat_tsvs:
     input:
