@@ -25,13 +25,14 @@ rule microphaser_germline:
         track="resources/annotation/{contig}.gtf",
         ref="resources/genome.fasta"
     output:
-        wt_fasta="results/microphaser/fasta/germline/{normal}/{normal}.germline.{contig}.fa"
+        wt_fasta="results/microphaser/fasta/germline/{normal}/{normal}.germline.{contig}.fa",
+        wt_tsv="results/microphaser/info/germline/{normal}/{normal}.germline.{contig}.tsv"
     log:
         "logs/microphaser/germline/{normal}-{contig}.log"
     params:
         window_length=config["params"]["microphaser"]["window_len"]
     shell:
-        "../microphaser/target/release/microphaser normal {input.bam} --variants {input.vcf} --ref {input.ref} -w {params.window_length} "
+        "../microphaser/target/release/microphaser normal {input.bam} --variants {input.vcf} --ref {input.ref} -t {output.wt_tsv} -w {params.window_length} "
         "< {input.track} > {output.wt_fasta} 2> {log}"
 
 rule concat_proteome:
@@ -48,13 +49,14 @@ rule build_germline_proteome:
     input:
         "results/microphaser/fasta/germline/{normal}/reference_proteome.fa"
     output:
-        "results/microphaser/fasta/germline/{normal}/{mhc}/reference_proteome.bin"
+        bin="results/microphaser/fasta/germline/{normal}/{mhc}/reference_proteome.bin",
+        fasta="results/microphaser/fasta/germline/{normal}/{mhc}/reference_proteome.peptides.fasta"
     log:
         "logs/microphaser/build-ref-proteome-db/{normal}-{mhc}.log"
     params:
         length=lambda wildcards: config["params"]["microphaser"]["peptide_len"][wildcards.mhc]
     shell:
-        "../microphaser/target/release/microphaser build_reference -r {input} -o {output} -l {params.length} > {log} 2>&1"
+        "../microphaser/target/release/microphaser build_reference -r {input} -o {output.bin} -l {params.length} --peptides {output.fasta} > {log} 2>&1"
 
 rule microphaser_filter:
     input:
@@ -64,13 +66,14 @@ rule microphaser_filter:
         mt_fasta="results/microphaser/fasta/{sample}/filtered/{mhc}/{sample}.{contig}.mt.fa",
         wt_fasta="results/microphaser/fasta/{sample}/filtered/{mhc}/{sample}.{contig}.wt.fa",
         tsv="results/microphaser/info/{sample}/filtered/{mhc}/{sample}.{contig}.tsv",
-        removed="results/microphaser/info/{sample}/removed/{mhc}/{sample}.{contig}.tsv"
+        removed="results/microphaser/info/{sample}/removed/{mhc}/{sample}.{contig}.removed.tsv"
     log:
         "logs/microphaser/filter/{sample}-{mhc}-{contig}.log"
     params:
         length=lambda wildcards: config["params"]["microphaser"]["peptide_len"][wildcards.mhc]
     shell:
-        "../microphaser/target/release/microphaser filter -r {input.proteome} -t {input.tsv} -o {output.tsv} -s {output.removed} -n {output.wt_fasta} -l {params.length} > {output.mt_fasta} 2>{log}"
+        "../microphaser/target/release/microphaser filter -r {input.proteome} -t {input.tsv} -o {output.tsv} -n {output.wt_fasta} -s {output.removed} -l {params.length} > {output.mt_fasta} 2>{log}"
+
 
 rule concat_tsvs:
     input:
