@@ -95,10 +95,12 @@ def get_map_reads_input(wildcards):
 
 
 def get_optitype_reads_input(wildcards):
-    if is_paired_end(wildcards.sample, "DNA"):
-        return expand("results/razers3/fastq/{sample}_{fq}.fished.fastq", sample=wildcards.sample, fq=["R1", "R2"])
-    return "results/razers3/fastq/{sample}_single.fastq"
-
+    if is_activated("HLAtyping/optitype_prefiltering"):
+        if is_paired_end(wildcards.sample, "DNA"):
+            return expand("results/razers3/fastq/{sample}_{fq}.fished.fastq", sample=wildcards.sample, fq=["R1", "R2"])
+        return "results/razers3/fastq/{sample}_single.fastq"
+    else:
+        return get_map_reads_input(wildcards)
 
 def get_quant_reads_input(wildcards):
     if is_paired_end(wildcards.sample, "RNA"):
