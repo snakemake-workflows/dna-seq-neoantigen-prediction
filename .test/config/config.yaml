@@ -58,6 +58,9 @@ affinity:
 
 
 HLAtyping:
+  # activate to use razers3 to pre-filter reads before using optitype
+  optitype_prefiltering:
+    activate: false
   HLA_LA:
     activate: false
 
