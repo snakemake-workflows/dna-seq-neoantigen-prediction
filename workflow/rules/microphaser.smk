@@ -74,6 +74,7 @@ rule microphaser_filter:
     shell:
         "../microphaser/target/release/microphaser filter -r {input.proteome} -t {input.tsv} -o {output.tsv} -n {output.wt_fasta} -s {output.removed} -l {params.length} > {output.mt_fasta} 2>{log}"
 
+
 rule concat_tsvs:
     input:
         expand("results/microphaser/info/{{sample}}/filtered/{{mhc}}/{{sample}}.{contig}.tsv", contig = contigs)
