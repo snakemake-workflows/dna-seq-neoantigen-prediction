@@ -19,7 +19,7 @@ rule microphaser_somatic:
 
 rule microphaser_germline:
     input:
-        vcf="results/strelka/germline/{normal}/results/variants/variants.norm.bcf",
+        vcf="results/strelka/germline/{normal}/results/variants/variants.reheader.norm.bcf",
         bam="results/recal/{normal}.sorted.bam",
         bai="results/recal/{normal}.sorted.bam.bai",
         track="resources/annotation/{contig}.gtf",
