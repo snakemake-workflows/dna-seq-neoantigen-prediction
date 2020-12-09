@@ -56,7 +56,7 @@ def merge(info, tumor, normal, outfile):
     ### Delete Stop-Codon including peptides
     data = data[data.Peptide_tumor.str.count("x") == 0]
     data = data[data.Peptide_tumor.str.count("X") == 0]
-
+    data.sort_values(["Chromosome", "somatic_positions"], inplace=True)
     ### Remove Duplicate kmers
     data = data.drop_duplicates(["Transcript_ID", "Peptide_tumor", "Somatic_AminoAcid_Change", "Peptide_normal"])
 
