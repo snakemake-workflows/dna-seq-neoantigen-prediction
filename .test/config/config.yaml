@@ -61,6 +61,7 @@ HLAtyping:
   # activate to use razers3 to pre-filter reads before using optitype
   optitype_prefiltering:
     activate: false
+  optitype_data: "config/HLA_Data/hla_reference_dna.fasta"
   HLA_LA:
     activate: false
 
@@ -76,8 +77,6 @@ ref:
   # Genome build
   build: GRCh38
 
-reference:
-  hla_data: "config/HLA_Data/hla_reference_dna.fasta"
 
 annotations:
   vep:
@@ -108,17 +107,17 @@ params:
     ""
   microphaser:
     window_len:
-        60
+      60
     peptide_len:
-        netMHCpan:
-            9
-        netMHCIIpan:
-            15
+      netMHCpan:
+          9
+      netMHCIIpan:
+          15
   optitype:
     ""
   kallisto:
     "-b 100"
-  star:
-    "--outSAMmapqUnique 60 --outSAMtype BAM Unsorted --chimSegmentMin 10 --chimOutType WithinBAM SoftClip "
-    "--chimJunctionOverhangMin 10 --chimScoreMin 1 --chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0 "
-    "--chimScoreSeparation 1 --alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3"
+  star: >-
+    --outSAMmapqUnique 60 --outSAMtype BAM Unsorted --chimSegmentMin 10 --chimOutType WithinBAM SoftClip
+    --chimJunctionOverhangMin 10 --chimScoreMin 1 --chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0
+    --chimScoreSeparation 1 --alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3

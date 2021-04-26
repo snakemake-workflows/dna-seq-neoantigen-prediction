@@ -36,7 +36,7 @@ rule razers3:
     log:
         "logs/razers3/{sample}_{fq}.log"
     params:
-        genome=config["reference"]["hla_data"],
+        genome=config["HLAtyping"]["optitype_data"],
         extra=config["params"]["razers3"]
     wrapper:
         "0.61.0/bio/razers3"
