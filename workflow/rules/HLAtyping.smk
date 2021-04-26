@@ -34,7 +34,7 @@ rule razers3:
         bam="results/razers3/bam/{sample}_{fq}.bam"
     threads: 8
     log:
-        "logs/razors/{sample}_{fq}.log"
+        "logs/razers3/{sample}_{fq}.log"
     params:
         genome=config["reference"]["hla_data"],
         extra=config["params"]["razers3"]

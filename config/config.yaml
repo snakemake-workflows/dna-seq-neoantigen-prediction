@@ -61,6 +61,7 @@ HLAtyping:
   # activate to use razers3 to pre-filter reads before using optitype
   optitype_prefiltering:
     activate: false
+  # activate to predict MHC-I and MHC-II alleles with HLA-LA
   HLA_LA:
     activate: false
 
@@ -75,12 +76,7 @@ ref:
   release: 100
   # Genome build
   build: GRCh38
-  # snpeff release
-  snpeff: GRCh38.86
 
-reference:
-  hla_data: "config/HLA_Data/hla_reference_dna.fasta"
-  HLA_LA_graphs: "path/to/graphs"
 
 annotations:
   vep:
@@ -120,4 +116,6 @@ params:
   kallisto:
     "-b 100"
   star:
-    "--outSAMmapqUnique 60"
+    "--outSAMmapqUnique 60 --outSAMtype BAM Unsorted --chimSegmentMin 10 --chimOutType WithinBAM SoftClip "
+    "--chimJunctionOverhangMin 10 --chimScoreMin 1 --chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0 "
+    "--chimScoreSeparation 1 --alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3"

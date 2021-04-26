@@ -12,25 +12,10 @@ rule strelka_somatic:
         "results/strelka/somatic/{sample}/results/variants/somatic.indels.vcf.gz"
     log:
         "logs/calling/strelka_somatic/{sample}.log"
-    # conda:
-    #     "../envs/strelka.yaml"
     params:
         config_extra="--callRegions {} {}".format("resources/genome.callregions.bed.gz", config["params"]["strelka"]["config"]),
         run_extra=config["params"]["strelka"]["run"]
     threads: 22
-    #shell:
-        # "(configureStrelkaSomaticWorkflow.py "  # Configuration script
-        # "--normalBam {input.normal} "  # Path to normal bam (if any)
-        # "--tumorBam {input.tumor} "  # Path to tumor bam
-        # "--referenceFasta {input.fasta} "  # Path to fasta file
-        # "--runDir results/strelka/somatic/{wildcards.sample} "  # Path to output directory
-        # "{params.config_extra} "  # Extra parametersfor configuration
-        # " && "
-        # "results/strelka/somatic/{wildcards.sample}/runWorkflow.py "  # Run the pipeline
-        # "--mode local "  # Stop internal job submission
-        # "--jobs {threads} "  # Nomber of threads
-        # "{params.run_extra}) "  # Extra parameters for runWorkflow
-        # "> {log} 2>&1"  # Logging behaviour"
     wrapper:
         "0.65.0/bio/strelka/somatic"
 
@@ -93,7 +78,7 @@ rule get_tumor_from_somatic:
 rule reheader_germline:
     input:
         vcf="{germline}/variants.output.bcf",
-        samples="config/newsamples.txt"
+        samples="resources/sampleheader.txt"
     output:
         "{germline}/variants.reheader.bcf"
     log:
@@ -106,13 +91,8 @@ rule reheader_germline:
 
 rule concat_variants:
     input:
-        # germline=get_germline_variants,
-        # index_g=get_germline_variants_index,
-        # somatic="results/strelka/somatic/{sample}/results/variants/somatic.complete.tumor.bcf",
-        # index_s="results/strelka/somatic/{sample}/results/variants/somatic.complete.tumor.bcf.csi",
         calls=lambda w: get_pair_variants(w, index=False),
         index=lambda w: get_pair_variants(w, index=True)
-        #db="resources/snpEff/GRCh38.86"
     output:
         "results/strelka/merged/{sample}/all_variants.bcf"
     log:
@@ -121,21 +101,6 @@ rule concat_variants:
         extra="-O b -a"
     wrapper:
         "0.64.0/bio/bcftools/concat"
-
-rule annotate_strelka:
-    input:
-        calls="results/strelka/merged/{sample}/all_variants.bcf",
-        db="resources/snpEff/GRCh38.86"
-    output:
-        calls="results/strelka/merged/{sample}/all_variants.annotated.bcf"
-    log:
-        "logs/snpeff/{sample}.log"
-    params:
-        #data_dir=lambda w, input: Path(input.db).parent.resolve(),
-        #release=config["ref"]["snpeff"],
-        extra="-Xmx4g -nodownload"
-    wrapper:
-        "0.64.0/bio/snpeff/annotate"
 
 rule preprocess_variants:
     input:

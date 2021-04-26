@@ -19,10 +19,6 @@ properties:
   platform:
     type: string
     enum: ["CAPILLARY", "LS454", "ILLUMINA", "SOLID", "HELICOS", "IONTORRENT", "ONT", "PACBIO"]
-  has_RNA:
-    type: string
-    enum: ["Yes", "No"]
-    description: Does matching transcriptome information exist for this sample
 
   
 

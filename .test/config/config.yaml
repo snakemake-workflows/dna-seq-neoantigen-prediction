@@ -75,8 +75,6 @@ ref:
   release: 100
   # Genome build
   build: GRCh38
-  # snpeff release
-  snpeff: GRCh38.86
 
 reference:
   hla_data: "config/HLA_Data/hla_reference_dna.fasta"
@@ -121,4 +119,6 @@ params:
   kallisto:
     "-b 100"
   star:
-    "--outSAMmapqUnique 60"
+    "--outSAMmapqUnique 60 --outSAMtype BAM Unsorted --chimSegmentMin 10 --chimOutType WithinBAM SoftClip "
+    "--chimJunctionOverhangMin 10 --chimScoreMin 1 --chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0 "
+    "--chimScoreSeparation 1 --alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3"
