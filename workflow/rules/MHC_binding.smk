@@ -96,10 +96,12 @@ rule mhc_csv_table:
 
 rule add_RNA_info:
     input:
-        counts="results/kallisto/{sample}/abundance.tsv",
+        counts="results/kallisto/{sample}",
         table="results/neoantigens/{mhc}/{sample}.WES.tsv"
     output:
         report("results/neoantigens/{mhc}/{sample}.RNA.tsv", caption="../report/RNA_results.rst", category="Results RNA")
+    params:
+        abundance=lambda wc, input: "{}/abundance.tsv".format(input.counts)
     log:
         "logs/add-RNA/{mhc}-{sample}.log"
     script:

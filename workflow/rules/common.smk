@@ -26,7 +26,10 @@ contigs.extend(["X", "Y"])
 wildcard_constraints:
     pair="|".join(samples[samples.type == "tumor"]["sample"]),
     sample="|".join(samples["sample"]),
-    caller="|".join(["freebayes", "delly"])
+    caller="|".join(["freebayes", "delly"]),
+    event="somatic|germline|complete",
+    scatteritem="\d+-of-\d+",
+    filter="|".join(config["calling"]["filter"])
 
 
 ### Output generation ###
@@ -35,7 +38,7 @@ def is_activated(xpath):
     c = config
     for entry in xpath.split("/"):
         c = c.get(entry, {})
-    return bool(c["activate"])
+    return bool(c.get("activate", False))
 
 def get_final_output():
     if config["epitope_prediction"]["activate"]:
@@ -162,11 +165,25 @@ def get_oncoprint_batch(wildcards):
 
 ## variant calls ## 
 
-def get_annotated_bcf(wildcards, pair=None):
-    if pair is None:
-        pair = wildcards.pair
+def get_annotated_bcf(wildcards):
     selection = ".annotated"
-    return "results/calls/{pair}{selection}.bcf".format(pair=pair, selection=selection)
+    return "results/calls/{pair}.{scatteritem}{selection}.bcf".format(pair=wildcards.pair, selection=selection, scatteritem=wildcards.scatteritem)
+
+def get_scattered_calls(ext=".bcf"):
+    print(caller)
+    def inner(wildcards):
+        return expand(
+            "results/calls/{{pair}}.{caller}.{{scatteritem}}.sorted{ext}",
+            caller=caller,
+            ext=ext,
+        )
+    return inner
+
+def get_fdr_control_params(wildcards):
+    query = config["calling"]["fdr-control"]["events"][wildcards.event]
+    threshold = query.get("threshold", config["calling"]["fdr-control"].get("threshold", 0.05))
+    events = query["varlociraptor"]
+    return {"threshold": threshold, "events": events}
 
 def get_pair_variants(wildcards, index):
     if index:
@@ -178,9 +195,10 @@ def get_pair_variants(wildcards, index):
     return(variants)
 
 def get_pair_observations(wildcards):
-    return expand("results/observations/{pair}/{sample}.{caller}.sorted.bcf", 
+    return expand("results/observations/{pair}/{sample}.{caller}.{scatteritem}.bcf", 
                   caller=wildcards.caller, 
                   pair=wildcards.pair,
+                  scatteritem=wildcards.scatteritem,
                   sample=get_paired_samples(wildcards))
 
 def get_merge_input(ext=".bcf"):

@@ -1,7 +1,7 @@
 if config["tmb"]["activate"]:
     rule estimate_tmb:
         input:
-            "results/calls/{pair}.annotated.bcf"
+            "results/merged-calls/{pair}.somatic.fdr-controlled.bcf"
         output:
             "results/plots/tmb/{pair}.{plotmode}.vl.json",
         conda:

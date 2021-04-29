@@ -5,6 +5,9 @@
 
 configfile: "config/config.yaml"
 
+scattergather:
+    calling=24
+
 ##### setup report #####
 
 report: "report/workflow.rst"
