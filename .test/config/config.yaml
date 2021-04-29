@@ -75,7 +75,7 @@ HLAtyping:
   optitype_data: "config/HLA_Data/hla_reference_dna.fasta"
   # activate to predict MHC-I and MHC-II alleles with HLA-LA
   HLA_LA:
-    activate: true
+    activate: false
 
 
 ref:
