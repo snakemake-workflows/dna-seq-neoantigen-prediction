@@ -28,7 +28,6 @@ wildcard_constraints:
     sample="|".join(samples["sample"]),
     caller="|".join(["freebayes", "delly"]),
     event="somatic|germline|complete",
-    scatteritem="\d+-of-\d+",
     filter="|".join(config["calling"]["filter"])
 
 
