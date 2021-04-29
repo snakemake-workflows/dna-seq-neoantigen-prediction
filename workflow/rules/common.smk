@@ -28,7 +28,7 @@ wildcard_constraints:
     sample="|".join(samples["sample"]),
     caller="|".join(["freebayes", "delly"]),
     event="somatic|germline|complete",
-    filter="|".join(config["calling"]["filter"])
+    #filter="|".join(config["calling"]["filter"])
 
 
 ### Output generation ###
