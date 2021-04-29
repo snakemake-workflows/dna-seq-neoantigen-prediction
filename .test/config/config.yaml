@@ -73,8 +73,9 @@ HLAtyping:
   optitype_prefiltering:
     activate: false
   optitype_data: "config/HLA_Data/hla_reference_dna.fasta"
+  # activate to predict MHC-I and MHC-II alleles with HLA-LA
   HLA_LA:
-    activate: false
+    activate: true
 
 
 ref:
@@ -91,7 +92,7 @@ ref:
 
 annotations:
   vep:
-    params: --everything
+    params: "--everything"
     plugins:
       # Add any plugin from https://www.ensembl.org/info/docs/tools/vep/script/vep_plugins.html
       # Plugin args can be passed as well, e.g. "LoFtool,path/to/custom/scores.txt".
@@ -118,14 +119,12 @@ params:
     ""
   microphaser:
     window_len:
-      60
+        33
     peptide_len:
       netMHCpan:
           9
       netMHCIIpan:
           15
-  optitype:
-    ""
   kallisto:
     "-b 100"
   star: >-
