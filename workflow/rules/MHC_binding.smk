@@ -78,7 +78,7 @@ rule mhc_csv_table:
         mt="results/{mhc}/{sample}/{sample}.mhc.mt.tsv",
         wt="results/{mhc}/{sample}/{sample}.mhc.wt.tsv"
     output:
-        report("results/neoantigens/{mhc}/{sample}.WES.tsv", caption="../report/WES_results.rst", category="Results WES (netMHC)")
+        report("results/neoantigens/{mhc}/{sample}.DNA.tsv", caption="../report/WES_results.rst", category="Results WES (netMHC)")
     log:
         "logs/create-mhc-table/{mhc}-{sample}.log"
     script:
@@ -97,7 +97,7 @@ rule mhc_csv_table:
 rule add_RNA_info:
     input:
         counts="results/kallisto/{sample}",
-        table="results/neoantigens/{mhc}/{sample}.WES.tsv"
+        table="results/neoantigens/{mhc}/{sample}.DNA.tsv"
     output:
         report("results/neoantigens/{mhc}/{sample}.RNA.tsv", caption="../report/RNA_results.rst", category="Results RNA")
     params:

@@ -40,10 +40,11 @@ def is_activated(xpath):
         c = c.get(entry, {})
     return bool(c.get("activate", False))
 
+
 def get_final_output():
     if config["epitope_prediction"]["activate"]:
-        final_output = expand("results/neoantigens/{mhc}/{sample}.WES.tsv",
-            sample=samples[(samples.type == "tumor")]["sample"],
+        final_output = expand("results/neoantigens/{mhc}/{S.sample}.{S.sequencing_type}.xlsx",
+            S=units.loc[samples[samples.type == "tumor"]["sample"]].drop_duplicates(["sample", "sequencing_type"]).itertuples(),
             mhc=list(filter(None, ["netMHCpan" if is_activated("affinity/netMHCpan") else None, "netMHCIIpan" if is_activated("affinity/netMHCIIpan") else None])))
     else:
         if config["HLAtyping"]["HLA_LA"]["activate"]:
