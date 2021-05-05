@@ -2,5 +2,5 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - kallisto =0.45
-  - hdf5 =1.10
+  - openpyxl =2.6.1
+  - pandas =1.1.3

@@ -58,6 +58,23 @@ rule get_annotation:
         "0.45.1/bio/reference/ensembl-annotation"
 
 
+rule STAR_index:
+    input:
+        fasta="resources/genome.fasta",
+        gtf="resources/genome.gtf"
+    output:
+        directory("resources/STAR_index")
+    params:
+        sjdb_overhang="100",
+        extra=""
+    log:
+        "logs/star/index.log"
+    threads: 32
+    cache: True
+    wrapper:
+        "0.42.0/bio/star/index"
+
+
 rule split_annotation:
     input:
         "resources/genome.gtf"
@@ -163,7 +180,7 @@ rule download_HLALA_graph:
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/translation"),
         "resources/graphs/PRG_MHC_GRCh38_withIMGT/sequences.txt"
     log:
-        "logs/get-HLA-LA-graph.log"
+        "logs/download-HLA-LA-graph.log"
     cache: True
     shell:
         "cd resources/graphs && wget  http://www.well.ox.ac.uk/downloads/PRG_MHC_GRCh38_withIMGT.tar.gz "
@@ -185,18 +202,6 @@ rule index_HLALA:
     shell:
         "HLA-LA.pl --prepareGraph 1 --customGraphDir {params.path} --graph {params.graph} > {log} 2>&1"
 
-rule get_snpeff_data:
-    output:
-        directory("resources/snpEff/{reference}")
-    log:
-        "logs/snpeff/download/{reference}.log"
-    cache: True
-    params:
-        reference="{reference}"
-    wrapper:
-        "0.60.1/bio/snpeff/download"
-
-
 rule get_vep_cache:
     output:
         directory("resources/vep/cache")
@@ -206,9 +211,9 @@ rule get_vep_cache:
         release=config["ref"]["release"]
     log:
         "logs/vep/cache.log"
+    cache: True
     wrapper:
         "0.59.2/bio/vep/cache"
-
 
 rule get_vep_plugins:
     output:
@@ -217,5 +222,14 @@ rule get_vep_plugins:
         release=config["ref"]["release"]
     log:
         "logs/vep/plugins.log"
+    cache: True
     wrapper:
         "0.59.2/bio/vep/plugins"
+
+rule make_sampleheader:
+    output:
+        "resources/sampleheader.txt"
+    log:
+        "logs/germline-reheader-sample.log"
+    shell:
+        "echo 'TUMOR' > {output}"

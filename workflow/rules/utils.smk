@@ -5,8 +5,6 @@ rule bcf_index:
         "{prefix}.bcf.csi"
     log:
         "logs/bcf-index/{prefix}.log"
-    conda:
-        "../envs/bcftools.yaml"
     wrapper:
         "0.60.0/bio/bcftools/index"        
 
@@ -44,3 +42,15 @@ rule gzip_fastq:
         "logs/gz-fastq/{prefix}.log"
     shell:
         "gzip < {input} > {output}"
+
+rule tsv_to_excel:
+    input:
+        tsv="results/{x}.tsv"
+    output:
+        xlsx="results/{x}.xlsx"
+    conda:
+        "../envs/excel.yaml"
+    log:
+        "logs/tsv_to_xlsx/{x}.log"
+    script:
+        "../scripts/tsv_to_xlsx.py"

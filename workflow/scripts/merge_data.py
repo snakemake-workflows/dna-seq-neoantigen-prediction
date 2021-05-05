@@ -28,7 +28,7 @@ def merge(info, tumor, normal, outfile):
     info = info.rename(columns={"gene_id":"Gene_ID","gene_name":"Gene_Symbol","strand":"Strand","positions":"Variant_Position","chrom":"Chromosome","somatic_aa_change":"Somatic_AminoAcid_Change"})
     merged_dataframe = merged_mhc.merge(info, how='left', on = 'ID')
 
-    merged_dataframe["Peptide_tumor"]=merged_dataframe[["Peptide_tumor","Peptide_normal"]].apply(lambda x: diffEpitope(*x), axis=1)
+    merged_dataframe["Peptide_tumor"] = merged_dataframe[["Peptide_tumor","Peptide_normal"]].apply(lambda x: diffEpitope(*x), axis=1)
     ## Are all possible variants in the peptide ("Cis") or not ("Trans")
     merged_dataframe["Variant_Orientation"] = "Cis"
     trans = merged_dataframe.nvariant_sites > merged_dataframe.nvar
@@ -37,7 +37,7 @@ def merge(info, tumor, normal, outfile):
     ## check misssense/silent mutation status
     nonsilent = merged_dataframe.Peptide_tumor != merged_dataframe.Peptide_normal
     merged_dataframe = merged_dataframe[nonsilent]
-    merged_dataframe = merged_dataframe.drop_duplicates(subset=["Gene_ID","offset","Peptide_tumor","Somatic_AminoAcid_Change"])
+    merged_dataframe = merged_dataframe.drop_duplicates(subset=["transcript","offset","Peptide_tumor","Somatic_AminoAcid_Change"])
 
     data = merged_dataframe[["ID","transcript","Gene_ID","Gene_Symbol","Chromosome","offset","freq","depth",
     "Somatic_AminoAcid_Change", "nvar", "nsomatic", "somatic_positions", "Peptide_tumor","NB_tumor","Rank_min_tumor","Aff_min_tumor",

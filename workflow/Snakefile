@@ -1,9 +1,12 @@
-# The main entry point of your workflow.
-# After configuring, running snakemake -n in a clone of this repository should successfully execute a dry-run of the workflow.
+from snakemake.utils import min_version
+min_version("6.0.5")
 
 #### setup config #####
 
 configfile: "config/config.yaml"
+
+scattergather:
+    calling=24
 
 ##### setup report #####
 
@@ -18,7 +21,6 @@ include: "rules/common.smk"
 include: "rules/utils.smk"
 include: "rules/trim.smk"
 include: "rules/ref.smk"
-include: "rules/quant.smk"
 include: "rules/mapping.smk"
 include: "rules/calling.smk"
 include: "rules/candidate_calling.smk"
@@ -28,8 +30,7 @@ include: "rules/filtering.smk"
 include: "rules/microphaser.smk"
 include: "rules/HLAtyping.smk"
 include: "rules/MHC_binding.smk"
-include: "rules/star.smk"
-include: "rules/fusion.smk"
+include: "rules/RNA.smk"
 include: "rules/tmb.smk"
 include: "rules/vega.smk"
 

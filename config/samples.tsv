@@ -1,4 +1,4 @@
-sample	type	matched_normal	purity	has_RNA	platform
-A_normal	normal			No	ILLUMINA
-A_tumor	tumor	A_normal	1	No	ILLUMINA
-B_tumor	tumor	A_normal	1	Yes	ILLUMINA
+sample	type	matched_normal	purity	platform
+A_normal	normal			ILLUMINA
+A_tumor	tumor	A_normal	1	ILLUMINA
+B_tumor	tumor	A_normal	1	ILLUMINA
