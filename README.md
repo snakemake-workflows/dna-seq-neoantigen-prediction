@@ -5,3 +5,4 @@ The workflow allows easy definition of tumor-normal pairs, where multiple tumor 
 
 **Software requirements**
 Unfortunately, the use of netMHCpan and netMHCIIpan is restricted to academic use only. To use those tools in the pipeline, please download them separately following instructions at https://services.healthtech.dtu.dk/software.php.
+Please specify the path to your netMHC folder in the `config.yaml`.
