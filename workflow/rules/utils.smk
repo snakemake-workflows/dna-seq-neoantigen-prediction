@@ -2,55 +2,57 @@ rule bcf_index:
     input:
         "{prefix}.bcf",
     output:
-        "{prefix}.bcf.csi"
+        "{prefix}.bcf.csi",
     log:
-        "logs/bcf-index/{prefix}.log"
+        "logs/bcf-index/{prefix}.log",
     wrapper:
-        "0.60.0/bio/bcftools/index"        
+        "0.60.0/bio/bcftools/index"
 
 
 rule bam_index:
     input:
-        "{prefix}.bam"
+        "{prefix}.bam",
     output:
-        "{prefix}.bam.bai"
+        "{prefix}.bam.bai",
     log:
-        "logs/bam-index/{prefix}.log"
+        "logs/bam-index/{prefix}.log",
     wrapper:
         "0.59.2/bio/samtools/index"
 
 
 rule tabix_known_variants:
     input:
-        "resources/{prefix}.{format}.gz"
+        "resources/{prefix}.{format}.gz",
     output:
-        "resources/{prefix}.{format}.gz.tbi"
+        "resources/{prefix}.{format}.gz.tbi",
     log:
-        "logs/tabix/{prefix}.{format}.log"
+        "logs/tabix/{prefix}.{format}.log",
     params:
-        get_tabix_params
+        get_tabix_params,
     cache: True
     wrapper:
         "0.59.2/bio/tabix"
 
+
 rule gzip_fastq:
     input:
-        "{prefix}.fastq"
+        "{prefix}.fastq",
     output:
-        "{prefix}.fastq.gz"
+        "{prefix}.fastq.gz",
     log:
-        "logs/gz-fastq/{prefix}.log"
+        "logs/gz-fastq/{prefix}.log",
     shell:
         "gzip < {input} > {output}"
 
+
 rule tsv_to_excel:
     input:
-        tsv="results/{x}.tsv"
+        tsv="results/{x}.tsv",
     output:
-        xlsx="results/{x}.xlsx"
+        xlsx="results/{x}.xlsx",
     conda:
         "../envs/excel.yaml"
     log:
-        "logs/tsv_to_xlsx/{x}.log"
+        "logs/tsv_to_xlsx/{x}.log",
     script:
         "../scripts/tsv_to_xlsx.py"

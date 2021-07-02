@@ -1,21 +1,29 @@
 from snakemake.utils import min_version
+
 min_version("6.0.5")
 
 #### setup config #####
 
+
 configfile: "config/config.yaml"
 
+
 scattergather:
-    calling=24
+    calling=24,
+
 
 ##### setup report #####
 
+
 report: "report/workflow.rst"
+
 
 # Allow users to fix the underlying OS via singularity.
 container: "docker://continuumio/miniconda3"
 
+
 ##### load rules #####
+
 
 include: "rules/common.smk"
 include: "rules/utils.smk"
@@ -39,4 +47,4 @@ rule all:
     input:
         get_final_output(),
         get_fusion_output(),
-        get_tmb_targets()
+        get_tmb_targets(),

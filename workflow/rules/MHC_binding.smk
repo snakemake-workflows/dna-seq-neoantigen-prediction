@@ -15,48 +15,56 @@
 #         cmd = "if [ -s {input.peptides} ]; then mhctools --mhc-predictor mhcflurry --mhc-alleles {alleles} --input-fasta-file {input.peptides} --output-csv {output} > {log}; else touch {output}; fi"
 #         shell(cmd)
 
+
 rule netMHCpan:
     input:
         peptides="results/microphaser/fasta/{sample}/filtered/netMHCpan/{sample}.{chr}.{group}.fa",
-        alleles=get_alleles_MHCI
+        alleles=get_alleles_MHCI,
     output:
         "results/netMHCpan/{sample}/{chr}/{sample}.{chr}.{group}.xls",
     log:
-        "logs/netMHCpan/{sample}-{chr}-{group}.log"
+        "logs/netMHCpan/{sample}-{chr}-{group}.log",
     params:
-        extra = config["affinity"]["netMHCpan"]["params"]
+        extra=config["affinity"]["netMHCpan"]["params"],
+        netMHC=config["affinity"]["netMHCpan"]["location"],
     run:
         alleles = ",".join(pd.read_csv(input.alleles, sep="\t").iloc[0])
-        cmd = "if [ -s {input.peptides} ]; then ../netMHCpan-4.0/netMHCpan {params.extra} -xlsfile {output} -a {alleles} -f {input.peptides} > {log}; else touch {output}; fi"
+        cmd = "if [ -s {input.peptides} ]; then {params.netMHC}/netMHCpan {params.extra} -xlsfile {output} -a {alleles} -f {input.peptides} > {log}; else touch {output}; fi"
         shell(cmd)
 
 
 rule netMHCIIpan:
     input:
         peptides="results/microphaser/fasta/{sample}/filtered/netMHCIIpan/{sample}.{chr}.{group}.fa",
-        alleles=get_alleles_MHCII
+        alleles=get_alleles_MHCII,
     output:
         "results/netMHCIIpan/{sample}/{chr}/{sample}.{chr}.{group}.xls",
     log:
-        "logs/netMHCIIpan/{sample}-{chr}-{group}.log"
+        "logs/netMHCIIpan/{sample}-{chr}-{group}.log",
     params:
-        extra=config["affinity"]["netMHCIIpan"]["params"]
+        extra=config["affinity"]["netMHCIIpan"]["params"],
+        netMHC=config["affinity"]["netMHCIIpan"]["location"],
     run:
         alleles = ",".join(pd.read_csv(input.alleles, sep="\t")["Allele"].tolist())
-        cmd = "if [ -s {input.peptides} ]; then ../netMHCIIpan-3.2/netMHCIIpan {params.extra} -xlsfile {output} -a {alleles} -f {input.peptides} > {log}; else touch {output}; fi"
+        cmd = "if [ -s {input.peptides} ]; then {params.netMHC}/netMHCIIpan {params.extra} -xlsfile {output} -a {alleles} -f {input.peptides} > {log}; else touch {output}; fi"
         shell(cmd)
+
 
 rule parse_mhc_out:
     input:
-        expand("results/{{mhc}}/{{sample}}/{chr}/{{sample}}.{chr}.{{group}}.xls", chr=contigs)
+        expand(
+            "results/{{mhc}}/{{sample}}/{chr}/{{sample}}.{chr}.{{group}}.xls",
+            chr=contigs,
+        ),
     output:
-        "results/{mhc}/{sample}/{sample}.mhc.{group}.tsv"
+        "results/{mhc}/{sample}/{sample}.mhc.{group}.tsv",
     log:
-        "logs/parse-mhc/{mhc}-{sample}-{group}.log"
+        "logs/parse-mhc/{mhc}-{sample}-{group}.log",
     wildcard_constraints:
-        group="wt|mt"
+        group="wt|mt",
     script:
         "../scripts/group_mhc_output.py"
+
 
 # rule parse_mhcflurry:
 #     input:
@@ -72,17 +80,23 @@ rule parse_mhc_out:
 #     shell:
 #         "xsv cat rows -d ',' {input} | cut --complement -f2,7,8 > {output}"
 
+
 rule mhc_csv_table:
     input:
         info="results/microphaser/info/{sample}/filtered/{mhc}/{sample}.tsv",
         mt="results/{mhc}/{sample}/{sample}.mhc.mt.tsv",
-        wt="results/{mhc}/{sample}/{sample}.mhc.wt.tsv"
+        wt="results/{mhc}/{sample}/{sample}.mhc.wt.tsv",
     output:
-        report("results/neoantigens/{mhc}/{sample}.DNA.tsv", caption="../report/WES_results.rst", category="Results WES (netMHC)")
+        report(
+            "results/neoantigens/{mhc}/{sample}.DNA.tsv",
+            caption="../report/WES_results.rst",
+            category="Results WES (netMHC)",
+        ),
     log:
-        "logs/create-mhc-table/{mhc}-{sample}.log"
+        "logs/create-mhc-table/{mhc}-{sample}.log",
     script:
         "../scripts/merge_data.py"
+
 
 # rule mhcflurry_table:
 #     input:
@@ -94,15 +108,20 @@ rule mhc_csv_table:
 #     script:
 #         "../scripts/merge_mhcflurry.py"
 
+
 rule add_RNA_info:
     input:
         counts="results/kallisto/{sample}",
-        table="results/neoantigens/{mhc}/{sample}.DNA.tsv"
+        table="results/neoantigens/{mhc}/{sample}.DNA.tsv",
     output:
-        report("results/neoantigens/{mhc}/{sample}.RNA.tsv", caption="../report/RNA_results.rst", category="Results RNA")
+        report(
+            "results/neoantigens/{mhc}/{sample}.RNA.tsv",
+            caption="../report/RNA_results.rst",
+            category="Results RNA",
+        ),
     params:
-        abundance=lambda wc, input: "{}/abundance.tsv".format(input.counts)
+        abundance=lambda wc, input: "{}/abundance.tsv".format(input.counts),
     log:
-        "logs/add-RNA/{mhc}-{sample}.log"
+        "logs/add-RNA/{mhc}-{sample}.log",
     script:
         "../scripts/add_rna_info.py"

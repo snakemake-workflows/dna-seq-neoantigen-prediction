@@ -52,9 +52,11 @@ affinity:
   netMHCpan:
     activate: true
     params: "-BA -l 9 -s -xls"
+    location: "../netMHCpan-4.0"
   netMHCIIpan:
     activate: false
     params: "-length 15 -s -xls"
+    location: "../netMHCIIpan-4.0"
 
 
 HLAtyping:
