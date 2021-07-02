@@ -1,13 +1,13 @@
 rule get_genome:
     output:
-        "resources/genome.fasta"
+        "resources/genome.fasta",
     log:
-        "logs/get-genome.log"
+        "logs/get-genome.log",
     params:
         species=config["ref"]["species"],
         datatype="dna",
         build=config["ref"]["build"],
-        release=config["ref"]["release"]
+        release=config["ref"]["release"],
     cache: True
     wrapper:
         "0.45.1/bio/reference/ensembl-sequence"
@@ -15,14 +15,14 @@ rule get_genome:
 
 rule get_cdna:
     output:
-        "resources/genome.cdna.fasta"
+        "resources/genome.cdna.fasta",
     log:
-        "logs/get-cdna.log"
+        "logs/get-cdna.log",
     params:
         species=config["ref"]["species"],
         datatype="cdna",
         build=config["ref"]["build"],
-        release=config["ref"]["release"]
+        release=config["ref"]["release"],
     cache: True
     wrapper:
         "0.45.1/bio/reference/ensembl-sequence"
@@ -30,13 +30,13 @@ rule get_cdna:
 
 rule kallisto_index:
     input:
-        "resources/genome.cdna.fasta"
+        "resources/genome.cdna.fasta",
     output:
-        "resources/kallisto/transcripts.idx"
+        "resources/kallisto/transcripts.idx",
     params:
-        extra=""
+        extra="",
     log:
-        "logs/kallisto/index.log"
+        "logs/kallisto/index.log",
     cache: True
     wrapper:
         "0.60.1/bio/kallisto/index"
@@ -44,16 +44,16 @@ rule kallisto_index:
 
 rule get_annotation:
     output:
-        "resources/genome.gtf"
+        "resources/genome.gtf",
     params:
         species=config["ref"]["species"],
         fmt="gtf",
         build=config["ref"]["build"],
         release=config["ref"]["release"],
-        flavor="" # optional, e.g. chr_patch_hapl_scaff, see Ensembl FTP.
+        flavor="",  # optional, e.g. chr_patch_hapl_scaff, see Ensembl FTP.
     cache: True
     log:
-        "logs/get-annotation.log"
+        "logs/get-annotation.log",
     wrapper:
         "0.45.1/bio/reference/ensembl-annotation"
 
@@ -61,14 +61,14 @@ rule get_annotation:
 rule STAR_index:
     input:
         fasta="resources/genome.fasta",
-        gtf="resources/genome.gtf"
+        gtf="resources/genome.gtf",
     output:
-        directory("resources/STAR_index")
+        directory("resources/STAR_index"),
     params:
         sjdb_overhang="100",
-        extra=""
+        extra="",
     log:
-        "logs/star/index.log"
+        "logs/star/index.log",
     threads: 32
     cache: True
     wrapper:
@@ -77,22 +77,22 @@ rule STAR_index:
 
 rule split_annotation:
     input:
-        "resources/genome.gtf"
+        "resources/genome.gtf",
     output:
-        "resources/annotation/{contig}.gtf"
+        "resources/annotation/{contig}.gtf",
     log:
-        "logs/split-annotation.{contig}.log"
+        "logs/split-annotation.{contig}.log",
     shell:
         "grep '^{wildcards.contig}\t' {input} > {output}"
 
 
 rule genome_faidx:
     input:
-        "resources/genome.fasta"
+        "resources/genome.fasta",
     output:
-        "resources/genome.fasta.fai"
+        "resources/genome.fasta.fai",
     log:
-        "logs/genome-faidx.log"
+        "logs/genome-faidx.log",
     cache: True
     wrapper:
         "0.45.1/bio/samtools/faidx"
@@ -100,24 +100,25 @@ rule genome_faidx:
 
 rule genome_dict:
     input:
-        "resources/genome.fasta"
+        "resources/genome.fasta",
     output:
-        "resources/genome.dict"
+        "resources/genome.dict",
     log:
-        "logs/picard/create-dict.log"
+        "logs/picard/create-dict.log",
     cache: True
     wrapper:
         "0.45.1/bio/picard/createsequencedictionary"
+
 
 rule get_callregions:
     input:
         "resources/genome.fasta.fai",
     output:
-        "resources/genome.callregions.bed.gz"
+        "resources/genome.callregions.bed.gz",
     log:
-        "logs/get-callregions.log"
+        "logs/get-callregions.log",
     params:
-        n_contigs=config["ref"]["n_chromosomes"]
+        n_contigs=config["ref"]["n_chromosomes"],
     conda:
         "../envs/index.yaml"
     shell:
@@ -128,16 +129,16 @@ rule get_callregions:
 rule get_known_variants:
     input:
         # use fai to annotate contig lengths for GATK BQSR
-        fai="resources/genome.fasta.fai"
+        fai="resources/genome.fasta.fai",
     output:
-        vcf="resources/variation.vcf.gz"
+        vcf="resources/variation.vcf.gz",
     log:
-        "logs/get-known-variants.log"
+        "logs/get-known-variants.log",
     params:
         species=config["ref"]["species"],
         release=config["ref"]["release"],
         build=config["ref"]["build"],
-        type="all"
+        type="all",
     cache: True
     wrapper:
         "0.59.2/bio/reference/ensembl-variation"
@@ -145,11 +146,11 @@ rule get_known_variants:
 
 rule remove_iupac_codes:
     input:
-        "resources/variation.vcf.gz"
+        "resources/variation.vcf.gz",
     output:
-        "resources/variation.noiupac.vcf.gz"
+        "resources/variation.noiupac.vcf.gz",
     log:
-        "logs/fix-iupac-alleles.log"
+        "logs/fix-iupac-alleles.log",
     conda:
         "../envs/rbt.yaml"
     cache: True
@@ -159,14 +160,15 @@ rule remove_iupac_codes:
 
 rule bwa_index:
     input:
-        "resources/genome.fasta"
+        "resources/genome.fasta",
     output:
-        multiext("resources/genome.fasta", ".amb", ".ann", ".bwt", ".pac", ".sa")
+        multiext("resources/genome.fasta", ".amb", ".ann", ".bwt", ".pac", ".sa"),
     log:
-        "logs/bwa_index.log"
+        "logs/bwa_index.log",
     cache: True
     wrapper:
         "0.45.1/bio/bwa/index"
+
 
 rule download_HLALA_graph:
     output:
@@ -178,9 +180,9 @@ rule download_HLALA_graph:
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/referenceGenomeSimulations"),
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/sampledReferenceGenomes"),
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/translation"),
-        "resources/graphs/PRG_MHC_GRCh38_withIMGT/sequences.txt"
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/sequences.txt",
     log:
-        "logs/download-HLA-LA-graph.log"
+        "logs/download-HLA-LA-graph.log",
     cache: True
     shell:
         "cd resources/graphs && wget  http://www.well.ox.ac.uk/downloads/PRG_MHC_GRCh38_withIMGT.tar.gz "
@@ -189,47 +191,52 @@ rule download_HLALA_graph:
 
 rule index_HLALA:
     input:
-        "resources/graphs/PRG_MHC_GRCh38_withIMGT/sequences.txt"
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/sequences.txt",
     output:
         "resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH",
-        "resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH_preGapPathindex"
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH_preGapPathindex",
     cache: True
-    conda: "../envs/hla_la.yaml"
+    conda:
+        "../envs/hla_la.yaml"
     params:
         path=lambda wc, input: os.path.dirname(os.path.dirname(input[0])),
-        graph=lambda wc, input: os.path.basename(os.path.dirname(input[0]))
-    log: "logs/index-HLA-LA-graph.log"
+        graph=lambda wc, input: os.path.basename(os.path.dirname(input[0])),
+    log:
+        "logs/index-HLA-LA-graph.log",
     shell:
         "HLA-LA.pl --prepareGraph 1 --customGraphDir {params.path} --graph {params.graph} > {log} 2>&1"
 
+
 rule get_vep_cache:
     output:
-        directory("resources/vep/cache")
+        directory("resources/vep/cache"),
     params:
         species=config["ref"]["species"],
         build=config["ref"]["build"],
-        release=config["ref"]["release"]
+        release=config["ref"]["release"],
     log:
-        "logs/vep/cache.log"
+        "logs/vep/cache.log",
     cache: True
     wrapper:
         "0.59.2/bio/vep/cache"
 
+
 rule get_vep_plugins:
     output:
-        directory("resources/vep/plugins")
+        directory("resources/vep/plugins"),
     params:
-        release=config["ref"]["release"]
+        release=config["ref"]["release"],
     log:
-        "logs/vep/plugins.log"
+        "logs/vep/plugins.log",
     cache: True
     wrapper:
         "0.59.2/bio/vep/plugins"
 
+
 rule make_sampleheader:
     output:
-        "resources/sampleheader.txt"
+        "resources/sampleheader.txt",
     log:
-        "logs/germline-reheader-sample.log"
+        "logs/germline-reheader-sample.log",
     shell:
         "echo 'TUMOR' > {output}"

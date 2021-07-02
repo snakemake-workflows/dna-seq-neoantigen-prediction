@@ -1,15 +1,16 @@
 if config["tmb"]["activate"]:
+
     rule estimate_tmb:
         input:
-            "results/merged-calls/{pair}.somatic.fdr-controlled.bcf"
+            "results/merged-calls/{pair}.somatic.fdr-controlled.bcf",
         output:
             "results/plots/tmb/{pair}.{plotmode}.vl.json",
         conda:
             "../envs/varlociraptor.yaml"
-        log: 
-            "logs/tmb/{pair}-{plotmode}.log"
+        log:
+            "logs/tmb/{pair}-{plotmode}.log",
         params:
-            **config["tmb"]
+            **config["tmb"],
         shell:
             "varlociraptor estimate tmb "
             " --plot-mode {wildcards.plotmode} "
