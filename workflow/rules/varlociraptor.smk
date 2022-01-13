@@ -3,14 +3,14 @@ rule render_scenario:
         config["calling"]["scenario"],
     output:
         report(
-            "results/scenarios/{pair}.yaml",
+            "results/scenarios/{cancer_sample}.yaml",
             caption="../report/scenario.rst",
             category="Variant calling scenarios",
         ),
     params:
         samples=samples,
     log:
-        "logs/scenarious/{pair}.log",
+        "logs/scenarious/{cancer_sample}.log",
     conda:
         "../envs/render_scenario.yaml"
     script:
@@ -21,15 +21,15 @@ rule varlociraptor_preprocess:
     input:
         ref="resources/genome.fasta",
         ref_idx="resources/genome.fasta.fai",
-        candidates="results/candidate-calls/{pair}.{caller}.{scatteritem}.bcf",
+        candidates="results/candidate-calls/{cancer_sample}.{caller}.{scatteritem}.bcf",
         bam="results/recal/{sample}.sorted.bam",
-        bai="results/recal/{sample}.sorted.bai",
+        bai="results/recal/{sample}.sorted.bam.bai",
     output:
-        "results/observations/{pair}/{sample}.{caller}.{scatteritem}.bcf",
+        "results/observations/{cancer_sample}/{sample}.{caller}.{scatteritem}.bcf",
     params:
         omit_isize="",
     log:
-        "logs/varlociraptor/preprocess/{pair}/{sample}.{caller}.{scatteritem}.log",
+        "logs/varlociraptor/preprocess/{cancer_sample}/{sample}.{caller}.{scatteritem}.log",
     conda:
         "../envs/varlociraptor.yaml"
     shell:
@@ -40,11 +40,11 @@ rule varlociraptor_preprocess:
 rule varlociraptor_call:
     input:
         obs=get_pair_observations,
-        scenario="results/scenarios/{pair}.yaml",
+        scenario="results/scenarios/{cancer_sample}.yaml",
     output:
-        temp("results/calls/{pair}.{caller}.{scatteritem}.bcf"),
+        temp("results/calls/{cancer_sample}.{caller}.{scatteritem}.bcf"),
     log:
-        "logs/varlociraptor/call/{pair}.{caller}.{scatteritem}.log",
+        "logs/varlociraptor/call/{cancer_sample}.{caller}.{scatteritem}.log",
     params:
         obs=lambda w, input: [
             "{}={}".format(s, f) for s, f in zip(get_pair_aliases(w), input.obs)
@@ -52,7 +52,7 @@ rule varlociraptor_call:
     conda:
         "../envs/varlociraptor.yaml"
     benchmark:
-        "benchmarks/varlociraptor/call/{pair}.{caller}.{scatteritem}.tsv"
+        "benchmarks/varlociraptor/call/{cancer_sample}.{caller}.{scatteritem}.tsv"
     shell:
         "varlociraptor "
         "call variants generic --obs {params.obs} "
@@ -61,11 +61,11 @@ rule varlociraptor_call:
 
 rule sort_calls:
     input:
-        "results/calls/{pair}.{caller}.{scatteritem}.bcf",
+        "results/calls/{cancer_sample}.{caller}.{scatteritem}.bcf",
     output:
-        temp("results/calls/{pair}.{caller}.{scatteritem}.sorted.bcf"),
+        temp("results/calls/{cancer_sample}.{caller}.{scatteritem}.sorted.bcf"),
     log:
-        "logs/bcf-sort/{pair}.{caller}.{scatteritem}.log",
+        "logs/bcf-sort/{cancer_sample}.{caller}.{scatteritem}.log",
     conda:
         "../envs/bcftools.yaml"
     resources:
@@ -80,9 +80,9 @@ rule bcftools_concat:
         calls=get_scattered_calls(),
         indexes=get_scattered_calls(ext=".bcf.csi"),
     output:
-        "results/calls/{pair}.{scatteritem}.bcf",
+        "results/calls/{cancer_sample}.{scatteritem}.bcf",
     log:
-        "logs/concat-calls/{pair}.{scatteritem}.log",
+        "logs/concat-calls/{cancer_sample}.{scatteritem}.log",
     params:
         "-a -Ob",  # TODO Check this
     wrapper:

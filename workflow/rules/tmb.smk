@@ -2,13 +2,13 @@ if config["tmb"]["activate"]:
 
     rule estimate_tmb:
         input:
-            "results/merged-calls/{pair}.somatic.fdr-controlled.bcf",
+            "results/merged-calls/{cancer_sample}.somatic.fdr-controlled.bcf",
         output:
-            "results/plots/tmb/{pair}.{plotmode}.vl.json",
+            "results/plots/tmb/{cancer_sample}.{plotmode}.vl.json",
         conda:
             "../envs/varlociraptor.yaml"
         log:
-            "logs/tmb/{pair}-{plotmode}.log",
+            "logs/tmb/{cancer_sample}-{plotmode}.log",
         params:
             **config["tmb"],
         shell:

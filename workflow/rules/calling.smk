@@ -2,16 +2,16 @@ rule strelka_somatic:
     input:
         normal=get_normal_bam,
         normal_index=get_normal_bai,
-        tumor="results/recal/{sample}.sorted.bam",
-        tumor_index="results/recal/{sample}.sorted.bam.bai",
+        tumor="results/recal/{cancer_sample}.sorted.bam",
+        tumor_index="results/recal/{cancer_sample}.sorted.bam.bai",
         fasta="resources/genome.fasta",
         fasta_index="resources/genome.fasta.fai",
         callregions="resources/genome.callregions.bed.gz",
     output:
-        "results/strelka/somatic/{sample}/results/variants/somatic.snvs.vcf.gz",
-        "results/strelka/somatic/{sample}/results/variants/somatic.indels.vcf.gz",
+        "results/strelka/somatic/{cancer_sample}/results/variants/somatic.snvs.vcf.gz",
+        "results/strelka/somatic/{cancer_sample}/results/variants/somatic.indels.vcf.gz",
     log:
-        "logs/calling/strelka_somatic/{sample}.log",
+        "logs/calling/strelka_somatic/{cancer_sample}.log",
     params:
         config_extra="--callRegions {} {}".format(
             "resources/genome.callregions.bed.gz", config["params"]["strelka"]["config"]
@@ -24,15 +24,15 @@ rule strelka_somatic:
 
 rule strelka_germline:
     input:
-        bam="results/recal/{normal}.sorted.bam",
-        normal_index="results/recal/{normal}.sorted.bam.bai",
+        bam="results/recal/{normal_sample}.sorted.bam",
+        normal_index="results/recal/{normal_sample}.sorted.bam.bai",
         fasta="resources/genome.fasta",
         fasta_index="resources/genome.fasta.fai",
         callregions="resources/genome.callregions.bed.gz",
     output:
-        "results/strelka/germline/{normal}/results/variants/variants.vcf.gz",
+        "results/strelka/germline/{normal_sample}/results/variants/variants.vcf.gz",
     log:
-        "logs/calling/strelka_germline/{normal}.log",
+        "logs/calling/strelka_germline/{normal_sample}.log",
     params:
         config_extra="--callRegions {} {}".format(
             "resources/genome.callregions.bed.gz", config["params"]["strelka"]["config"]

@@ -1,12 +1,12 @@
 rule annotate_variants:
     input:
-        calls="results/calls/{group}.{scatteritem}.bcf",
+        calls="results/calls/{cancer_sample}.{scatteritem}.bcf",
         cache="resources/vep/cache",
         plugins="resources/vep/plugins",
     output:
-        calls="results/calls/{group}.{scatteritem}.annotated.bcf",
+        calls="results/calls/{cancer_sample}.{scatteritem}.annotated.bcf",
         stats=report(
-            "results/calls/{group}.{scatteritem}.stats.html",
+            "results/calls/{cancer_sample}.{scatteritem}.stats.html",
             caption="../report/stats.rst",
             category="QC",
         ),
@@ -16,7 +16,7 @@ rule annotate_variants:
         plugins=config["annotations"]["vep"]["plugins"],
         extra="{} --vcf_info_field ANN".format(config["annotations"]["vep"]["params"]),
     log:
-        "logs/vep/{group}.{scatteritem}.annotate.log",
+        "logs/vep/{cancer_sample}.{scatteritem}.annotate.log",
     wrapper:
         "0.59.2/bio/vep/annotate"
 

@@ -1,12 +1,12 @@
 # rule mhcflurry:
 #     input:
-#         peptides="results/microphaser/fasta/{sample}/filtered/{sample}.{chr}.{group}.fa",
+#         peptides="results/microphaser/fasta/{sample}/filtered/{sample}.{chr}.{peptide_type}.fa",
 #         alleles="results/optitype/{sample}/hla_alleles_{sample}.tsv",
 #         wt_alleles=get_germline_optitype
 #     output:
-#         "results/mhcflurry/{sample}/{chr}/output.{group}.csv"
+#         "results/mhcflurry/{sample}/{chr}/output.{peptide_type}.csv"
 #     log:
-#         "logs/mhcflurry/{sample}-{chr}-{group}.log"
+#         "logs/mhcflurry/{sample}-{chr}-{peptide_type}.log"
 #     run:
 #         if "wt" in input.peptides:
 #             alleles = ",".join(pd.read_csv(input.wt_alleles, sep="\t").iloc[0])
@@ -18,12 +18,12 @@
 
 rule netMHCpan:
     input:
-        peptides="results/microphaser/fasta/{sample}/filtered/netMHCpan/{sample}.{chr}.{group}.fa",
+        peptides="results/microphaser/fasta/{sample}/filtered/netMHCpan/{sample}.{chr}.{peptide_type}.fa",
         alleles=get_alleles_MHCI,
     output:
-        "results/netMHCpan/{sample}/{chr}/{sample}.{chr}.{group}.xls",
+        "results/netMHCpan/{sample}/{chr}/{sample}.{chr}.{peptide_type}.xls",
     log:
-        "logs/netMHCpan/{sample}-{chr}-{group}.log",
+        "logs/netMHCpan/{sample}-{chr}-{peptide_type}.log",
     params:
         extra=config["affinity"]["netMHCpan"]["params"],
         netMHC=config["affinity"]["netMHCpan"]["location"],
@@ -35,12 +35,12 @@ rule netMHCpan:
 
 rule netMHCIIpan:
     input:
-        peptides="results/microphaser/fasta/{sample}/filtered/netMHCIIpan/{sample}.{chr}.{group}.fa",
+        peptides="results/microphaser/fasta/{sample}/filtered/netMHCIIpan/{sample}.{chr}.{peptide_type}.fa",
         alleles=get_alleles_MHCII,
     output:
-        "results/netMHCIIpan/{sample}/{chr}/{sample}.{chr}.{group}.xls",
+        "results/netMHCIIpan/{sample}/{chr}/{sample}.{chr}.{peptide_type}.xls",
     log:
-        "logs/netMHCIIpan/{sample}-{chr}-{group}.log",
+        "logs/netMHCIIpan/{sample}-{chr}-{peptide_type}.log",
     params:
         extra=config["affinity"]["netMHCIIpan"]["params"],
         netMHC=config["affinity"]["netMHCIIpan"]["location"],
@@ -53,13 +53,13 @@ rule netMHCIIpan:
 rule parse_mhc_out:
     input:
         expand(
-            "results/{{mhc}}/{{sample}}/{chr}/{{sample}}.{chr}.{{group}}.xls",
+            "results/{{mhc}}/{{sample}}/{chr}/{{sample}}.{chr}.{{peptide_type}}.xls",
             chr=contigs,
         ),
     output:
-        "results/{mhc}/{sample}/{sample}.mhc.{group}.tsv",
+        "results/{mhc}/{sample}/{sample}.mhc.{peptide_type}.tsv",
     log:
-        "logs/parse-mhc/{mhc}-{sample}-{group}.log",
+        "logs/parse-mhc/{mhc}-{sample}-{peptide_type}.log",
     wildcard_constraints:
         group="wt|mt",
     script:
@@ -68,13 +68,13 @@ rule parse_mhc_out:
 
 # rule parse_mhcflurry:
 #     input:
-#         expand("results/mhcflurry/{{sample}}/{chr}/output.{{group}}.csv", chr=contigs)
+#         expand("results/mhcflurry/{{sample}}/{chr}/output.{{peptide_type}}.csv", chr=contigs)
 #     output:
-#         "results/mhcflurry/{sample}/{sample}.mhc.{group}.csv"
+#         "results/mhcflurry/{sample}/{sample}.mhc.{peptide_type}.csv"
 #     wildcard_constraints:
 #         group="wt|mt"
 #     log:
-#         "logs/parse-mhc/mhcflurry-{sample}-{group}.log"
+#         "logs/parse-mhc/mhcflurry-{sample}-{peptide_type}.log"
 #     conda:
 #         "../envs/xsv.yaml"
 #     shell:
@@ -84,8 +84,8 @@ rule parse_mhc_out:
 rule mhc_csv_table:
     input:
         info="results/microphaser/info/{sample}/filtered/{mhc}/{sample}.tsv",
-        mt="results/{mhc}/{sample}/{sample}.mhc.mt.tsv",
-        wt="results/{mhc}/{sample}/{sample}.mhc.wt.tsv",
+        neo="results/{mhc}/{sample}/{sample}.mhc.neo.tsv",
+        normal="results/{mhc}/{sample}/{sample}.mhc.normal.tsv",
     output:
         report(
             "results/neoantigens/{mhc}/{sample}.DNA.tsv",
@@ -101,8 +101,8 @@ rule mhc_csv_table:
 # rule mhcflurry_table:
 #     input:
 #         info="results/microphaser/info/{sample}/filtered/mhcflurry/{sample}.tsv",
-#         mt="results/mhcflurry/{sample}/{sample}.mhc.mt.tsv",
-#         wt="results/mhcflurry/{sample}/{sample}.mhc.wt.tsv"
+#         neo="results/mhcflurry/{sample}/{sample}.mhc.neo.tsv",
+#         normal="results/mhcflurry/{sample}/{sample}.mhc.normal.tsv"
 #     output:
 #         report("results/neoantigens/mhcflurry/{sample}.WES.tsv", caption="../report/WES_results.rst", category="Results WES (MHCFlurry)")
 #     script:

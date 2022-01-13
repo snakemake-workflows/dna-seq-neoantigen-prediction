@@ -1,7 +1,7 @@
 def get_somatic_calls(wildcards):
     return expand(
         "results/strelka/somatic/{sample}/results/variants/somatic.complete.tumor.bcf",
-        sample=samples[samples.type == "tumor"]["sample"],
+        sample=samples[samples.alias == "tumor"]["sample_name"],
     )
 
 

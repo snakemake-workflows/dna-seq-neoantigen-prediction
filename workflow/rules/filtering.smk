@@ -17,13 +17,13 @@ rule filter_odds:
     input:
         get_annotated_bcf,
     output:
-        "results/calls/{pair}.{event}.{scatteritem}.filtered_odds.bcf",
+        "results/calls/{cancer_sample}.{event}.{scatteritem}.filtered_odds.bcf",
     params:
         events=lambda wc: config["calling"]["fdr-control"]["events"][wc.event][
             "varlociraptor"
         ],
     log:
-        "logs/filter-calls/posterior_odds/{pair}.{scatteritem}.{event}.log",
+        "logs/filter-calls/posterior_odds/{cancer_sample}.{scatteritem}.{event}.log",
     conda:
         "../envs/varlociraptor.yaml"
     shell:
@@ -33,15 +33,15 @@ rule filter_odds:
 rule gather_calls:
     input:
         calls=gather.calling(
-            "results/calls/{{pair}}.{{event}}.{scatteritem}.filtered_odds.bcf"
+            "results/calls/{{cancer_sample}}.{{event}}.{scatteritem}.filtered_odds.bcf"
         ),
         idx=gather.calling(
-            "results/calls/{{pair}}.{{event}}.{scatteritem}.filtered_odds.bcf.csi"
+            "results/calls/{{cancer_sample}}.{{event}}.{scatteritem}.filtered_odds.bcf.csi"
         ),
     output:
-        "results/calls/{pair}.{event}.filtered_odds.bcf",
+        "results/calls/{cancer_sample}.{event}.filtered_odds.bcf",
     log:
-        "logs/gather-calls/{pair}.{event}.log",
+        "logs/gather-calls/{cancer_sample}.{event}.log",
     params:
         "-a -Ob",
     wrapper:
@@ -50,11 +50,11 @@ rule gather_calls:
 
 rule control_fdr:
     input:
-        "results/calls/{pair}.{event}.filtered_odds.bcf",
+        "results/calls/{cancer_sample}.{event}.filtered_odds.bcf",
     output:
-        "results/calls/{pair}.{vartype}.{event}.fdr-controlled.bcf",
+        "results/calls/{cancer_sample}.{vartype}.{event}.fdr-controlled.bcf",
     log:
-        "logs/control-fdr/{pair}.{vartype}.{event}.log",
+        "logs/control-fdr/{cancer_sample}.{vartype}.{event}.log",
     params:
         query=get_fdr_control_params,
     conda:
@@ -69,9 +69,9 @@ rule merge_calls:
         calls=get_merge_input(".bcf"),
         idx=get_merge_input(".bcf.csi"),
     output:
-        "results/merged-calls/{pair}.{event}.fdr-controlled.bcf",
+        "results/merged-calls/{cancer_sample}.{event}.fdr-controlled.bcf",
     log:
-        "logs/merge-calls/{pair}.{event}.log",
+        "logs/merge-calls/{cancer_sample}.{event}.log",
     params:
         "-a -Ob",
     wrapper:
@@ -80,11 +80,11 @@ rule merge_calls:
 
 rule change_samplenames:
     input:
-        call="results/merged-calls/{pair}.{event}.fdr-controlled.bcf",
+        call="results/merged-calls/{cancer_sample}.{event}.fdr-controlled.bcf",
     output:
-        temp("results/merged-calls/{pair}.{event}.renaming.txt"),
+        temp("results/merged-calls/{cancer_sample}.{event}.renaming.txt"),
     log:
-        "logs/change-samplenames/{pair}.{event}.log",
+        "logs/change-samplenames/{cancer_sample}.{event}.log",
     params:
         prefix=lambda w, input: os.path.basename(input["call"]).split(".")[0],
     shell:
@@ -93,12 +93,12 @@ rule change_samplenames:
 
 rule reheader_varlociraptor:
     input:
-        vcf="results/merged-calls/{pair}.{event}.fdr-controlled.bcf",
-        samples="results/merged-calls/{pair}.{event}.renaming.txt",
+        vcf="results/merged-calls/{cancer_sample}.{event}.fdr-controlled.bcf",
+        samples="results/merged-calls/{cancer_sample}.{event}.renaming.txt",
     output:
-        "results/merged-calls/{pair}.{event}.reheader.bcf",
+        "results/merged-calls/{cancer_sample}.{event}.reheader.bcf",
     log:
-        "logs/reheader-calls/{pair}.{event}.log",
+        "logs/reheader-calls/{cancer_sample}.{event}.log",
     params:
         extra="",
         view_extra="-O b",

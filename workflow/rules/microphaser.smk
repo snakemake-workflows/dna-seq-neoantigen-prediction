@@ -6,8 +6,8 @@ rule microphaser_somatic:
         track="resources/annotation/{contig}.gtf",
         ref="resources/genome.fasta",
     output:
-        mt_fasta="results/microphaser/fasta/{sample}/{sample}.{contig}.mt.fa",
-        wt_fasta="results/microphaser/fasta/{sample}/{sample}.{contig}.wt.fa",
+        mt_fasta="results/microphaser/fasta/{sample}/{sample}.{contig}.neo.fa",
+        wt_fasta="results/microphaser/fasta/{sample}/{sample}.{contig}.normal.fa",
         tsv="results/microphaser/info/{sample}/{sample}.{contig}.tsv",
     log:
         "logs/microphaser/somatic/{sample}-{contig}.log",
@@ -83,10 +83,10 @@ rule microphaser_filter:
         proteome=get_proteome,
     output:
         mt_fasta=(
-            "results/microphaser/fasta/{sample}/filtered/{mhc}/{sample}.{contig}.mt.fa"
+            "results/microphaser/fasta/{sample}/filtered/{mhc}/{sample}.{contig}.neo.fa"
         ),
         wt_fasta=(
-            "results/microphaser/fasta/{sample}/filtered/{mhc}/{sample}.{contig}.wt.fa"
+            "results/microphaser/fasta/{sample}/filtered/{mhc}/{sample}.{contig}.normal.fa"
         ),
         tsv="results/microphaser/info/{sample}/filtered/{mhc}/{sample}.{contig}.tsv",
         removed="results/microphaser/info/{sample}/removed/{mhc}/{sample}.{contig}.removed.tsv",
