@@ -2,18 +2,22 @@ $schema: "http://json-schema.org/draft-04/schema#"
 description: row of the units.tsv, representing a sequencing unit, i.e. single-end or paired-end data
 type: object
 properties:
-  sample:
+  sample_name:
     type: string
-    description: sample name/id the unit has been sequenced from
+    pattern: "^[a-zA-Z_0-9-]+$"
+    description: sample name/id the unit has been sequenced from (alphanumeric string, that may additionally contain '_' and '-')
   sequencing_type:
     type: string
     enum: ["DNA", "RNA"]
-  unit:
+    description: type of sequenced material ('DNA' or 'RNA')
+  unit_name:
     type: string
-    description: unit or lane name
+    pattern: "^[a-zA-Z_0-9-]+$"
+    description: unit id (alphanumeric string, that may additionally contain '_' and '-')
   fq1:
     type: string
-    description: path to FASTQ file
+    pattern: "^[^ \t]+$"
+    description: path to FASTQ file (may not contain whitespace)
   fq2:
     type: string
     description: path to second FASTQ file (leave empty in case of single-end)
@@ -22,9 +26,9 @@ properties:
     description: SRA id for automatic download of unit
   adapters:
     type: string
-    description: adapter trimming settings to use (for cutadapt)
+    description: cutadapt adapter trimming settings to use (see https://cutadapt.readthedocs.io)
 
 required:
-  - sample
-  - unit
+  - sample_name
+  - unit_name
   - sequencing_type

@@ -1,3 +1,3 @@
-sample	type	matched_normal	purity	platform
-A_normal	normal			ILLUMINA
-A_tumor	tumor	A_normal	1	ILLUMINA
+sample_name	group	alias	purity	platform
+A_normal	A	normal	1	ILLUMINA
+A_tumor	A	tumor	.99	ILLUMINA
