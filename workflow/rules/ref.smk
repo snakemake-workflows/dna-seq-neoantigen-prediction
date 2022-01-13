@@ -120,7 +120,7 @@ rule get_callregions:
     params:
         n_contigs=config["ref"]["n_chromosomes"],
     conda:
-        "../envs/index.yaml"
+        "../envs/htslib.yaml"
     shell:
         "paste <(cut -f1 {input}) <(yes 0 | head -n {params.n_contigs}) <(cut -f2 {input})"
         " | head -n {params.n_contigs} | bgzip -c > {output} && tabix -p bed {output}"
