@@ -1,4 +1,5 @@
 *
+!.github/workflows/*
 !.test
 !.test/*
 !.test/config/*
