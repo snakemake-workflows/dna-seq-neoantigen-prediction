@@ -14,7 +14,8 @@ rule strelka_somatic:
         "logs/calling/strelka_somatic/{cancer_sample}.log",
     params:
         config_extra="--callRegions {} {}".format(
-            "resources/genome.callregions.bed.gz", config["params"]["strelka"]["config"]
+            "resources/genome.callregions.bed.gz",
+            config["params"]["strelka"]["config"],
         ),
         run_extra=config["params"]["strelka"]["run"],
     threads: 22
@@ -35,7 +36,8 @@ rule strelka_germline:
         "logs/calling/strelka_germline/{normal_sample}.log",
     params:
         config_extra="--callRegions {} {}".format(
-            "resources/genome.callregions.bed.gz", config["params"]["strelka"]["config"]
+            "resources/genome.callregions.bed.gz",
+            config["params"]["strelka"]["config"],
         ),
         run_extra="",
     threads: 22

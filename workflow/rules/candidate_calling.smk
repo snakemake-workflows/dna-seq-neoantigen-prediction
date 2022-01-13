@@ -19,7 +19,9 @@ rule scatter_candidates:
     input:
         "results/candidate-calls/{cancer_sample}.{caller}.bcf",
     output:
-        scatter.calling("results/candidate-calls/{{cancer_sample}}.{{caller}}.{scatteritem}.bcf"),
+        scatter.calling(
+            "results/candidate-calls/{{cancer_sample}}.{{caller}}.{scatteritem}.bcf"
+        ),
     log:
         "logs/scatter-candidates/{cancer_sample}.{caller}.log",
     conda:

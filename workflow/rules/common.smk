@@ -264,7 +264,9 @@ def get_oncoprint_batch(wildcards):
 def get_annotated_bcf(wildcards):
     selection = ".annotated"
     return "results/calls/{cancer_sample}.{scatteritem}{selection}.bcf".format(
-        cancer_sample=wildcards.cancer_sample, selection=selection, scatteritem=wildcards.scatteritem
+        cancer_sample=wildcards.cancer_sample,
+        selection=selection,
+        scatteritem=wildcards.scatteritem,
     )
 
 
@@ -330,10 +332,7 @@ def get_merge_input(ext=".bcf"):
 
 def get_pair_aliases(wildcards):
     return [
-        samples.loc[
-            get_normal(wildcards.cancer_sample),
-            "alias"
-        ],
+        samples.loc[get_normal(wildcards.cancer_sample), "alias"],
         samples.loc[wildcards.cancer_sample, "alias"],
     ]
 
@@ -394,8 +393,9 @@ def get_paired_bais(wildcards):
 
 def get_normal(sample_name):
     normal_sample = samples.loc[
-        (samples["group"] == samples.loc[sample_name, "group"]) & (samples["alias"] == "normal"),
-        "sample_name"
+        (samples["group"] == samples.loc[sample_name, "group"])
+        & (samples["alias"] == "normal"),
+        "sample_name",
     ].iat[0]
     return normal_sample
 
@@ -433,8 +433,13 @@ def get_alleles_MHCII(wildcards):
 
 
 def get_normal_bam(wildcards):
-    return expand("results/recal/{normal}.sorted.bam", normal=get_normal(wildcards.cancer_sample))
+    return expand(
+        "results/recal/{normal}.sorted.bam", normal=get_normal(wildcards.cancer_sample)
+    )
 
 
 def get_normal_bai(wildcards):
-    return expand("results/recal/{normal}.sorted.bam.bai", normal=get_normal(wildcards.cancer_sample))
+    return expand(
+        "results/recal/{normal}.sorted.bam.bai",
+        normal=get_normal(wildcards.cancer_sample),
+    )
