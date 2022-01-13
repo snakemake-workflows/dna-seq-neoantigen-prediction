@@ -53,6 +53,8 @@ wildcard_constraints:
     caller="|".join(["freebayes", "delly"]),
     peptide_type="|".join(["normal", "neo"]),
     event="|".join(["somatic", "germline", "complete"]),
+    read="|".join(["single", "R1", "R2"]),
+    seqtype="|".join(["DNA", "RNA"]),
 
 
 ### Output generation ###
@@ -132,28 +134,38 @@ caller = list(
 
 
 def get_cutadapt_input(wildcards):
-    unit = units.loc[wildcards.sample].loc[wildcards.unit].loc[wildcards.seqtype]
+    unit = units.loc[
+        (units["sample_name"] == wildcards.sample)
+        & (units["unit_name"] == wildcards.unit)
+        & (units["sequencing_type"] == wildcards.seqtype)
+    ]
 
-    if pd.isna(unit["fq1"]):
+    if pd.isna(unit["fq1"].iat[0]):
         # SRA sample (always paired-end for now)
         accession = unit["sra"]
         return expand("sra/{accession}_{read}.fastq", accession=accession, read=[1, 2])
 
-    if unit["fq1"].endswith("gz"):
+    if unit["fq1"].iat[0].endswith("gz"):
         ending = ".gz"
     else:
         ending = ""
 
-    if pd.isna(unit["fq2"]):
+    if pd.isna(unit["fq2"].iat[0]):
         # single end local sample
         return "pipe/cutadapt/{S}/{T}/{U}.fq1.fastq{E}".format(
-            S=unit.sample_name, U=unit.unit_name, T=unit.sequencing_type, E=ending
+            S=unit["sample_name"].iat[0],
+            U=unit["unit_name"].iat[0],
+            T=unit["sequencing_type"].iat[0],
+            E=ending,
         )
     else:
         # paired end local sample
         return expand(
             "pipe/cutadapt/{S}/{T}/{U}.{{read}}.fastq{E}".format(
-                S=unit.sample_name, U=unit.unit_name, T=unit.sequencing_type, E=ending
+                S=unit["sample_name"].iat[0],
+                U=unit["unit_name"].iat[0],
+                T=unit["sequencing_type"].iat[0],
+                E=ending,
             ),
             read=["fq1", "fq2"],
         )
@@ -189,7 +201,11 @@ def get_fastqs(wc):
     if config["trimming"]["activate"]:
         return expand(
             "results/trimmed/{sample}/{seqtype}/{unit}_{read}.fastq.gz",
-            unit=units.loc[wc.seqtype].loc[wc.sample, "unit_name"],
+            unit=units.loc[
+                (units["sequencing_type"] == wc.seqtype)
+                & (units["sample_name"] == wc.sample),
+                "unit_name",
+            ],
             sample=wc.sample,
             read=wc.read,
             seqtype=wc.seqtype,

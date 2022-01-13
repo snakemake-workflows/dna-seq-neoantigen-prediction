@@ -64,8 +64,5 @@ rule merge_fastqs:
         "results/merged/{seqtype}/{sample}_{read}.fastq.gz",
     log:
         "logs/merge-fastqs/{seqtype}_{sample}_{read}.log",
-    wildcard_constraints:
-        read="single|R1|R2",
-        seqtype="DNA|RNA",
     shell:
         "cat {input} > {output} 2> {log}"
