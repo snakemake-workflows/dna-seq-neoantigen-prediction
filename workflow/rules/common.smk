@@ -30,7 +30,12 @@ units = (
     pd.read_csv(
         config["units"],
         sep="\t",
-        dtype={"sample_name": str, "sequencing_type": str, "unit_name": str, "adapters": str},
+        dtype={
+            "sample_name": str,
+            "sequencing_type": str,
+            "unit_name": str,
+            "adapters": str,
+        },
         comment="#",
     )
     .set_index(["sample_name", "sequencing_type", "unit_name"], drop=False)
@@ -180,6 +185,7 @@ def get_cutadapt_pipe_input(wildcards):
     files = list(sorted(glob.glob(pattern)))
     assert len(files) > 0, "no files found at {}".format(pattern)
     return files
+
 
 def get_cutadapt_adapters(wildcards):
     unit = units.loc[wildcards.sample].loc[wildcards.unit]
