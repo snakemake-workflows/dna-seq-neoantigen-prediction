@@ -32,13 +32,11 @@ rule cutadapt_pe:
     log:
         "logs/cutadapt/{sample}-{seqtype}-{unit}.log",
     params:
-        others=config["params"]["cutadapt"],
-        adapters=lambda w: str(
-            units.loc[w.sample].loc[w.seqtype].loc[w.unit, "adapters"]
-        ),
+        extra=config["params"]["cutadapt"],
+        adapters=get_cutadapt_adapters,
     threads: 8
     wrapper:
-        "0.59.2/bio/cutadapt/pe"
+        "0.85.1/bio/cutadapt/pe"
 
 
 rule cutadapt_se:
@@ -50,11 +48,11 @@ rule cutadapt_se:
     log:
         "logs/cutadapt/{sample}-{seqtype}-{unit}.log",
     params:
-        others=config["params"]["cutadapt"],
-        adapters_r1=lambda w: str(units.loc[w.sample].loc[w.unit, "adapters"]),
+        extra=config["params"]["cutadapt"],
+        adapters_r1=get_cutadapt_adapters,
     threads: 8
     wrapper:
-        "0.59.2/bio/cutadapt/se"
+        "0.85.1/bio/cutadapt/se"
 
 
 rule merge_fastqs:
