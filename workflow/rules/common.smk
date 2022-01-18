@@ -139,37 +139,33 @@ caller = list(
 
 
 def get_cutadapt_input(wildcards):
-    unit = units.loc[
-        (units["sample_name"] == wildcards.sample)
-        & (units["unit_name"] == wildcards.unit)
-        & (units["sequencing_type"] == wildcards.seqtype)
-    ]
+    unit = units.loc[wildcards.sample].loc[wildcards.seqtype].loc[wildcards.unit]
 
-    if pd.isna(unit["fq1"].iat[0]):
+    if pd.isna(unit["fq1"]):
         # SRA sample (always paired-end for now)
         accession = unit["sra"]
         return expand("sra/{accession}_{read}.fastq", accession=accession, read=[1, 2])
 
-    if unit["fq1"].iat[0].endswith("gz"):
+    if unit["fq1"].endswith("gz"):
         ending = ".gz"
     else:
         ending = ""
 
-    if pd.isna(unit["fq2"].iat[0]):
+    if pd.isna(unit["fq2"]):
         # single end local sample
         return "pipe/cutadapt/{S}/{T}/{U}.fq1.fastq{E}".format(
-            S=unit["sample_name"].iat[0],
-            U=unit["unit_name"].iat[0],
-            T=unit["sequencing_type"].iat[0],
+            S=unit.sample_name,
+            U=unit.unit_name,
+            T=unit.sequencing_type,
             E=ending,
         )
     else:
         # paired end local sample
         return expand(
             "pipe/cutadapt/{S}/{T}/{U}.{{read}}.fastq{E}".format(
-                S=unit["sample_name"].iat[0],
-                U=unit["unit_name"].iat[0],
-                T=unit["sequencing_type"].iat[0],
+                S=unit.sample_name,
+                U=unit.unit_name,
+                T=unit.sequencing_type,
                 E=ending,
             ),
             read=["fq1", "fq2"],
@@ -182,8 +178,23 @@ def get_cutadapt_pipe_input(wildcards):
         .loc[wildcards.seqtype]
         .loc[wildcards.unit, wildcards.fq]
     )
-    files = list(sorted(glob.glob(pattern)))
-    assert len(files) > 0, "no files found at {}".format(pattern)
+    if "*" in pattern:
+        files = sorted(
+            glob.glob(
+                units.loc[wildcards.sample]
+                .loc[wildcards.seqtype]
+                .loc[wildcards.unit, wildcards.fq]
+            )
+        )
+        if not files:
+            raise ValueError(
+                "No raw fastq files found for unit pattern {} (sample {}, sequencing type {}). "
+                "Please check the your sample sheet.".format(
+                    wildcards.unit, wildcards.sample, wildcards.seqtype
+                )
+            )
+    else:
+        files = [pattern]
     return files
 
 
