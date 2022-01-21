@@ -39,12 +39,12 @@ rule parse_HLA_LA:
 
 rule razers3:
     input:
-        reads="results/merged/{sample}_{read}.fastq.gz"
+        reads="results/merged/{sample}_{read}.fastq.gz",
     output:
         bam="results/razers3/bam/{sample}_{read}.bam",
     threads: 8
     log:
-        "logs/razers3/{sample}_{fq}.log",
+        "logs/razers3/{sample}_{read}.log",
     params:
         genome=config["HLAtyping"]["optitype_data"],
         extra=config["params"]["razers3"],
