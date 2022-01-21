@@ -281,7 +281,7 @@ def get_optitype_reads_input(wildcards):
             return expand(
                 "results/razers3/fastq/{sample}_{read}.fished.fastq",
                 sample=wildcards.sample,
-                fq=["R1", "R2"],
+                read=["R1", "R2"],
             )
         return "results/razers3/fastq/{sample}_single.fastq"
     else:
