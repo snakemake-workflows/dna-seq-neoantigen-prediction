@@ -51,6 +51,7 @@ contigs.extend(["X", "Y"])
 
 wildcard_constraints:
     cancer_sample="|".join(samples[samples.alias != "normal"]["sample_name"]),
+    normal_sample="|".join(samples[samples.alias == "normal"]["sample_name"]),
     sample="|".join(samples["sample_name"]),
     unit="|".join(units["unit_name"]),
     alias="|".join(pd.unique(samples["alias"])),
@@ -453,8 +454,8 @@ def get_seperate(sample, group):
 
 def get_proteome(wildcards):
     return expand(
-        "results/microphaser/fasta/germline/{normal}/{mhc}/reference_proteome.bin",
-        normal=get_normal(wildcards.sample),
+        "results/microphaser/fasta/germline/{normal_sample}/{mhc}/reference_proteome.bin",
+        normal_sample=get_normal(wildcards.cancer_sample),
         mhc=wildcards.mhc,
     )
 
@@ -462,17 +463,17 @@ def get_proteome(wildcards):
 def get_alleles_MHCI(wildcards):
     if wildcards.peptide_type == "wt":
         return "results/optitype/{S}/hla_alleles_{S}.tsv".format(
-            S=get_normal(wildcards.sample)
+            S=get_normal(wildcards.cancer_sample)
         )
     else:
-        return "results/optitype/{S}/hla_alleles_{S}.tsv".format(S=wildcards.sample)
+        return "results/optitype/{S}/hla_alleles_{S}.tsv".format(S=wildcards.cancer_sample)
 
 
 def get_alleles_MHCII(wildcards):
     if wildcards.peptide_type == "wt":
-        return "results/HLA-LA/hlaI_{S}.tsv".format(S=get_normal(wildcards.sample))
+        return "results/HLA-LA/hlaI_{S}.tsv".format(S=get_normal(wildcards.cancer_sample))
     else:
-        return "results/HLA-LA/hlaI_{S}.tsv".format(S=wildcards.sample)
+        return "results/HLA-LA/hlaI_{S}.tsv".format(S=wildcards.cancer_sample)
 
 
 def get_normal_bam(wildcards):

@@ -18,12 +18,12 @@
 
 rule netMHCpan:
     input:
-        peptides="results/microphaser/fasta/{sample}/filtered/netMHCpan/{sample}.{chr}.{peptide_type}.fa",
+        peptides="results/microphaser/fasta/{cancer_sample}/filtered/netMHCpan/{cancer_sample}.{chr}.{peptide_type}.fa",
         alleles=get_alleles_MHCI,
     output:
-        "results/netMHCpan/{sample}/{chr}/{sample}.{chr}.{peptide_type}.xls",
+        "results/netMHCpan/{cancer_sample}/{chr}/{cancer_sample}.{chr}.{peptide_type}.xls",
     log:
-        "logs/netMHCpan/{sample}-{chr}-{peptide_type}.log",
+        "logs/netMHCpan/{cancer_sample}-{chr}-{peptide_type}.log",
     params:
         extra=config["affinity"]["netMHCpan"]["params"],
         netMHC=config["affinity"]["netMHCpan"]["location"],
@@ -35,12 +35,12 @@ rule netMHCpan:
 
 rule netMHCIIpan:
     input:
-        peptides="results/microphaser/fasta/{sample}/filtered/netMHCIIpan/{sample}.{chr}.{peptide_type}.fa",
+        peptides="results/microphaser/fasta/{cancer_sample}/filtered/netMHCIIpan/{cancer_sample}.{chr}.{peptide_type}.fa",
         alleles=get_alleles_MHCII,
     output:
-        "results/netMHCIIpan/{sample}/{chr}/{sample}.{chr}.{peptide_type}.xls",
+        "results/netMHCIIpan/{cancer_sample}/{chr}/{cancer_sample}.{chr}.{peptide_type}.xls",
     log:
-        "logs/netMHCIIpan/{sample}-{chr}-{peptide_type}.log",
+        "logs/netMHCIIpan/{cancer_sample}-{chr}-{peptide_type}.log",
     params:
         extra=config["affinity"]["netMHCIIpan"]["params"],
         netMHC=config["affinity"]["netMHCIIpan"]["location"],
@@ -53,13 +53,13 @@ rule netMHCIIpan:
 rule parse_mhc_out:
     input:
         expand(
-            "results/{{mhc}}/{{sample}}/{chr}/{{sample}}.{chr}.{{peptide_type}}.xls",
+            "results/{{mhc}}/{{cancer_sample}}/{chr}/{{cancer_sample}}.{chr}.{{peptide_type}}.xls",
             chr=contigs,
         ),
     output:
-        "results/{mhc}/{sample}/{sample}.mhc.{peptide_type}.tsv",
+        "results/{mhc}/{cancer_sample}/{sample}.mhc.{peptide_type}.tsv",
     log:
-        "logs/parse-mhc/{mhc}-{sample}-{peptide_type}.log",
+        "logs/parse-mhc/{mhc}-{cancer_sample}-{peptide_type}.log",
     wildcard_constraints:
         group="wt|mt",
     script:
@@ -83,17 +83,17 @@ rule parse_mhc_out:
 
 rule mhc_csv_table:
     input:
-        info="results/microphaser/info/{sample}/filtered/{mhc}/{sample}.tsv",
-        neo="results/{mhc}/{sample}/{sample}.mhc.neo.tsv",
-        normal="results/{mhc}/{sample}/{sample}.mhc.normal.tsv",
+        info="results/microphaser/info/{cancer_sample}/filtered/{mhc}/{cancer_sample}.tsv",
+        neo="results/{mhc}/{cancer_sample}/{cancer_sample}.mhc.neo.tsv",
+        normal="results/{mhc}/{cancer_sample}/{cancer_sample}.mhc.normal.tsv",
     output:
         report(
-            "results/neoantigens/{mhc}/{sample}.DNA.tsv",
+            "results/neoantigens/{mhc}/{cancer_sample}.DNA.tsv",
             caption="../report/WES_results.rst",
             category="Results WES (netMHC)",
         ),
     log:
-        "logs/create-mhc-table/{mhc}-{sample}.log",
+        "logs/create-mhc-table/{mhc}-{cancer_sample}.log",
     script:
         "../scripts/merge_data.py"
 
@@ -111,17 +111,17 @@ rule mhc_csv_table:
 
 rule add_RNA_info:
     input:
-        counts="results/kallisto/{sample}",
-        table="results/neoantigens/{mhc}/{sample}.DNA.tsv",
+        counts="results/kallisto/{cancer_sample}",
+        table="results/neoantigens/{mhc}/{cancer_sample}.DNA.tsv",
     output:
         report(
-            "results/neoantigens/{mhc}/{sample}.RNA.tsv",
+            "results/neoantigens/{mhc}/{cancer_sample}.RNA.tsv",
             caption="../report/RNA_results.rst",
             category="Results RNA",
         ),
     params:
         abundance=lambda wc, input: "{}/abundance.tsv".format(input.counts),
     log:
-        "logs/add-RNA/{mhc}-{sample}.log",
+        "logs/add-RNA/{mhc}-{cancer_sample}.log",
     script:
         "../scripts/add_rna_info.py"
