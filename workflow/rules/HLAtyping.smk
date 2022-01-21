@@ -39,7 +39,7 @@ rule parse_HLA_LA:
 
 rule razers3:
     input:
-        reads="results/merged/{sample}_{read}.fastq.gz",
+        reads="results/merged/DNA/{sample}_{read}.fastq.gz",
     output:
         bam="results/razers3/bam/{sample}_{read}.bam",
     threads: 8
