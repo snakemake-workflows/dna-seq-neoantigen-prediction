@@ -60,7 +60,7 @@ rule bam2fq:
     params:
         "",
     log:
-        "logs/razers3-bam2fq/{sample}-{fq}.log",
+        "logs/razers3-bam2fq/{sample}-{read}.log",
     threads: 1
     wrapper:
         "0.61.0/bio/samtools/bam2fq/interleaved"
