@@ -466,12 +466,16 @@ def get_alleles_MHCI(wildcards):
             S=get_normal(wildcards.cancer_sample)
         )
     else:
-        return "results/optitype/{S}/hla_alleles_{S}.tsv".format(S=wildcards.cancer_sample)
+        return "results/optitype/{S}/hla_alleles_{S}.tsv".format(
+            S=wildcards.cancer_sample
+        )
 
 
 def get_alleles_MHCII(wildcards):
     if wildcards.peptide_type == "wt":
-        return "results/HLA-LA/hlaI_{S}.tsv".format(S=get_normal(wildcards.cancer_sample))
+        return "results/HLA-LA/hlaI_{S}.tsv".format(
+            S=get_normal(wildcards.cancer_sample)
+        )
     else:
         return "results/HLA-LA/hlaI_{S}.tsv".format(S=wildcards.cancer_sample)
 
