@@ -279,7 +279,7 @@ def get_optitype_reads_input(wildcards):
     if is_activated("HLAtyping/optitype_prefiltering"):
         if is_paired_end(wildcards.sample, "DNA"):
             return expand(
-                "results/razers3/fastq/{sample}_{fq}.fished.fastq",
+                "results/razers3/fastq/{sample}_{read}.fished.fastq",
                 sample=wildcards.sample,
                 fq=["R1", "R2"],
             )

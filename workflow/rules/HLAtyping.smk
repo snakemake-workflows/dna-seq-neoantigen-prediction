@@ -39,9 +39,9 @@ rule parse_HLA_LA:
 
 rule razers3:
     input:
-        reads="results/merged/DNA/{sample}_{fq}.fastq.gz",
+        reads="results/merged/{sample}_{read}.fastq.gz"
     output:
-        bam="results/razers3/bam/{sample}_{fq}.bam",
+        bam="results/razers3/bam/{sample}_{read}.bam",
     threads: 8
     log:
         "logs/razers3/{sample}_{fq}.log",
@@ -54,9 +54,9 @@ rule razers3:
 
 rule bam2fq:
     input:
-        "results/razers3/bam/{sample}_{fq}.bam",
+        "results/razers3/bam/{sample}_{read}.bam",
     output:
-        "results/razers3/fastq/{sample}_{fq}.fished.fastq",
+        "results/razers3/fastq/{sample}_{read}.fished.fastq",
     params:
         "",
     log:
