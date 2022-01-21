@@ -57,7 +57,7 @@ rule parse_mhc_out:
             chr=contigs,
         ),
     output:
-        "results/{mhc}/{cancer_sample}/{sample}.mhc.{peptide_type}.tsv",
+        "results/{mhc}/{cancer_sample}/{cancer_sample}.mhc.{peptide_type}.tsv",
     log:
         "logs/parse-mhc/{mhc}-{cancer_sample}-{peptide_type}.log",
     wildcard_constraints:
