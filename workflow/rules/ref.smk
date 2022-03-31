@@ -195,8 +195,8 @@ rule index_HLALA:
         multiext(
             "resources/graphs/PRG_MHC_GRCh38_withIMGT/",
             "serializedGRAPH",
-            "serializedGRAPH_preGapPathindex"
-        )
+            "serializedGRAPH_preGapPathindex",
+        ),
     cache: True
     conda:
         "../envs/hla_la.yaml"
