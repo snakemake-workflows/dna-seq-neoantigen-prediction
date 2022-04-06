@@ -1,16 +1,16 @@
-rule microphaser_somatic:
+rule microphaser_tumor:
     input:
-        vcf="results/strelka/merged/{cancer_sample}/all_variants.norm.annotated.bcf",
-        bam="results/recal/{cancer_sample}.sorted.bam",
-        bai="results/recal/{cancer_sample}.sorted.bam.bai",
+        vcf="results/strelka/merged/{group}.{tumor_event}.{normal_event}.norm.annotated.bcf",
+        bam=get_tumor_bam(),
+        bai=get_tumor_bam(ext=".bam.bai"),
         track="resources/annotation/{contig}.gtf",
         ref="resources/genome.fasta",
     output:
-        mt_fasta="results/microphaser/fasta/{cancer_sample}/{cancer_sample}.{contig}.neo.fa",
-        wt_fasta="results/microphaser/fasta/{cancer_sample}/{cancer_sample}.{contig}.normal.fa",
-        tsv="results/microphaser/info/{cancer_sample}/{cancer_sample}.{contig}.tsv",
+        mt_fasta="results/microphaser/fasta/{group}/tumor.{tumor_event}.{normal_event}.{contig}.neo.fa",
+        wt_fasta="results/microphaser/fasta/{group}/tumor.{tumor_event}.{normal_event}.{contig}.normal.fa",
+        tsv="results/microphaser/info/{group}/tumor.{tumor_event}.{normal_event}.{contig}.tsv",
     log:
-        "logs/microphaser/somatic/{cancer_sample}-{contig}.log",
+        "logs/microphaser_tumor/{group}/{tumor_event}-{contig}.log",
     conda:
         "../envs/microphaser.yaml"
     params:
@@ -20,22 +20,22 @@ rule microphaser_somatic:
         "< {input.track} > {output.mt_fasta} 2> {log}"
 
 
-rule microphaser_germline:
+rule microphaser_normal:
     input:
-        vcf="results/strelka/germline/{normal_sample}/results/variants/variants.reheader.norm.bcf",
-        bam="results/recal/{normal_sample}.sorted.bam",
-        bai="results/recal/{normal_sample}.sorted.bam.bai",
+        vcf="results/strelka/normal/{group}.{normal_event}.variants.reheader.norm.bcf",
+        bam=get_normal_bam(),
+        bai=get_normal_bam(ext=".bam.bai"),
         track="resources/annotation/{contig}.gtf",
         ref="resources/genome.fasta",
     output:
         wt_fasta=(
-            "results/microphaser/fasta/germline/{normal_sample}/{normal_sample}.germline.{contig}.fa"
+            "results/microphaser/fasta/{group}/normal.{normal_event}.{contig}.fa"
         ),
         wt_tsv=(
-            "results/microphaser/info/germline/{normal_sample}/{normal_sample}.germline.{contig}.tsv"
+            "results/microphaser/info/{group}/normal.{normal_event}.{contig}.tsv"
         ),
     log:
-        "logs/microphaser/germline/{normal_sample}-{contig}.log",
+        "logs/microphaser_germline/{group}/{normal_event}-{contig}.log",
     conda:
         "../envs/microphaser.yaml"
     params:
@@ -45,28 +45,28 @@ rule microphaser_germline:
         "< {input.track} > {output.wt_fasta} 2> {log}"
 
 
-rule concat_proteome:
+rule concat_normal_proteome:
     input:
         expand(
-            "results/microphaser/fasta/germline/{{normal_sample}}/{{normal_sample}}.germline.{contig}.fa",
+            "results/microphaser/fasta/{{group}}/normal.{{normal_event}}.{contig}.fa",
             contig=contigs,
         ),
     output:
-        "results/microphaser/fasta/germline/{normal_sample}/reference_proteome.fa",
+        "results/microphaser/fasta/{group}.{normal_event}.normal_proteome.fa",
     log:
-        "logs/microphaser/concat-ref-proteome/{normal_sample}.log",
+        "logs/microphaser/concat_normal_proteome/{group}.{normal_event}.log",
     shell:
         "cat {input} > {output} 2> {log}"
 
 
-rule build_germline_proteome:
+rule build_normal_proteome_db:
     input:
-        "results/microphaser/fasta/germline/{normal_sample}/reference_proteome.fa",
+        "results/microphaser/fasta/{group}.{normal_event}.normal_proteome.fa",
     output:
-        bin="results/microphaser/fasta/germline/{normal_sample}/{mhc}/reference_proteome.bin",
-        fasta="results/microphaser/fasta/germline/{normal_sample}/{mhc}/reference_proteome.peptides.fasta",
+        bin="results/microphaser/bin/{group}.{normal_event}.{mhc}.normal_proteome.bin",
+        fasta="results/microphaser/fasta/{group}.{normal_event}.{mhc}.normal_proteome.peptides.fasta",
     log:
-        "logs/microphaser/build-ref-proteome-db/{normal_sample}-{mhc}.log",
+        "logs/microphaser/build_normal_proteome_db/{group}.{normal_event}-{mhc}.log",
     conda:
         "../envs/microphaser.yaml"
     params:
@@ -79,19 +79,19 @@ rule build_germline_proteome:
 
 rule microphaser_filter:
     input:
-        tsv="results/microphaser/info/{cancer_sample}/{cancer_sample}.{contig}.tsv",
-        proteome=get_proteome,
+        tsv="results/microphaser/info/{group}/tumor.{tumor_event}.{contig}.tsv",
+        proteome="results/microphaser/bin/{group}.{normal_event}.{mhc}.normal_proteome.bin",
     output:
         mt_fasta=(
-            "results/microphaser/fasta/{cancer_sample}/filtered/{mhc}/{cancer_sample}.{contig}.neo.fa"
+            "results/microphaser/fasta/filtered/{group}/{mhc}.{tumor_event}.{contig}.neo.fa"
         ),
         wt_fasta=(
-            "results/microphaser/fasta/{cancer_sample}/filtered/{mhc}/{cancer_sample}.{contig}.normal.fa"
+            "results/microphaser/fasta/filtered/{group}/{mhc}.{tumor_event}.{contig}.normal.fa"
         ),
-        tsv="results/microphaser/info/{cancer_sample}/filtered/{mhc}/{cancer_sample}.{contig}.tsv",
-        removed="results/microphaser/info/{cancer_sample}/removed/{mhc}/{cancer_sample}.{contig}.removed.tsv",
+        tsv="results/microphaser/info/filtered/{group}/{mhc}.{tumor_event}.{contig}.tsv",
+        removed="results/microphaser/info/removed/{group}/{mhc}.{tumor_event}.{contig}.removed.tsv",
     log:
-        "logs/microphaser/filter/{cancer_sample}-{mhc}-{contig}.log",
+        "logs/microphaser_filter/{group}/{mhc}.{tumor_event}.{contig}.log",
     conda:
         "../envs/microphaser.yaml"
     params:
@@ -105,13 +105,13 @@ rule microphaser_filter:
 rule concat_tsvs:
     input:
         expand(
-            "results/microphaser/info/{{cancer_sample}}/filtered/{{mhc}}/{{cancer_sample}}.{contig}.tsv",
+            "results/microphaser/info/filtered/{group}/{mhc}.{tumor_event}.{contig}.tsv",
             contig=contigs,
         ),
     output:
-        "results/microphaser/info/{cancer_sample}/filtered/{mhc}/{cancer_sample}.tsv",
+        "results/microphaser/info/filtered/{group}.{mhc}.{tumor_event}.tsv",
     log:
-        "logs/concat-tsv/{cancer_sample}-{mhc}.log",
+        "logs/concat_tsvs/{group}.{mhc}.{tumor_event}.log",
     conda:
         "../envs/xsv.yaml"
     shell:

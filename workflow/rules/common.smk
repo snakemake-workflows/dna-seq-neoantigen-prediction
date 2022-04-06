@@ -74,22 +74,27 @@ def is_activated(xpath):
 
 
 def get_final_output():
+    final_output = []
     if config["epitope_prediction"]["activate"]:
-        final_output = expand(
-            "results/neoantigens/{mhc}/{S.sample_name}.{S.sequencing_type}.xlsx",
-            S=units.loc[samples[samples.alias == "tumor"]["sample_name"]]
-            .drop_duplicates(["sample_name", "sequencing_type"])
-            .itertuples(),
-            mhc=list(
-                filter(
-                    None,
-                    [
-                        "netMHCpan" if is_activated("affinity/netMHCpan") else None,
-                        "netMHCIIpan" if is_activated("affinity/netMHCIIpan") else None,
-                    ],
-                )
-            ),
-        )
+        for group in pd.unique(samples["group"]):
+            samples = samples.loc[samples["group"] == group, "sample_name"]
+            sequencing_types = pd.unique(units.loc[units.sample_name in samples, "sequencing_type"])
+            final_output.extend(
+                expand(
+                    "results/neoantigens/{group}.{tumor_event}.{mhc}.{seqtype}.tsv",
+                    group=group,
+                    tumor_event=config["params"]["microphaser"]["events"]["tumor"],
+                    mhc=list(
+                        filter(
+                            None,
+                            [
+                                "netMHCpan" if is_activated("affinity/netMHCpan") else None,
+                                "netMHCIIpan" if is_activated("affinity/netMHCIIpan") else None,
+                            ],
+                        )
+                    ),
+                    seqtype=sequencing_types,
+            )
     else:
         if config["HLAtyping"]["HLA_LA"]["activate"]:
             final_output = expand(
@@ -340,13 +345,13 @@ def get_pair_variants(wildcards, index):
     else:
         ext = ""
     variants = [
-        "results/strelka/somatic/{}/results/variants/somatic.complete.tumor.bcf{}".format(
+        "results/strelka/somatic/{sample}/results/variants/somatic.complete.tumor.bcf{ext}".format(
             wildcards.sample, ext
         )
     ]
     variants.append(
         "results/strelka/germline/{}/results/variants/variants.reheader.bcf{}".format(
-            get_normal(wildcards.sample), ext
+            get_normal_from_group(wildcards.group), ext
         )
     )
     return variants
@@ -376,7 +381,7 @@ def get_merge_input(ext=".bcf"):
 
 def get_pair_aliases(wildcards):
     return [
-        samples.loc[get_normal(wildcards.cancer_sample), "alias"],
+        samples.loc[get_normal_from_sample(wildcards.cancer_sample), "alias"],
         samples.loc[wildcards.cancer_sample, "alias"],
     ]
 
@@ -387,6 +392,16 @@ def get_tabix_params(wildcards):
     if wildcards.format == "txt":
         return "-s 1 -b 2 -e 2"
     raise ValueError("Invalid format for tabix: {}".format(wildcards.format))
+
+
+def get_normal_bam(wildcards, ext=".bam"):
+    normal_sample = get_normal_from_group(wildcards.group)
+    return f"results/recal/{normal_sample}.sorted{ext}"
+
+
+def get_tumor_bam(wildcards, ext=".bam"):
+    tumor_sample = get_tumor_from_group(wildcards.group)
+    return f"results/recal/{tumor_sample}.sorted{ext}"
 
 
 ## RNA ##
@@ -418,7 +433,7 @@ def kallisto_params(wildcards, input):
 
 def get_paired_samples(wildcards):
     return [
-        get_normal(wildcards.cancer_sample),
+        get_normal_from_sample(wildcards.cancer_sample),
         samples.loc[wildcards.cancer_sample, "sample_name"],
     ]
 
@@ -435,13 +450,31 @@ def get_paired_bais(wildcards):
     )
 
 
-def get_normal(sample_name):
+def get_normal_from_sample(sample_name):
     normal_sample = samples.loc[
         (samples["group"] == samples.loc[sample_name, "group"])
         & (samples["alias"] == "normal"),
         "sample_name",
     ].iat[0]
     return normal_sample
+
+
+def get_normal_from_group(group):
+    normal_sample = samples.loc[
+        (samples["group"] == group)
+        & (samples["alias"] == "normal"),
+        "sample_name",
+    ].iat[0]
+    return normal_sample
+
+
+def get_tumor_from_group(group):
+    tumor_sample = samples.loc[
+        (samples["group"] == group)
+        & (samples["alias"] == "tumor"),
+        "sample_name",
+    ].iat[0]
+    return tumor_sample
 
 
 def get_reads(wildcards):
@@ -454,40 +487,30 @@ def get_seperate(sample, group):
 
 def get_proteome(wildcards):
     return expand(
-        "results/microphaser/fasta/germline/{normal_sample}/{mhc}/reference_proteome.bin",
-        normal_sample=get_normal(wildcards.cancer_sample),
+        "results/microphaser/bin/{group}.{normal_event}.{mhc}.normal_proteome.bin",
+        normal_event=config["params"]["microphaser"]["events"]["normal"],
         mhc=wildcards.mhc,
     )
 
 
 def get_alleles_MHCI(wildcards):
-    if wildcards.peptide_type == "wt":
+    if wildcards.peptide_type == "normal":
         return "results/optitype/{S}/hla_alleles_{S}.tsv".format(
-            S=get_normal(wildcards.cancer_sample)
+            S=get_normal_from_group(wildcards.group)
         )
     else:
         return "results/optitype/{S}/hla_alleles_{S}.tsv".format(
-            S=wildcards.cancer_sample
+            S=get_tumor_from_group(wildcards.group)
         )
 
 
 def get_alleles_MHCII(wildcards):
-    if wildcards.peptide_type == "wt":
+    if wildcards.peptide_type == "normal":
         return "results/HLA-LA/hlaI_{S}.tsv".format(
-            S=get_normal(wildcards.cancer_sample)
+            S=get_normal_from_group(wildcards.group)
         )
     else:
-        return "results/HLA-LA/hlaI_{S}.tsv".format(S=wildcards.cancer_sample)
+        return "results/HLA-LA/hlaI_{S}.tsv".format(
+            S=get_tumor_from_group(wildcards.group)
+        )
 
-
-def get_normal_bam(wildcards):
-    return expand(
-        "results/recal/{normal}.sorted.bam", normal=get_normal(wildcards.cancer_sample)
-    )
-
-
-def get_normal_bai(wildcards):
-    return expand(
-        "results/recal/{normal}.sorted.bam.bai",
-        normal=get_normal(wildcards.cancer_sample),
-    )

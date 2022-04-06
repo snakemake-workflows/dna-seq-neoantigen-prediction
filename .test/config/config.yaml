@@ -127,6 +127,9 @@ params:
           9
       netMHCIIpan:
           15
+    events:
+      tumor: "strelka_somatic"
+      normal: "strelka_germline"
   kallisto:
     "-b 100"
   star: >-
