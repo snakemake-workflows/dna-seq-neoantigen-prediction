@@ -77,9 +77,9 @@ def get_final_output():
     final_output = []
     if config["epitope_prediction"]["activate"]:
         for group in pd.unique(samples["group"]):
-            samples = samples.loc[samples["group"] == group, "sample_name"]
+            smps = samples.loc[samples["group"] == group, "sample_name"]
             sequencing_types = pd.unique(
-                units.loc[units.sample_name in samples, "sequencing_type"]
+                units.loc[units["sample_name"].isin(smps), "sequencing_type"]
             )
             final_output.extend(
                 expand(
