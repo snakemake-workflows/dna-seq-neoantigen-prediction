@@ -484,11 +484,9 @@ def get_seperate(sample, group):
 
 def get_proteome(wildcards):
     return expand(
-        "results/microphaser/bin/{group}.{normal_event}.{mhc}.normal_proteome.bin",
+        "results/microphaser/bin/{{group}}.{normal_event}.{{mhc}}.normal_proteome.bin",
         normal_event=config["params"]["microphaser"]["events"]["normal"],
-        mhc=wildcards.mhc,
     )
-
 
 def get_alleles_MHCI(wildcards):
     if wildcards.peptide_type == "normal":

@@ -76,7 +76,7 @@ rule build_normal_proteome_db:
 rule microphaser_filter:
     input:
         tsv="results/microphaser/info/{group}/tumor.{tumor_event}.{contig}.tsv",
-        proteome="results/microphaser/bin/{group}.{normal_event}.{mhc}.normal_proteome.bin",
+        proteome=get_proteome(),
     output:
         mt_fasta=(
             "results/microphaser/fasta/filtered/{group}/{mhc}.{tumor_event}.{contig}.neo.fa"

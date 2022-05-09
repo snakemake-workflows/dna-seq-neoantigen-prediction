@@ -118,6 +118,7 @@ params:
           15
     events:
       tumor: "tumor_unfiltered"
+      normal: "normal_unfiltered"
   kallisto:
     "-b 100"
   star: >-
