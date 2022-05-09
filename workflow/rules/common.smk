@@ -271,12 +271,14 @@ def get_read_group(wildcards):
     )
 
 
-def get_recalibrate_quality_input(wildcards, bai=False):
+def get_recalibrate_quality_input(bai=False):
     ext = ".bai" if bai else ""
-    if is_activated("remove_duplicates"):
-        return "results/dedup/{}.sorted.bam{}".format(wildcards.sample, ext)
-    else:
-        return "results/mapped/{}.sorted.bam{}".format(wildcards.sample, ext)
+    def inner(wildcards):
+        if is_activated("remove_duplicates"):
+            return "results/dedup/{}.sorted.bam{}".format(wildcards.sample, ext)
+        else:
+            return "results/mapped/{}.sorted.bam{}".format(wildcards.sample, ext)
+    return inner
 
 
 ## HLA Typing ##
@@ -377,14 +379,18 @@ def get_tabix_params(wildcards):
     raise ValueError("Invalid format for tabix: {}".format(wildcards.format))
 
 
-def get_normal_bam(wildcards, ext=".bam"):
-    normal_sample = get_normal_from_group(wildcards.group)
-    return f"results/recal/{normal_sample}.sorted{ext}"
+def get_normal_bam(ext=".bam"):
+    def inner(wildcards):
+        normal_sample = get_normal_from_group(wildcards.group)
+        return f"results/recal/{normal_sample}.sorted{ext}"
+    return inner
 
 
-def get_tumor_bam(wildcards, ext=".bam"):
-    tumor_sample = get_tumor_from_group(wildcards.group)
-    return f"results/recal/{tumor_sample}.sorted{ext}"
+def get_tumor_bam(ext=".bam"):
+    def inner(wildcards):
+        tumor_sample = get_tumor_from_group(wildcards.group)
+        return f"results/recal/{tumor_sample}.sorted{ext}"
+    return inner
 
 
 ## RNA ##
