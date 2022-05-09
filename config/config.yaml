@@ -116,6 +116,8 @@ params:
           9
       netMHCIIpan:
           15
+    events:
+      tumor: "tumor_unfiltered"
   kallisto:
     "-b 100"
   star: >-
