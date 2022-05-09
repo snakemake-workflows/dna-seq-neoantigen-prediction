@@ -340,24 +340,6 @@ def get_fdr_control_params(wildcards):
     return {"threshold": threshold, "events": events}
 
 
-def get_pair_variants(wildcards, index):
-    if index:
-        ext = ".csi"
-    else:
-        ext = ""
-    variants = [
-        "results/strelka/somatic/{sample}/results/variants/somatic.complete.tumor.bcf{ext}".format(
-            wildcards.sample, ext
-        )
-    ]
-    variants.append(
-        "results/strelka/germline/{}/results/variants/variants.reheader.bcf{}".format(
-            get_normal_from_group(wildcards.group), ext
-        )
-    )
-    return variants
-
-
 def get_pair_observations(wildcards):
     return expand(
         "results/observations/{cancer_sample}/{sample}.{caller}.{scatteritem}.bcf",
