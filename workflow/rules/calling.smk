@@ -33,7 +33,7 @@ rule strelka_germline:
     output:
         "results/strelka/{group}.strelka_germline.variants.vcf.gz",
     log:
-        "logs/calling/strelka_germline/{normal_sample}.log",
+        "logs/calling/strelka_germline/{group}.log",
     params:
         config_extra="--callRegions {} {}".format(
             "resources/genome.callregions.bed.gz",

@@ -10,7 +10,7 @@ rule microphaser_tumor:
         wt_fasta="results/microphaser/fasta/{group}/tumor.{tumor_event}.{normal_event}.{contig}.normal.fa",
         tsv="results/microphaser/info/{group}/tumor.{tumor_event}.{normal_event}.{contig}.tsv",
     log:
-        "logs/microphaser_tumor/{group}/{tumor_event}-{contig}.log",
+        "logs/microphaser_tumor/{group}/{tumor_event}.{normal_event}.{contig}.log",
     conda:
         "../envs/microphaser.yaml"
     params:
