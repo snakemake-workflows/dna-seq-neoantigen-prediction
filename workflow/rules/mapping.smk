@@ -32,8 +32,8 @@ rule mark_duplicates:
 
 rule recalibrate_base_qualities:
     input:
-        bam=get_recalibrate_quality_input,
-        bai=lambda w: get_recalibrate_quality_input(w, bai=True),
+        bam=get_recalibrate_quality_input(),
+        bai=get_recalibrate_quality_input(bai=True),
         ref="resources/genome.fasta",
         ref_dict="resources/genome.dict",
         ref_fai="resources/genome.fasta.fai",
@@ -53,8 +53,8 @@ rule recalibrate_base_qualities:
 
 rule apply_bqsr:
     input:
-        bam=get_recalibrate_quality_input,
-        bai=lambda w: get_recalibrate_quality_input(w, bai=True),
+        bam=get_recalibrate_quality_input(),
+        bai=get_recalibrate_quality_input(bai=True),
         ref="resources/genome.fasta",
         ref_dict="resources/genome.dict",
         ref_fai="resources/genome.fasta.fai",

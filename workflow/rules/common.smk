@@ -282,9 +282,9 @@ def get_recalibrate_quality_input(bai=False):
 
     def inner(wildcards):
         if is_activated("remove_duplicates"):
-            return "results/dedup/{}.sorted.bam{}".format(wildcards.sample, ext)
+            return f"results/dedup/{wildcards.sample}.sorted.bam{ext}"
         else:
-            return "results/mapped/{}.sorted.bam{}".format(wildcards.sample, ext)
+            return f"results/mapped/{wildcards.sample}.sorted.bam{ext}"
 
     return inner
 
@@ -481,12 +481,6 @@ def get_reads(wildcards):
 def get_seperate(sample, group):
     return units.loc[(sample, "DNA"), "fq{}".format(str(group))]
 
-
-def get_proteome(wildcards):
-    return expand(
-        "results/microphaser/bin/{{group}}.{normal_event}.{{mhc}}.normal_proteome.bin",
-        normal_event=config["params"]["microphaser"]["events"]["normal"],
-    )
 
 def get_alleles_MHCI(wildcards):
     if wildcards.peptide_type == "normal":
