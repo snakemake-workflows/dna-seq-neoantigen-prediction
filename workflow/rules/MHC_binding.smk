@@ -18,7 +18,7 @@
 
 rule netMHCpan:
     input:
-        peptides="results/microphaser/fasta/filtered/{group}/netMHCpan.{tumor_event}.{contig}.{peptide_type}.fa"
+        peptides="results/microphaser/fasta/filtered/{group}/netMHCpan.{tumor_event}.{contig}.{peptide_type}.fa",
         alleles=get_alleles_MHCI,
     output:
         "results/netMHCpan/{group}/{tumor_event}.{contig}.{peptide_type}.xls",
@@ -35,7 +35,7 @@ rule netMHCpan:
 
 rule netMHCIIpan:
     input:
-        peptides="results/microphaser/fasta/filtered/{group}/netMHCIIpan.{tumor_event}.{contig}.{peptide_type}.fa"
+        peptides="results/microphaser/fasta/filtered/{group}/netMHCIIpan.{tumor_event}.{contig}.{peptide_type}.fa",
         alleles=get_alleles_MHCII,
     output:
         "results/netMHCIIpan/{group}/{tumor_event}.{contig}.{peptide_type}.xls",
