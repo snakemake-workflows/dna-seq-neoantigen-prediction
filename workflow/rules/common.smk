@@ -78,7 +78,9 @@ def get_final_output():
     if config["epitope_prediction"]["activate"]:
         for group in pd.unique(samples["group"]):
             samples = samples.loc[samples["group"] == group, "sample_name"]
-            sequencing_types = pd.unique(units.loc[units.sample_name in samples, "sequencing_type"])
+            sequencing_types = pd.unique(
+                units.loc[units.sample_name in samples, "sequencing_type"]
+            )
             final_output.extend(
                 expand(
                     "results/neoantigens/{group}.{tumor_event}.{mhc}.{seqtype}.tsv",
@@ -88,8 +90,12 @@ def get_final_output():
                         filter(
                             None,
                             [
-                                "netMHCpan" if is_activated("affinity/netMHCpan") else None,
-                                "netMHCIIpan" if is_activated("affinity/netMHCIIpan") else None,
+                                "netMHCpan"
+                                if is_activated("affinity/netMHCpan")
+                                else None,
+                                "netMHCIIpan"
+                                if is_activated("affinity/netMHCIIpan")
+                                else None,
                             ],
                         )
                     ),
@@ -273,11 +279,13 @@ def get_read_group(wildcards):
 
 def get_recalibrate_quality_input(bai=False):
     ext = ".bai" if bai else ""
+
     def inner(wildcards):
         if is_activated("remove_duplicates"):
             return "results/dedup/{}.sorted.bam{}".format(wildcards.sample, ext)
         else:
             return "results/mapped/{}.sorted.bam{}".format(wildcards.sample, ext)
+
     return inner
 
 
@@ -383,6 +391,7 @@ def get_normal_bam(ext=".bam"):
     def inner(wildcards):
         normal_sample = get_normal_from_group(wildcards.group)
         return f"results/recal/{normal_sample}.sorted{ext}"
+
     return inner
 
 
@@ -390,6 +399,7 @@ def get_tumor_bam(ext=".bam"):
     def inner(wildcards):
         tumor_sample = get_tumor_from_group(wildcards.group)
         return f"results/recal/{tumor_sample}.sorted{ext}"
+
     return inner
 
 
@@ -450,8 +460,7 @@ def get_normal_from_sample(sample_name):
 
 def get_normal_from_group(group):
     normal_sample = samples.loc[
-        (samples["group"] == group)
-        & (samples["alias"] == "normal"),
+        (samples["group"] == group) & (samples["alias"] == "normal"),
         "sample_name",
     ].iat[0]
     return normal_sample
@@ -459,8 +468,7 @@ def get_normal_from_group(group):
 
 def get_tumor_from_group(group):
     tumor_sample = samples.loc[
-        (samples["group"] == group)
-        & (samples["alias"] == "tumor"),
+        (samples["group"] == group) & (samples["alias"] == "tumor"),
         "sample_name",
     ].iat[0]
     return tumor_sample
@@ -502,4 +510,3 @@ def get_alleles_MHCII(wildcards):
         return "results/HLA-LA/hlaI_{S}.tsv".format(
             S=get_tumor_from_group(wildcards.group)
         )
-

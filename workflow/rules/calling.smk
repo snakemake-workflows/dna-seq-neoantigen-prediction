@@ -108,11 +108,11 @@ rule reheader_germline:
 
 rule concat_variants:
     input:
-        calls=[ 
+        calls=[
             "results/strelka/{group}.strelka_somatic.tumor.bcf",
             "results/strelka/{group}.strelka_germline.variants.reheader.bcf",
         ],
-        index=[ 
+        index=[
             "results/strelka/{group}.strelka_somatic.tumor.bcf.csi",
             "results/strelka/{group}.strelka_germline.variants.reheader.bcf.csi",
         ],

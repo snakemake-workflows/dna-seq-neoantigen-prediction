@@ -28,12 +28,8 @@ rule microphaser_normal:
         track="resources/annotation/{contig}.gtf",
         ref="resources/genome.fasta",
     output:
-        wt_fasta=(
-            "results/microphaser/fasta/{group}/normal.{normal_event}.{contig}.fa"
-        ),
-        wt_tsv=(
-            "results/microphaser/info/{group}/normal.{normal_event}.{contig}.tsv"
-        ),
+        wt_fasta=("results/microphaser/fasta/{group}/normal.{normal_event}.{contig}.fa"),
+        wt_tsv=("results/microphaser/info/{group}/normal.{normal_event}.{contig}.tsv"),
     log:
         "logs/microphaser_germline/{group}/{normal_event}-{contig}.log",
     conda:
