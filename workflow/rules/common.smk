@@ -94,6 +94,7 @@ def get_final_output():
                         )
                     ),
                     seqtype=sequencing_types,
+                )
             )
     else:
         if config["HLAtyping"]["HLA_LA"]["activate"]:
