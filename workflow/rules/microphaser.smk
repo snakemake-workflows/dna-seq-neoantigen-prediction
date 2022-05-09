@@ -105,7 +105,7 @@ rule microphaser_filter:
 rule concat_tsvs:
     input:
         expand(
-            "results/microphaser/info/filtered/{group}/{mhc}.{tumor_event}.{contig}.tsv",
+            "results/microphaser/info/filtered/{{group}}/{{mhc}}.{{tumor_event}}.{contig}.tsv",
             contig=contigs,
         ),
     output:
