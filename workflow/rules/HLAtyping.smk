@@ -71,7 +71,9 @@ rule OptiType:
         reads=get_optitype_reads_input,
     output:
         multiext(
-            "results/optitype/{group}/{group}.{alias}", ".coverage_plot.pdf", ".result.tsv"
+            "results/optitype/{group}/{group}.{alias}",
+            ".coverage_plot.pdf",
+            ".result.tsv",
         ),
     log:
         "logs/optitype/{group}.{alias}.log",

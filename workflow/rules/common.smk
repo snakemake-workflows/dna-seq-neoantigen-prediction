@@ -59,7 +59,9 @@ wildcard_constraints:
     sample="|".join(samples["sample_name"]),
     unit="|".join(units["unit_name"]),
     alias="|".join(pd.unique(samples["alias"])),
-    tumor_alias="|".join(pd.unique(samples.loc[samples["alias"].str.match("tumor"), "alias"])),
+    tumor_alias="|".join(
+        pd.unique(samples.loc[samples["alias"].str.match("tumor"), "alias"])
+    ),
     group="|".join(pd.unique(samples["group"])),
     caller="|".join(["freebayes", "delly"]),
     peptide_type="|".join(["normal", "neo"]),
@@ -86,7 +88,10 @@ def get_final_output():
             sequencing_types = pd.unique(
                 units.loc[units["sample_name"].isin(smps), "sequencing_type"]
             )
-            tumor_aliases = samples.loc[(samples["group"] == group) & (samples["alias"].str.match("tumor")), "alias"]
+            tumor_aliases = samples.loc[
+                (samples["group"] == group) & (samples["alias"].str.match("tumor")),
+                "alias",
+            ]
             final_output.extend(
                 expand(
                     "results/neoantigens/{group}.{tumor_alias}.{tumor_event}.{mhc}.{seqtype}.tsv",
@@ -397,11 +402,9 @@ def get_tabix_params(wildcards):
 
 def get_sample_from_group_and_alias(group, alias):
     sample = samples.loc[
-        (samples["group"] == group) & (samples["alias"] == alias),
-        "sample_name"
+        (samples["group"] == group) & (samples["alias"] == alias), "sample_name"
     ]
     return sample
-
 
 
 def get_normal_bam(ext=".bam"):
@@ -414,7 +417,9 @@ def get_normal_bam(ext=".bam"):
 
 def get_tumor_bam_from_group_and_alias(ext=".bam"):
     def inner(wildcards):
-        tumor_sample = get_sample_from_group_and_alias(wildcards.group, wildcards.tumor_alias)
+        tumor_sample = get_sample_from_group_and_alias(
+            wildcards.group, wildcards.tumor_alias
+        )
         return f"results/recal/{tumor_sample}.sorted{ext}"
 
     return inner
@@ -495,7 +500,5 @@ def get_alleles_MHCI(wildcards):
 def get_alleles_MHCII(wildcards):
     alias = "normal" if wildcards.peptide_type == "normal" else wildcards.tumor_alias
     return expand(
-        "results/HLA-LA/{group}.{alias}.hlaI.tsv",
-        group=wildcards.group,
-        alias=alias
-        )
+        "results/HLA-LA/{group}.{alias}.hlaI.tsv", group=wildcards.group, alias=alias
+    )
