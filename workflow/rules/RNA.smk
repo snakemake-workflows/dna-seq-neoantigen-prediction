@@ -3,11 +3,11 @@ rule kallisto_quant:
         fastq=get_quant_reads_input,
         index="resources/kallisto/transcripts.idx",
     output:
-        directory("results/kallisto/{sample}"),
+        directory("results/kallisto/{group}.{tumor_alias}"),
     params:
         extra=kallisto_params,
     log:
-        "results/logs/kallisto/quant/{sample}.log",
+        "results/logs/kallisto/quant/{group}.{tumor_alias}.log",
     wrapper:
         "0.60.1/bio/kallisto/quant"
 

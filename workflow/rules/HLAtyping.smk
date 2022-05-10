@@ -1,13 +1,13 @@
 rule HLA_LA:
     input:
-        bam="results/recal/{sample}.sorted.bam",
-        bai="results/recal/{sample}.sorted.bam.bai",
+        bam=get_bam_from_group_and_alias(),
+        bai=get_bam_from_group_and_alias(ext=".bai"),
         index="resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH",
     output:
-        "results/HLA-LA/output/{sample}/hla/R1_bestguess_G.txt",
+        "results/HLA-LA/output/{group}/{alias}/hla/R1_bestguess_G.txt",
     threads: 7
     log:
-        "logs/HLA-LA/{sample}.log",
+        "logs/HLA-LA/{group}.{alias}.log",
     params:
         graph=lambda w, input: os.path.basename(os.path.dirname(input.index)),
         graphdir=lambda w, input: os.path.dirname(os.path.dirname(input.index)),
@@ -19,20 +19,20 @@ rule HLA_LA:
 
 rule parse_HLA_LA:
     input:
-        "results/HLA-LA/output/{sample}/hla/R1_bestguess_G.txt",
+        "results/HLA-LA/output/{group}/{alias}/hla/R1_bestguess_G.txt",
     output:
         report(
-            "results/HLA-LA/hlaI_{sample}.tsv",
+            "results/HLA-LA/{group}.{alias}.hlaI.tsv",
             caption="../report/HLA_Types.rst",
             category="HLA-Typing(HLA-LA)",
         ),
         report(
-            "results/HLA-LA/hlaII_{sample}.tsv",
+            "results/HLA-LA/{group}.{alias}.hlaII.tsv",
             caption="../report/HLA_Types.rst",
             category="HLA-Typing(HLA-LA)",
         ),
     log:
-        "logs/parse-HLA-LA/{sample}.log",
+        "logs/parse-HLA-LA/{group}.{alias}.log",
     script:
         "../scripts/parse_HLA_types.py"
 
@@ -71,10 +71,10 @@ rule OptiType:
         reads=get_optitype_reads_input,
     output:
         multiext(
-            "results/optitype/{sample}/{sample}", "_coverage_plot.pdf", "_result.tsv"
+            "results/optitype/{group}/{group}.{alias}", ".coverage_plot.pdf", ".result.tsv"
         ),
     log:
-        "logs/optitype/{sample}.log",
+        "logs/optitype/{group}.{alias}.log",
     params:
         extra=config["params"]["optitype"],
         sequencing_type="dna",
@@ -84,15 +84,15 @@ rule OptiType:
 
 rule parse_Optitype:
     input:
-        "results/optitype/{sample}/{sample}_result.tsv",
+        "results/optitype/{group}/{group}.{alias}.result.tsv",
     output:
         report(
-            "results/optitype/{sample}/hla_alleles_{sample}.tsv",
+            "results/optitype/{group}/{group}.{alias}.hla_alleles.tsv",
             caption="../report/HLA_Types.rst",
             category="HLA-Typing(Optitype)",
         ),
     log:
-        "logs/parse-optitype/{sample}.log",
+        "logs/parse-optitype/{group}.{alias}.log",
     shell:
         "cut {input} -f2-7 | awk 'NR == 1 {{print}} NR>1 {{for (i = 1; i<=6; ++i) sub(/^/, \"&HLA-\", $i); print}}' "
         '| sed -e s/[*,:]//g | sed "s/ /\t/g" > {output} 2> {log}'

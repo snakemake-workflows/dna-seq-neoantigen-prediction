@@ -16,7 +16,11 @@ samples = (
     pd.read_csv(
         config["samples"],
         sep="\t",
-        dtype={"sample_name": str, "group": str},
+        dtype={
+            "sample_name": str,
+            "group": str,
+            "alias": str,
+        },
         comment="#",
     )
     .set_index("sample_name", drop=False)
@@ -55,6 +59,7 @@ wildcard_constraints:
     sample="|".join(samples["sample_name"]),
     unit="|".join(units["unit_name"]),
     alias="|".join(pd.unique(samples["alias"])),
+    tumor_alias="|".join(pd.unique(samples.loc[samples["alias"].str.match("tumor"), "alias"])),
     group="|".join(pd.unique(samples["group"])),
     caller="|".join(["freebayes", "delly"]),
     peptide_type="|".join(["normal", "neo"]),
@@ -81,10 +86,12 @@ def get_final_output():
             sequencing_types = pd.unique(
                 units.loc[units["sample_name"].isin(smps), "sequencing_type"]
             )
+            tumor_aliases = samples.loc[(samples["group"] == group) & (samples["alias"].str.match("tumor")), "alias"]
             final_output.extend(
                 expand(
-                    "results/neoantigens/{group}.{tumor_event}.{mhc}.{seqtype}.tsv",
+                    "results/neoantigens/{group}.{tumor_alias}.{tumor_event}.{mhc}.{seqtype}.tsv",
                     group=group,
+                    tumor_alias=tumor_aliases,
                     tumor_event=config["params"]["microphaser"]["events"]["tumor"],
                     mhc=list(
                         filter(
@@ -261,8 +268,8 @@ def get_fastqs(wc):
     return units.loc[wc.sample].loc[wc.seqtype, fq].tolist()
 
 
-def get_map_reads_input(wildcards):
-    if is_paired_end(wildcards.sample, "DNA"):
+def get_map_reads_input(sample):
+    if is_paired_end(sample, "DNA"):
         return [
             "results/merged/DNA/{sample}_R1.fastq.gz",
             "results/merged/DNA/{sample}_R2.fastq.gz",
@@ -293,16 +300,17 @@ def get_recalibrate_quality_input(bai=False):
 
 
 def get_optitype_reads_input(wildcards):
+    sample = get_sample_from_group_and_alias(wildcards.group, wildcards.alias)
     if is_activated("HLAtyping/optitype_prefiltering"):
-        if is_paired_end(wildcards.sample, "DNA"):
+        if is_paired_end(sample, "DNA"):
             return expand(
                 "results/razers3/fastq/{sample}_{read}.fished.fastq",
-                sample=wildcards.sample,
+                sample=sample,
                 read=["R1", "R2"],
             )
         return "results/razers3/fastq/{sample}_single.fastq"
     else:
-        return get_map_reads_input(wildcards)
+        return get_map_reads_input(sample)
 
 
 def get_oncoprint_batch(wildcards):
@@ -387,18 +395,35 @@ def get_tabix_params(wildcards):
     raise ValueError("Invalid format for tabix: {}".format(wildcards.format))
 
 
+def get_sample_from_group_and_alias(group, alias):
+    sample = samples.loc[
+        (samples["group"] == group) & (samples["alias"] == alias),
+        "sample_name"
+    ]
+    return sample
+
+
+
 def get_normal_bam(ext=".bam"):
     def inner(wildcards):
-        normal_sample = get_normal_from_group(wildcards.group)
+        normal_sample = get_sample_from_group_and_alias(wildcards.group, "normal")
         return f"results/recal/{normal_sample}.sorted{ext}"
 
     return inner
 
 
-def get_tumor_bam(ext=".bam"):
+def get_tumor_bam_from_group_and_alias(ext=".bam"):
     def inner(wildcards):
-        tumor_sample = get_tumor_from_group(wildcards.group)
+        tumor_sample = get_sample_from_group_and_alias(wildcards.group, wildcards.tumor_alias)
         return f"results/recal/{tumor_sample}.sorted{ext}"
+
+    return inner
+
+
+def get_bam_from_group_and_alias(ext=".bam"):
+    def inner(wildcards):
+        sample = get_sample_from_group_and_alias(wildcards.group, wildcards.alias)
+        return f"results/recal/{sample}.sorted{ext}"
 
     return inner
 
@@ -407,7 +432,8 @@ def get_tumor_bam(ext=".bam"):
 
 
 def get_quant_reads_input(wildcards):
-    if is_paired_end(wildcards.sample, "RNA"):
+    sample = get_sample_from_group_and_alias(wildcards.group, wildcards.tumor_alias)
+    if is_paired_end(sample, "RNA"):
         return [
             "results/merged/RNA/{sample}_R1.fastq.gz",
             "results/merged/RNA/{sample}_R2.fastq.gz",
@@ -449,31 +475,6 @@ def get_paired_bais(wildcards):
     )
 
 
-def get_normal_from_sample(sample_name):
-    normal_sample = samples.loc[
-        (samples["group"] == samples.loc[sample_name, "group"])
-        & (samples["alias"] == "normal"),
-        "sample_name",
-    ].iat[0]
-    return normal_sample
-
-
-def get_normal_from_group(group):
-    normal_sample = samples.loc[
-        (samples["group"] == group) & (samples["alias"] == "normal"),
-        "sample_name",
-    ].iat[0]
-    return normal_sample
-
-
-def get_tumor_from_group(group):
-    tumor_sample = samples.loc[
-        (samples["group"] == group) & (samples["alias"] == "tumor"),
-        "sample_name",
-    ].iat[0]
-    return tumor_sample
-
-
 def get_reads(wildcards):
     return get_seperate(wildcards.sample, wildcards.group)
 
@@ -483,22 +484,18 @@ def get_seperate(sample, group):
 
 
 def get_alleles_MHCI(wildcards):
-    if wildcards.peptide_type == "normal":
-        return "results/optitype/{S}/hla_alleles_{S}.tsv".format(
-            S=get_normal_from_group(wildcards.group)
-        )
-    else:
-        return "results/optitype/{S}/hla_alleles_{S}.tsv".format(
-            S=get_tumor_from_group(wildcards.group)
-        )
+    alias = "normal" if wildcards.peptide_type == "normal" else wildcards.tumor_alias
+    return expand(
+        "results/optitype/{group}/{group}.{alias}.hla_alleles.tsv",
+        group=wildcards.group,
+        alias=alias,
+    )
 
 
 def get_alleles_MHCII(wildcards):
-    if wildcards.peptide_type == "normal":
-        return "results/HLA-LA/hlaI_{S}.tsv".format(
-            S=get_normal_from_group(wildcards.group)
-        )
-    else:
-        return "results/HLA-LA/hlaI_{S}.tsv".format(
-            S=get_tumor_from_group(wildcards.group)
+    alias = "normal" if wildcards.peptide_type == "normal" else wildcards.tumor_alias
+    return expand(
+        "results/HLA-LA/{group}.{alias}.hlaI.tsv",
+        group=wildcards.group,
+        alias=alias
         )

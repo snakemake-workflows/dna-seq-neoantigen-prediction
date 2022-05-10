@@ -1,16 +1,16 @@
 rule microphaser_tumor:
     input:
-        vcf="results/strelka/merged/{group}.{tumor_event}.{normal_event}.norm.annotated.bcf",
-        bam=get_tumor_bam(),
-        bai=get_tumor_bam(ext=".bam.bai"),
+        vcf="results/strelka/merged/{group}.{tumor_alias}.{tumor_event}.{normal_event}.norm.annotated.bcf",
+        bam=get_tumor_bam_from_group_and_alias(),
+        bai=get_tumor_bam_from_group_and_alias(ext=".bai"),
         track="resources/annotation/{contig}.gtf",
         ref="resources/genome.fasta",
     output:
-        mt_fasta="results/microphaser/fasta/{group}/tumor.{tumor_event}.{normal_event}.{contig}.neo.fa",
-        wt_fasta="results/microphaser/fasta/{group}/tumor.{tumor_event}.{normal_event}.{contig}.normal.fa",
-        tsv="results/microphaser/info/{group}/tumor.{tumor_event}.{normal_event}.{contig}.tsv",
+        mt_fasta="results/microphaser/fasta/{group}/{tumor_alias}.{tumor_event}.{normal_event}.{contig}.neo.fa",
+        wt_fasta="results/microphaser/fasta/{group}/{tumor_alias}.{tumor_event}.{normal_event}.{contig}.normal.fa",
+        tsv="results/microphaser/info/{group}/{tumor_alias}.{tumor_event}.{normal_event}.{contig}.tsv",
     log:
-        "logs/microphaser_tumor/{group}/{tumor_event}.{normal_event}.{contig}.log",
+        "logs/microphaser_tumor/{group}/{tumor_alias}.{tumor_event}.{normal_event}.{contig}.log",
     conda:
         "../envs/microphaser.yaml"
     params:
@@ -22,7 +22,7 @@ rule microphaser_tumor:
 
 rule microphaser_normal:
     input:
-        vcf="results/strelka/normal/{group}.{normal_event}.variants.reheader.norm.bcf",
+        vcf="results/strelka/{group}.normal.{normal_event}.variants.reheader.norm.bcf",
         bam=get_normal_bam(),
         bai=get_normal_bam(ext=".bam.bai"),
         track="resources/annotation/{contig}.gtf",
@@ -75,22 +75,22 @@ rule build_normal_proteome_db:
 
 rule microphaser_filter:
     input:
-        tsv="results/microphaser/info/{group}/tumor.{tumor_event}.{contig}.tsv",
+        tsv="results/microphaser/info/{group}/{tumor_alias}.{tumor_event}.{contig}.tsv",
         proteome=expand(
             "results/microphaser/bin/{{group}}.{normal_event}.{{mhc}}.normal_proteome.bin",
             normal_event=config["params"]["microphaser"]["events"]["normal"],
         ),
     output:
         mt_fasta=(
-            "results/microphaser/fasta/filtered/{group}/{mhc}.{tumor_event}.{contig}.neo.fa"
+            "results/microphaser/fasta/filtered/{group}/{tumor_alias}.{tumor_event}.{mhc}.{contig}.neo.fa"
         ),
         wt_fasta=(
-            "results/microphaser/fasta/filtered/{group}/{mhc}.{tumor_event}.{contig}.normal.fa"
+            "results/microphaser/fasta/filtered/{group}/{tumor_alias}.{tumor_event}.{mhc}.{contig}.normal.fa"
         ),
-        tsv="results/microphaser/info/filtered/{group}/{mhc}.{tumor_event}.{contig}.tsv",
-        removed="results/microphaser/info/removed/{group}/{mhc}.{tumor_event}.{contig}.removed.tsv",
+        tsv="results/microphaser/info/filtered/{group}/{tumor_alias}.{tumor_event}.{mhc}.{contig}.tsv",
+        removed="results/microphaser/info/removed/{group}/{tumor_alias}.{tumor_event}.{mhc}.{contig}.removed.tsv",
     log:
-        "logs/microphaser_filter/{group}/{mhc}.{tumor_event}.{contig}.log",
+        "logs/microphaser_filter/{group}/{tumor_alias}.{tumor_event}.{mhc}.{contig}.log",
     conda:
         "../envs/microphaser.yaml"
     params:
@@ -104,13 +104,13 @@ rule microphaser_filter:
 rule concat_tsvs:
     input:
         expand(
-            "results/microphaser/info/filtered/{{group}}/{{mhc}}.{{tumor_event}}.{contig}.tsv",
+            "results/microphaser/info/filtered/{{group}}/{{tumor_alias}}.{{tumor_event}}.{{mhc}}.{contig}.tsv",
             contig=contigs,
         ),
     output:
-        "results/microphaser/info/filtered/{group}.{mhc}.{tumor_event}.tsv",
+        "results/microphaser/info/filtered/{group}.{tumor_alias}.{tumor_event}.{mhc}.tsv",
     log:
-        "logs/concat_tsvs/{group}.{mhc}.{tumor_event}.log",
+        "logs/concat_tsvs/{group}.{tumor_alias}.{tumor_event}.{mhc}.log",
     conda:
         "../envs/xsv.yaml"
     shell:

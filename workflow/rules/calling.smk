@@ -1,17 +1,17 @@
 rule strelka_tumor:
     input:
         normal=get_normal_bam(),
-        normal_index=get_normal_bam(ext=".bam.bai"),
-        tumor=get_tumor_bam(),
-        tumor_index=get_tumor_bam(ext=".bam.bai"),
+        normal_index=get_normal_bam(ext=".bai"),
+        tumor=get_tumor_bam_from_group_and_alias(),
+        tumor_index=get_tumor_bam_from_group_and_alias(ext=".bai"),
         fasta="resources/genome.fasta",
         fasta_index="resources/genome.fasta.fai",
         callregions="resources/genome.callregions.bed.gz",
     output:
-        "results/strelka/{group}.strelka_somatic.snvs.vcf.gz",
-        "results/strelka/{group}.strelka_somatic.indels.vcf.gz",
+        "results/strelka/{group}.{tumor_alias}.strelka_somatic.snvs.vcf.gz",
+        "results/strelka/{group}.{tumor_alias}.strelka_somatic.indels.vcf.gz",
     log:
-        "logs/calling/strelka/{group}.strelka_somatic.log",
+        "logs/calling/strelka/{group}.{tumor_alias}.strelka_somatic.log",
     params:
         config_extra="--callRegions {} {}".format(
             "resources/genome.callregions.bed.gz",
@@ -26,12 +26,12 @@ rule strelka_tumor:
 rule strelka_germline:
     input:
         bam=get_normal_bam(),
-        normal_index=get_normal_bam(ext=".bam.bai"),
+        normal_index=get_normal_bam(ext=".bai"),
         fasta="resources/genome.fasta",
         fasta_index="resources/genome.fasta.fai",
         callregions="resources/genome.callregions.bed.gz",
     output:
-        "results/strelka/{group}.strelka_germline.variants.vcf.gz",
+        "results/strelka/{group}.normal.strelka_germline.variants.vcf.gz",
     log:
         "logs/calling/strelka_germline/{group}.log",
     params:
@@ -61,17 +61,17 @@ rule vcf_to_bcf:
 rule concat_somatic:
     input:
         calls=expand(
-            "results/strelka/{{group}}.strelka_somatic.{type}.output.bcf",
+            "results/strelka/{{group}}.{{tumor_alias}}.strelka_somatic.{type}.output.bcf",
             type=["snvs", "indels"],
         ),
         indices=expand(
-            "results/strelka/{{group}}.strelka_somatic.{type}.output.bcf.csi",
+            "results/strelka/{{group}}.{{tumor_alias}}.strelka_somatic.{type}.output.bcf.csi",
             type=["snvs", "indels"],
         ),
     output:
-        "results/strelka/{group}.strelka_somatic.bcf",
+        "results/strelka/{group}.{tumor_alias}.strelka_somatic.bcf",
     log:
-        "bcftools/concat_somatic/{group}.log",
+        "bcftools/concat_somatic/{group}.{tumor_alias}.log",
     params:
         "-O b -a",
     wrapper:
@@ -80,11 +80,11 @@ rule concat_somatic:
 
 rule get_tumor_from_somatic:
     input:
-        "results/strelka/{group}.strelka_somatic.bcf",
+        "results/strelka/{group}.{tumor_alias}.strelka_somatic.bcf",
     output:
-        "results/strelka/{group}.strelka_somatic.tumor.bcf",
+        "results/strelka/{group}.{tumor_alias}.strelka_somatic.tumor.bcf",
     log:
-        "logs/bcftools/get_tumor_from_somatic/{group}.strelka_somatic.tumor.log",
+        "logs/bcftools/get_tumor_from_somatic/{group}.{tumor_alias}.strelka_somatic.tumor.log",
     params:
         "-O b -s TUMOR",
     wrapper:
@@ -93,12 +93,12 @@ rule get_tumor_from_somatic:
 
 rule reheader_germline:
     input:
-        vcf="results/strelka/{group}.strelka_germline.variants.output.bcf",
+        vcf="results/strelka/{group}.normal.strelka_germline.variants.output.bcf",
         samples="resources/sampleheader.txt",
     output:
-        "results/strelka/{group}.strelka_germline.variants.reheader.bcf",
+        "results/strelka/{group}.normal.strelka_germline.variants.reheader.bcf",
     log:
-        "logs/bcftools/reheader_germline/{group}.log",
+        "logs/bcftools/reheader_germline/{group}.normal.log",
     params:
         extra="",
         view_extra="-O b",
@@ -109,17 +109,17 @@ rule reheader_germline:
 rule concat_variants:
     input:
         calls=[
-            "results/strelka/{group}.strelka_somatic.tumor.bcf",
+            "results/strelka/{group}.{tumor_alias}.strelka_somatic.tumor.bcf",
             "results/strelka/{group}.strelka_germline.variants.reheader.bcf",
         ],
         index=[
-            "results/strelka/{group}.strelka_somatic.tumor.bcf.csi",
+            "results/strelka/{group}.{tumor_alias}.strelka_somatic.tumor.bcf.csi",
             "results/strelka/{group}.strelka_germline.variants.reheader.bcf.csi",
         ],
     output:
-        "results/strelka/merged/{group}.strelka_somatic.strelka_germline.bcf",
+        "results/strelka/merged/{group}.{tumor_alias}.strelka_somatic.strelka_germline.bcf",
     log:
-        "bcftools/concat_variants/{group}.strelka_somatic.strelka_germline.log",
+        "bcftools/concat_variants/{group}.{tumor_alias}.strelka_somatic.strelka_germline.log",
     params:
         extra="-O b -a",
     wrapper:
