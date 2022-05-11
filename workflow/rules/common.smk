@@ -236,7 +236,7 @@ def get_cutadapt_adapters(wildcards):
 
 
 def is_paired_end(sample, seqtype):
-    sample_units = units.loc[sample].loc[seqtype]
+    sample_units = units.loc[(units["sample_name"] == sample) & (units["sequencing_type"] == seqtype)]
     fq2_null = sample_units["fq2"].isnull()
     sra_null = sample_units["sra"].isnull()
     paired = ~fq2_null | ~sra_null
