@@ -403,7 +403,7 @@ def get_tabix_params(wildcards):
 def get_sample_from_group_and_alias(group, alias):
     sample = samples.loc[
         (samples["group"] == group) & (samples["alias"] == alias), "sample_name"
-    ]
+    ].squeeze()
     return sample
 
 
