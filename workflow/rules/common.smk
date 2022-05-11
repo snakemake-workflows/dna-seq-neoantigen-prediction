@@ -119,15 +119,15 @@ def get_final_output():
         if config["HLAtyping"]["HLA_LA"]["activate"]:
             final_output = expand(
                 [
-                    "results/optitype/{sample}/hla_alleles_{sample}.tsv",
-                    "results/HLA-LA/hlaI_{sample}.tsv",
-                    "results/HLA-LA/hlaII_{sample}.tsv",
+                    "results/optitype/{group}/{group}.{alias}.hla_alleles.tsv",
+                    "results/HLA-LA/{group}.{alias}.hlaI.tsv",
+                    "results/HLA-LA/{group}.{alias}.hlaII.tsv",
                 ],
                 sample=samples["sample_name"],
             )
         else:
             final_output = expand(
-                "results/optitype/{sample}/hla_alleles_{sample}.tsv",
+                "results/optitype/{group}/{group}.{alias}.hla_alleles.tsv",
                 sample=samples["sample_name"],
             )
     return final_output
@@ -279,10 +279,10 @@ def get_fastqs(wc):
 def get_map_reads_input(sample):
     if is_paired_end(sample, "DNA"):
         return [
-            "results/merged/DNA/{sample}_R1.fastq.gz",
-            "results/merged/DNA/{sample}_R2.fastq.gz",
+            f"results/merged/DNA/{sample}_R1.fastq.gz",
+            f"results/merged/DNA/{sample}_R2.fastq.gz",
         ]
-    return "results/merged/DNA/{sample}_single.fastq.gz"
+    return f"results/merged/DNA/{sample}_single.fastq.gz"
 
 
 def get_read_group(wildcards):
@@ -313,7 +313,7 @@ def get_optitype_reads_input(wildcards):
                 sample=sample,
                 read=["R1", "R2"],
             )
-        return "results/razers3/fastq/{sample}_single.fastq"
+        return f"results/razers3/fastq/{sample}_single.fastq"
     else:
         return get_map_reads_input(sample)
 
@@ -376,10 +376,10 @@ def get_quant_reads_input(wildcards):
     sample = get_sample_from_group_and_alias(wildcards.group, wildcards.tumor_alias)
     if is_paired_end(sample, "RNA"):
         return [
-            "results/merged/RNA/{sample}_R1.fastq.gz",
-            "results/merged/RNA/{sample}_R2.fastq.gz",
+            f"results/merged/RNA/{sample}_R1.fastq.gz",
+            f"results/merged/RNA/{sample}_R2.fastq.gz",
         ]
-    return "results/merged/RNA/{sample}_single.fastq.gz"
+    return f"results/merged/RNA/{sample}_single.fastq.gz"
 
 
 def kallisto_params(wildcards, input):
