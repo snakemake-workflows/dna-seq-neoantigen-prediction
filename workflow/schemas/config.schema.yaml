@@ -204,7 +204,6 @@ required:
   - units
   - ref
   - tmb
-  - calling
   - params
   - annotations
   - epitope_prediction
