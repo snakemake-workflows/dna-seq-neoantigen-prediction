@@ -94,10 +94,11 @@ def get_final_output():
             ]
             final_output.extend(
                 expand(
-                    "results/neoantigens/{group}.{tumor_alias}.{tumor_event}.{mhc}.{seqtype}.tsv",
+                    "results/neoantigens/{group}.{tumor_alias}.{tumor_event}.{normal_event}.{mhc}.{seqtype}.tsv",
                     group=group,
                     tumor_alias=tumor_aliases,
                     tumor_event=config["params"]["microphaser"]["events"]["tumor"],
+                    normal_event=config["params"]["microphaser"]["events"]["normal"],
                     mhc=list(
                         filter(
                             None,
