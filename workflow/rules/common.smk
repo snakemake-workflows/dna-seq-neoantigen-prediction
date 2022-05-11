@@ -301,9 +301,6 @@ def get_recalibrate_quality_input(bai=False):
     return inner
 
 
-## HLA Typing ##
-
-
 def get_optitype_reads_input(wildcards):
     sample = get_sample_from_group_and_alias(wildcards.group, wildcards.alias)
     if is_activated("HLAtyping/optitype_prefiltering"):
@@ -329,67 +326,6 @@ def get_oncoprint_batch(wildcards):
     return expand(
         "results/merged-calls/{group}.{{event}}.fdr-controlled.bcf", group=groups
     )
-
-
-## variant calls ##
-
-
-def get_annotated_bcf(wildcards):
-    selection = ".annotated"
-    return "results/calls/{cancer_sample}.{scatteritem}{selection}.bcf".format(
-        cancer_sample=wildcards.cancer_sample,
-        selection=selection,
-        scatteritem=wildcards.scatteritem,
-    )
-
-
-def get_scattered_calls(ext=".bcf"):
-    def inner(wildcards):
-        return expand(
-            "results/calls/{{cancer_sample}}.{caller}.{{scatteritem}}.sorted{ext}",
-            caller=caller,
-            ext=ext,
-        )
-
-    return inner
-
-
-def get_fdr_control_params(wildcards):
-    query = config["calling"]["fdr-control"]["events"][wildcards.event]
-    threshold = query.get(
-        "threshold", config["calling"]["fdr-control"].get("threshold", 0.05)
-    )
-    events = query["varlociraptor"]
-    return {"threshold": threshold, "events": events}
-
-
-def get_pair_observations(wildcards):
-    return expand(
-        "results/observations/{cancer_sample}/{sample}.{caller}.{scatteritem}.bcf",
-        caller=wildcards.caller,
-        cancer_sample=wildcards.cancer_sample,
-        scatteritem=wildcards.scatteritem,
-        sample=get_paired_samples(wildcards),
-    )
-
-
-def get_merge_input(ext=".bcf"):
-    def inner(wildcards):
-        return expand(
-            "results/calls/{{cancer_sample}}.{vartype}.{{event}}.fdr-controlled{ext}",
-            ext=ext,
-            vartype=["SNV", "INS", "DEL", "MNV"],
-            filter=config["calling"]["fdr-control"]["events"][wildcards.event],
-        )
-
-    return inner
-
-
-def get_pair_aliases(wildcards):
-    return [
-        samples.loc[get_normal_from_sample(wildcards.cancer_sample), "alias"],
-        samples.loc[wildcards.cancer_sample, "alias"],
-    ]
 
 
 def get_tabix_params(wildcards):
@@ -433,9 +369,6 @@ def get_bam_from_group_and_alias(ext=".bam"):
     return inner
 
 
-## RNA ##
-
-
 def get_quant_reads_input(wildcards):
     sample = get_sample_from_group_and_alias(wildcards.group, wildcards.tumor_alias)
     if is_paired_end(sample, "RNA"):
@@ -456,36 +389,6 @@ def kallisto_params(wildcards, input):
     else:
         extra += " --fusion"
     return extra
-
-
-## helper functions ##
-
-
-def get_paired_samples(wildcards):
-    return [
-        get_normal_from_sample(wildcards.cancer_sample),
-        samples.loc[wildcards.cancer_sample, "sample_name"],
-    ]
-
-
-def get_paired_bams(wildcards):
-    return expand(
-        "results/recal/{sample}.sorted.bam", sample=get_paired_samples(wildcards)
-    )
-
-
-def get_paired_bais(wildcards):
-    return expand(
-        "results/recal/{sample}.sorted.bam.bai", sample=get_paired_samples(wildcards)
-    )
-
-
-def get_reads(wildcards):
-    return get_seperate(wildcards.sample, wildcards.group)
-
-
-def get_seperate(sample, group):
-    return units.loc[(sample, "DNA"), "fq{}".format(str(group))]
 
 
 def get_alleles_MHCI(wildcards):
