@@ -63,34 +63,6 @@ properties:
       - tumor_sample
       - somatic_events
 
-
-  calling:
-    type: object
-    properties:
-      freebayes:
-        type: object
-        properties:
-          activate:
-            type: boolean
-      scenario:
-        type: string
-      fdr-control:
-        type: object
-        properties:
-          threshold:
-            type: number
-            minimum: 0.0
-            maximum: 1.0
-          events:
-            $ref: "#/definitions/evententry"
-            description: "a map of <eventname: event> pairs"
-        required:
-          - threshold
-          - events
-    required:
-      - freebayes
-      - scenario
-      - fdr-control
   
   remove_duplicates:
     type: object
