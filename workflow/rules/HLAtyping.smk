@@ -4,22 +4,22 @@ rule HLA_LA:
         bai=get_bam_from_group_and_alias(ext=".bai"),
         index="resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH",
     output:
-        "results/HLA-LA/output/{group}/{alias}/hla/R1_bestguess_G.txt",
+        "results/HLA-LA/output/{group}_{alias}/hla/R1_bestguess_G.txt",
     threads: 7
     log:
-        "logs/HLA-LA/{group}.{alias}.log",
+        "logs/HLA-LA/{group}_{alias}.log",
     params:
         graph=lambda w, input: os.path.basename(os.path.dirname(input.index)),
         graphdir=lambda w, input: os.path.dirname(os.path.dirname(input.index)),
     conda:
         "../envs/hla_la.yaml"
     shell:
-        "HLA-LA.pl --bam {input.bam} --sampleID {wildcards.group}.{wildcards.alias} --graph {params.graph} --customGraphDir {params.graphdir} --workingDir results/HLA-LA/output --maxThreads {threads} > {log} 2>&1"
+        "HLA-LA.pl --bam {input.bam} --sampleID {wildcards.group}_{wildcards.alias} --graph {params.graph} --customGraphDir {params.graphdir} --workingDir results/HLA-LA/output --maxThreads {threads} > {log} 2>&1"
 
 
 rule parse_HLA_LA:
     input:
-        "results/HLA-LA/output/{group}/{alias}/hla/R1_bestguess_G.txt",
+        "results/HLA-LA/output/{group}_{alias}/hla/R1_bestguess_G.txt",
     output:
         report(
             "results/HLA-LA/{group}.{alias}.hlaI.tsv",
