@@ -236,9 +236,7 @@ def get_cutadapt_adapters(wildcards):
 
 
 def is_paired_end(sample, seqtype):
-    sample_units = units[
-        (units["sample_name"] == sample) & (units["sequencing_type"] == seqtype)
-    ]
+    sample_units = units.loc[sample].loc[seqtype]
     fq2_null = sample_units["fq2"].isnull()
     sra_null = sample_units["sra"].isnull()
     paired = ~fq2_null | ~sra_null
@@ -276,13 +274,13 @@ def get_fastqs(wc):
     return units.loc[wc.sample].loc[wc.seqtype, fq].tolist()
 
 
-def get_map_reads_input(sample):
-    if is_paired_end(sample, "DNA"):
+def get_map_reads_input(wildcards):
+    if is_paired_end(wildcards.sample, "DNA"):
         return [
-            f"results/merged/DNA/{sample}_R1.fastq.gz",
-            f"results/merged/DNA/{sample}_R2.fastq.gz",
+            f"results/merged/DNA/{wildcards.sample}_R1.fastq.gz",
+            f"results/merged/DNA/{wildcards.sample}_R2.fastq.gz",
         ]
-    return f"results/merged/DNA/{sample}_single.fastq.gz"
+    return f"results/merged/DNA/{wildcards.sample}_single.fastq.gz"
 
 
 def get_read_group(wildcards):
@@ -315,7 +313,8 @@ def get_optitype_reads_input(wildcards):
             )
         return f"results/razers3/fastq/{sample}_single.fastq"
     else:
-        return get_map_reads_input(sample)
+        wildcards["sample"] = sample
+        return get_map_reads_input(wildcards)
 
 
 def get_oncoprint_batch(wildcards):
