@@ -42,40 +42,6 @@ properties:
       - build
       - n_chromosomes
 
-
-  tmb:
-    type: object
-    properties:
-      activate:
-        type: boolean
-      coding_genome_size:
-        # TODO allow integer here!
-        type: string
-      tumor_sample:
-        type: string
-      somatic_events:
-        type: array
-        items: 
-          type: string
-    required:
-      - activate
-      - coding_genome_size
-      - tumor_sample
-      - somatic_events
-
-  
-  remove_duplicates:
-    type: object
-    properties:
-      activate:
-        type: boolean
-
-  trimming:
-    type: object
-    properties:
-      activate:
-        type: boolean
-
   epitope_prediction:
     type: object
     properties:
@@ -109,23 +75,6 @@ properties:
           activate:
             type: boolean
 
-  annotations:
-    type: object
-    properties:
-      vep:
-        properties:
-          params:
-            type: string
-          plugins:
-            type: array
-            items:
-              type: string
-        required:
-          - params
-          - plugins
-    required:
-      - vep
-
   fusion:
     type: object
     properties:
@@ -142,34 +91,6 @@ properties:
   params:
     type: object
     properties:
-      cutadapt:
-        type: string
-      bwa:
-        type: string
-      gatk:
-        type: object
-        properties:
-          BaseRecalibrator:
-            type: string
-          applyBQSR:
-            type: string
-        required:
-          - BaseRecalibrator
-          - applyBQSR
-      picard:
-        type: object
-        properties:
-          MarkDuplicates:
-            type: string
-        required:
-          - MarkDuplicates
-      strelka:
-        type: object
-        properties:
-          config:
-            type: string
-          run:
-            type: string
       razers3:
         type: string
       optitype:
@@ -186,15 +107,21 @@ properties:
                 type: integer
               netMHCIIpan:
                 type: integer
-      kallisto:
-        type: string
-      star:
-        type: string
+          variant_sets:
+            type: object
+            properties:
+              normal:
+                type: string
+              tumor:
+                type: string
+            required:
+              - normal
+              - tumor
+        required:
+          - window_len
+          - peptide_len
+          - variant_sets
     required:
-      - bwa
-      - gatk
-      - picard
-      - strelka
       - razers3
       - microphaser
       - optitype
@@ -203,8 +130,6 @@ required:
   - samples
   - units
   - ref
-  - tmb
   - params
-  - annotations
   - epitope_prediction
   - affinity

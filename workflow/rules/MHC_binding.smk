@@ -18,12 +18,12 @@
 
 rule netMHCpan:
     input:
-        peptides="results/microphaser/fasta/filtered/{group}/{tumor_alias}.{tumor_event}.{normal_event}.netMHCpan.{contig}.{peptide_type}.fa",
+        peptides="results/microphaser/fasta/filtered/{group}/{tumor_alias}.merged_tumor_normal.netMHCpan.{contig}.{peptide_type}.fa",
         alleles=get_alleles_MHCI,
     output:
-        "results/netMHCpan/{group}/{tumor_alias}.{tumor_event}.{normal_event}.{contig}.{peptide_type}.xls",
+        "results/netMHCpan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.xls",
     log:
-        "logs/netMHCpan/{group}/{tumor_alias}.{tumor_event}.{normal_event}.{contig}.{peptide_type}.log",
+        "logs/netMHCpan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.log",
     params:
         extra=config["affinity"]["netMHCpan"]["params"],
         netMHC=config["affinity"]["netMHCpan"]["location"],
@@ -35,12 +35,12 @@ rule netMHCpan:
 
 rule netMHCIIpan:
     input:
-        peptides="results/microphaser/fasta/filtered/{group}/{tumor_alias}.{tumor_event}.{normal_event}.netMHCIIpan.{contig}.{peptide_type}.fa",
+        peptides="results/microphaser/fasta/filtered/{group}/{tumor_alias}.merged_tumor_normal.netMHCIIpan.{contig}.{peptide_type}.fa",
         alleles=get_alleles_MHCII,
     output:
-        "results/netMHCIIpan/{group}/{tumor_alias}.{tumor_event}.{normal_event}.{contig}.{peptide_type}.xls",
+        "results/netMHCIIpan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.xls",
     log:
-        "logs/netMHCIIpan/{group}/{tumor_alias}.{tumor_event}.{normal_event}.{contig}.{peptide_type}.log",
+        "logs/netMHCIIpan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.log",
     params:
         extra=config["affinity"]["netMHCIIpan"]["params"],
         netMHC=config["affinity"]["netMHCIIpan"]["location"],
@@ -53,13 +53,13 @@ rule netMHCIIpan:
 rule parse_mhc_out:
     input:
         expand(
-            "results/{{mhc}}/{{group}}/{{tumor_alias}}.{{tumor_event}}.{{normal_event}}.{contig}.{{peptide_type}}.xls",
+            "results/{{mhc}}/{{group}}/{{tumor_alias}}.merged_tumor_normal.{contig}.{{peptide_type}}.xls",
             contig=contigs,
         ),
     output:
-        "results/{mhc}/{group}.{tumor_alias}.{tumor_event}.{normal_event}.mhc.{peptide_type}.tsv",
+        "results/{mhc}/{group}.{tumor_alias}.merged_tumor_normal.mhc.{peptide_type}.tsv",
     log:
-        "logs/parse_mhc_out/{mhc}/{group}.{tumor_alias}.{tumor_event}.{normal_event}.{peptide_type}.log",
+        "logs/parse_mhc_out/{mhc}/{group}.{tumor_alias}.merged_tumor_normal.{peptide_type}.log",
     script:
         "../scripts/group_mhc_output.py"
 
@@ -81,17 +81,17 @@ rule parse_mhc_out:
 
 rule mhc_csv_table:
     input:
-        info="results/microphaser/info/filtered/{group}.{tumor_alias}.{tumor_event}.{normal_event}.{mhc}.tsv",
-        neo="results/{mhc}/{group}.{tumor_alias}.{tumor_event}.{normal_event}.mhc.neo.tsv",
-        normal="results/{mhc}/{group}.{tumor_alias}.{tumor_event}.{normal_event}.mhc.normal.tsv",
+        info="results/microphaser/info/filtered/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.tsv",
+        neo="results/{mhc}/{group}.{tumor_alias}.merged_tumor_normal.mhc.neo.tsv",
+        normal="results/{mhc}/{group}.{tumor_alias}.merged_tumor_normal.mhc.normal.tsv",
     output:
         report(
-            "results/neoantigens/{group}.{tumor_alias}.{tumor_event}.{normal_event}.{mhc}.DNA.tsv",
+            "results/neoantigens/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.DNA.tsv",
             caption="../report/WES_results.rst",
             category="Results WES (netMHC)",
         ),
     log:
-        "logs/mhc_csv_table/{group}.{tumor_alias}.{tumor_event}.{normal_event}.{mhc}.log",
+        "logs/mhc_csv_table/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.log",
     script:
         "../scripts/merge_data.py"
 
@@ -110,16 +110,16 @@ rule mhc_csv_table:
 rule add_RNA_info:
     input:
         counts="results/kallisto/{group}.{tumor_alias}",
-        table="results/neoantigens/{group}.{tumor_alias}.{tumor_event}.{normal_event}.{mhc}.DNA.tsv",
+        table="results/neoantigens/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.DNA.tsv",
     output:
         report(
-            "results/neoantigens/{group}.{tumor_alias}.{tumor_event}.{normal_event}.{mhc}.RNA.tsv",
+            "results/neoantigens/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.RNA.tsv",
             caption="../report/RNA_results.rst",
             category="Results RNA",
         ),
     params:
         abundance=lambda wc, input: "{}/abundance.tsv".format(input.counts),
     log:
-        "logs/add-RNA/{group}.{tumor_alias}.{tumor_event}.{normal_event}.{mhc}.log",
+        "logs/add-RNA/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.log",
     script:
         "../scripts/add_rna_info.py"

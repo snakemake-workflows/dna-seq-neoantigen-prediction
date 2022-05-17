@@ -27,21 +27,12 @@ container: "docker://continuumio/miniconda3"
 
 include: "rules/common.smk"
 include: "rules/utils.smk"
-include: "rules/trim.smk"
 include: "rules/ref.smk"
-include: "rules/mapping.smk"
-include: "rules/calling.smk"
-include: "rules/annotation.smk"
 include: "rules/microphaser.smk"
 include: "rules/HLAtyping.smk"
 include: "rules/MHC_binding.smk"
-include: "rules/RNA.smk"
-include: "rules/tmb.smk"
-include: "rules/vega.smk"
 
 
 rule all:
     input:
         get_final_output(),
-        get_fusion_output(),
-        get_tmb_targets(),

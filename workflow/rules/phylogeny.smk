@@ -1,6 +1,6 @@
 def get_somatic_calls(wildcards):
     return expand(
-        "results/strelka/somatic/{sample}/results/variants/somatic.complete.tumor.bcf",
+        "results/final-calls/somatic/{sample}/results/variants/somatic.complete.tumor.bcf",
         sample=samples[samples.alias == "tumor"]["sample_name"],
     )
 
@@ -9,20 +9,20 @@ rule merge_snvs:
     input:
         calls=get_somatic_calls,
     output:
-        "results/strelka/merged_calls.vcf",
+        "results/final-calls/merged_calls.vcf",
     log:
         "results/logs/bcftools/merge.log",
     params:
-        "--use-header strelka/sampleheader.txt --force-samples",
+        "--use-header final-calls/sampleheader.txt --force-samples",
     wrapper:
         "0.36.0/bio/bcftools/merge"
 
 
 rule query:
     input:
-        "results/strelka/merged_calls.vcf",
+        "results/final-calls/merged_calls.vcf",
     output:
-        "results/strelka/call_matrix.tsv",
+        "results/final-calls/call_matrix.tsv",
     log:
         "results/logs/bcftools/query.log",
     params:
@@ -35,7 +35,7 @@ rule query:
 
 rule nj_tree:
     input:
-        matrix="results/strelka/call_matrix.tsv",
+        matrix="results/final-calls/call_matrix.tsv",
     output:
         pdf="results/plots/phylogeny_njtree.pdf",
     log:

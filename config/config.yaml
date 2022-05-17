@@ -1,29 +1,6 @@
 samples: "config/samples.tsv"
 units: "config/units.tsv"
 
-# boolean if read trimming should be skipped
-trimming:
-  activate: false
-
-remove_duplicates:
-  activate: true
-
-fusion:
-  arriba:
-    activate: false
-    blacklist:
-     "arriba_blacklist"
-    params:
-      "-T -P"
-
-tmb:
-  activate: false
-  coding_genome_size: 3e7
-  # Name of the tumor sample in the scenario.yaml.
-  tumor_sample: tumor
-  somatic_events:
-    - somatic
-
 
 epitope_prediction:
   activate: true
@@ -43,11 +20,11 @@ affinity:
 HLAtyping:
   # activate to use razers3 to pre-filter reads before using optitype
   optitype_prefiltering:
-    activate: false
+    activate: True
   optitype_data: "config/HLA_Data/hla_reference_dna.fasta"
   # activate to predict MHC-I and MHC-II alleles with HLA-LA
   HLA_LA:
-    activate: false
+    activate: true
 
 
 ref:
@@ -71,20 +48,6 @@ annotations:
       - LoFtool
 
 params:
-  cutadapt: ""
-  bwa:
-    "-M"
-  picard:
-    MarkDuplicates:
-      "VALIDATION_STRINGENCY=LENIENT"
-  gatk:
-    BaseRecalibrator: "--tmp-dir tmp"
-    applyBQSR: ""
-  strelka:
-    config:
-      "--exome"
-    run:
-      "--mode local"
   razers3:
     "-i 95 -m 1 -dr 0"
   optitype:
@@ -97,12 +60,6 @@ params:
           9
       netMHCIIpan:
           15
-    events:
-      tumor: "strelka_somatic"
-      normal: "strelka_germline"
-  kallisto:
-    "-b 100"
-  star: >-
-    --outSAMmapqUnique 60 --outSAMtype BAM Unsorted --chimSegmentMin 10 --chimOutType WithinBAM SoftClip
-    --chimJunctionOverhangMin 10 --chimScoreMin 1 --chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0
-    --chimScoreSeparation 1 --alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3
+    variant_sets:
+      normal: "normal_only"
+      tumor: "tumor_only"

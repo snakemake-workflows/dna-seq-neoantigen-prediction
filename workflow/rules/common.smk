@@ -94,11 +94,9 @@ def get_final_output():
             ]
             final_output.extend(
                 expand(
-                    "results/neoantigens/{group}.{tumor_alias}.{tumor_event}.{normal_event}.{mhc}.{seqtype}.tsv",
+                    "results/neoantigens/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.{seqtype}.tsv",
                     group=group,
                     tumor_alias=tumor_aliases,
-                    tumor_event=config["params"]["microphaser"]["events"]["tumor"],
-                    normal_event=config["params"]["microphaser"]["events"]["normal"],
                     mhc=list(
                         filter(
                             None,
@@ -133,107 +131,11 @@ def get_final_output():
     return final_output
 
 
-def get_fusion_output():
-    if config["fusion"]["arriba"]["activate"]:
-        fusion_output = expand(
-            "results/fusion/arriba/{sample}.fusions.tsv",
-            sample=units[units["sequencing_type"] == "RNA"]["sample_name"],
-        )
-    else:
-        fusion_output = []
-    return fusion_output
-
-
-def get_tmb_targets():
-    if is_activated("tmb"):
-        return expand(
-            "results/plots/tmb/{group}.{mode}.svg",
-            group=samples[(samples.alias == "tumor")]["sample_name"],
-            mode=config["tmb"].get("mode", "curve"),
-        )
-    else:
-        return []
-
-
 caller = list(
     filter(None, ["freebayes" if is_activated("calling/freebayes") else None])
 )
 
 ### helper functions ###
-
-## alignment ##
-
-
-def get_cutadapt_input(wildcards):
-    unit = units.loc[wildcards.sample].loc[wildcards.seqtype].loc[wildcards.unit]
-
-    if pd.isna(unit["fq1"]):
-        # SRA sample (always paired-end for now)
-        accession = unit["sra"]
-        return expand("sra/{accession}_{read}.fastq", accession=accession, read=[1, 2])
-
-    if unit["fq1"].endswith("gz"):
-        ending = ".gz"
-    else:
-        ending = ""
-
-    if pd.isna(unit["fq2"]):
-        # single end local sample
-        return "pipe/cutadapt/{S}/{T}/{U}.fq1.fastq{E}".format(
-            S=unit.sample_name,
-            U=unit.unit_name,
-            T=unit.sequencing_type,
-            E=ending,
-        )
-    else:
-        # paired end local sample
-        return expand(
-            "pipe/cutadapt/{S}/{T}/{U}.{{read}}.fastq{E}".format(
-                S=unit.sample_name,
-                U=unit.unit_name,
-                T=unit.sequencing_type,
-                E=ending,
-            ),
-            read=["fq1", "fq2"],
-        )
-
-
-def get_cutadapt_pipe_input(wildcards):
-    pattern = (
-        units.loc[wildcards.sample]
-        .loc[wildcards.seqtype]
-        .loc[wildcards.unit, wildcards.fq]
-    )
-    if "*" in pattern:
-        files = sorted(
-            glob.glob(
-                units.loc[wildcards.sample]
-                .loc[wildcards.seqtype]
-                .loc[wildcards.unit, wildcards.fq]
-            )
-        )
-        if not files:
-            raise ValueError(
-                "No raw fastq files found for unit pattern {} (sample {}, sequencing type {}). "
-                "Please check the your sample sheet.".format(
-                    wildcards.unit, wildcards.sample, wildcards.seqtype
-                )
-            )
-    else:
-        files = [pattern]
-    return files
-
-
-def get_cutadapt_adapters(wildcards):
-    unit = units.loc[wildcards.sample].loc[wildcards.unit]
-    try:
-        adapters = unit["adapters"]
-        if isinstance(adapters, str):
-            return adapters
-        return ""
-    except KeyError:
-        return ""
-
 
 def is_paired_end(sample, seqtype):
     sample_units = units.loc[sample].loc[seqtype]
@@ -250,56 +152,11 @@ def is_paired_end(sample, seqtype):
     return all_paired
 
 
-def get_fastqs(wc):
-    if config["trimming"]["activate"]:
-        return expand(
-            "results/trimmed/{sample}/{seqtype}/{unit}_{read}.fastq.gz",
-            unit=units.loc[
-                (units["sequencing_type"] == wc.seqtype)
-                & (units["sample_name"] == wc.sample),
-                "unit_name",
-            ],
-            sample=wc.sample,
-            read=wc.read,
-            seqtype=wc.seqtype,
-        )
-    unit = units.loc[wc.sample].loc[wc.seqtype]
-    if all(pd.isna(unit["fq1"])):
-        # SRA sample (always paired-end for now)
-        accession = unit["sra"]
-        return expand(
-            "sra/{accession}_{read}.fastq", accession=accession, read=wc.read[-1]
-        )
-    fq = "fq{}".format(wc.read[-1])
-    return units.loc[wc.sample].loc[wc.seqtype, fq].tolist()
-
-
-def get_map_reads_input(wildcards):
-    if is_paired_end(wildcards.sample, "DNA"):
-        return [
-            f"results/merged/DNA/{wildcards.sample}_R1.fastq.gz",
-            f"results/merged/DNA/{wildcards.sample}_R2.fastq.gz",
-        ]
-    return f"results/merged/DNA/{wildcards.sample}_single.fastq.gz"
-
-
-def get_read_group(wildcards):
-    """Denote sample name and platform in read group."""
-    return r"-R '@RG\tID:{sample}\tSM:{sample}\tPL:{platform}'".format(
-        sample=wildcards.sample, platform=samples.loc[wildcards.sample, "platform"]
-    )
-
-
-def get_recalibrate_quality_input(bai=False):
-    ext = ".bai" if bai else ""
-
-    def inner(wildcards):
-        if is_activated("remove_duplicates"):
-            return f"results/dedup/{wildcards.sample}.sorted.bam{ext}"
-        else:
-            return f"results/mapped/{wildcards.sample}.sorted.bam{ext}"
-
-    return inner
+def get_sample_from_group_and_alias(group, alias):
+    sample = samples.loc[
+        (samples["group"] == group) & (samples["alias"] == alias), "sample_name"
+    ].squeeze()
+    return sample
 
 
 def get_optitype_reads_input(wildcards):
@@ -317,80 +174,21 @@ def get_optitype_reads_input(wildcards):
         return get_map_reads_input(wildcards)
 
 
-def get_oncoprint_batch(wildcards):
-    if wildcards.batch == "all":
-        groups = samples[samples["alias"] == "tumor"]["sample_name"].unique()
-    else:
-        groups = samples.loc[
-            samples[config["oncoprint"]["stratify"]["by-column"]] == wildcards.batch,
-            "group",
-        ].unique()
-    return expand(
-        "results/merged-calls/{group}.{{event}}.fdr-controlled.bcf", group=groups
-    )
-
-
-def get_tabix_params(wildcards):
-    if wildcards.format == "vcf":
-        return "-p vcf"
-    if wildcards.format == "txt":
-        return "-s 1 -b 2 -e 2"
-    raise ValueError("Invalid format for tabix: {}".format(wildcards.format))
-
-
-def get_sample_from_group_and_alias(group, alias):
-    sample = samples.loc[
-        (samples["group"] == group) & (samples["alias"] == alias), "sample_name"
-    ].squeeze()
-    return sample
-
-
-def get_normal_bam(ext=".bam"):
-    def inner(wildcards):
-        normal_sample = get_sample_from_group_and_alias(wildcards.group, "normal")
-        return f"results/recal/{normal_sample}.sorted{ext}"
-
-    return inner
-
-
-def get_tumor_bam_from_group_and_alias(ext=".bam"):
-    def inner(wildcards):
-        tumor_sample = get_sample_from_group_and_alias(
-            wildcards.group, wildcards.tumor_alias
-        )
-        return f"results/recal/{tumor_sample}.sorted{ext}"
-
-    return inner
-
-
 def get_bam_from_group_and_alias(ext=".bam"):
     def inner(wildcards):
-        sample = get_sample_from_group_and_alias(wildcards.group, wildcards.alias)
+        alias = wildcards.get("alias",
+            wildcards.get("tumor_alias",
+                wildcards.get("normal_alias", "unknown")
+            )
+        )
+        if alias == "unknown":
+            raise CustomException(
+                "get_bam_from_group_and_alias() requires on of the following wildcards: 'alias', 'tumor_alias', 'normal_alias'."
+            )
+        sample = get_sample_from_group_and_alias(wildcards.group, alias)
         return f"results/recal/{sample}.sorted{ext}"
 
     return inner
-
-
-def get_quant_reads_input(wildcards):
-    sample = get_sample_from_group_and_alias(wildcards.group, wildcards.tumor_alias)
-    if is_paired_end(sample, "RNA"):
-        return [
-            f"results/merged/RNA/{sample}_R1.fastq.gz",
-            f"results/merged/RNA/{sample}_R2.fastq.gz",
-        ]
-    return f"results/merged/RNA/{sample}_single.fastq.gz"
-
-
-def kallisto_params(wildcards, input):
-    extra = config["params"]["kallisto"]
-    if len(input.fastq) == 1:
-        extra += " --single"
-        extra += (
-            " --fragment-length {unit.fragment_len_mean} " "--sd {unit.fragment_len_sd}"
-        ).format(unit=units.loc[(wildcards.sample, wildcards.unit)])
-    else:
-        extra += " --fusion"
-    return extra
 
 
 def get_alleles_MHCI(wildcards):
@@ -405,5 +203,6 @@ def get_alleles_MHCI(wildcards):
 def get_alleles_MHCII(wildcards):
     alias = "normal" if wildcards.peptide_type == "normal" else wildcards.tumor_alias
     return expand(
-        "results/HLA-LA/{group}.{alias}.hlaI.tsv", group=wildcards.group, alias=alias
+        #TODO: check that hlaII is correct here, and not hlaI which it previously was
+        "results/HLA-LA/{group}.{alias}.hlaII.tsv", group=wildcards.group, alias=alias
     )
