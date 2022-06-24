@@ -11,10 +11,11 @@ rule HLA_LA:
     params:
         graph=lambda w, input: os.path.basename(os.path.dirname(input.index)),
         graphdir=lambda w, input: os.path.dirname(os.path.dirname(input.index)),
+        workdir=lambda w, output: os.path.dirname(os.path.dirname(os.path.dirname(output[0]))),
     conda:
         "../envs/hla_la.yaml"
     shell:
-        "HLA-LA.pl --bam {input.bam} --sampleID {wildcards.group}_{wildcards.alias} --graph {params.graph} --customGraphDir {params.graphdir} --workingDir results/HLA-LA/output --maxThreads {threads} > {log} 2>&1"
+        "HLA-LA.pl --bam {input.bam} --sampleID {wildcards.group}_{wildcards.alias} --graph {params.graph} --customGraphDir {params.graphdir} --workingDir {params.workdir} --maxThreads {threads} > {log} 2>&1"
 
 
 rule parse_HLA_LA:
