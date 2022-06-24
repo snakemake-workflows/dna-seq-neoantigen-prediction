@@ -37,33 +37,37 @@ rule parse_HLA_LA:
         "../scripts/parse_HLA_types.py"
 
 
-rule razers3:
+rule yara:
     input:
         reads="results/merged/DNA/{sample}_{read}.fastq.gz",
+        index="resources/yara/hla_alleles.index",
     output:
-        bam="results/razers3/bam/{sample}_{read}.bam",
-    threads: 8
+        bam=temp("results/yara/{sample}_{read}.bam"),
+    threads: 12
     log:
-        "logs/razers3/{sample}_{read}.log",
+        "logs/yara/{sample}_{read}.log",
+    conda:
+        "../envs/yara.yaml"
     params:
-        genome=config["HLAtyping"]["optitype_data"],
-        extra=config["params"]["razers3"],
-    wrapper:
-        "0.61.0/bio/razers3"
+        extra=config["params"]["yara"],
+    shell:
+        "( yara_mapper {params.extra} -t {threads} -f bam {input.index} {input.reads} > {output.bam} ) 2> {log}"
 
 
-rule bam2fq:
+rule filter_yara:
     input:
-        "results/razers3/bam/{sample}_{read}.bam",
+        "results/yara/{sample}_{read}.bam",
     output:
-        "results/razers3/fastq/{sample}_{read}.fished.fastq",
-    params:
-        "",
+        temp("results/yara/{sample}_{read}.filtered.bam"),
     log:
-        "logs/razers3-bam2fq/{sample}-{read}.log",
-    threads: 1
+        "logs/filter_yara/{sample}_{read}.filtered.log",
+    threads: 3
+    params:
+        extra="-h -F 4 -b1"
     wrapper:
-        "0.61.0/bio/samtools/bam2fq/interleaved"
+        "v1.5.0/bio/samtools/view"
+
+
 
 
 rule OptiType:
