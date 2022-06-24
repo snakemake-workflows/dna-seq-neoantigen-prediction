@@ -1,0 +1,4 @@
+channels:
+  - conda-forge
+dependencies:
+  - tcsh =6.24
