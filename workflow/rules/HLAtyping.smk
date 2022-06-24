@@ -37,42 +37,49 @@ rule parse_HLA_LA:
         "../scripts/parse_HLA_types.py"
 
 
-rule yara:
+rule get_hla_aligning_reads:
     input:
-        reads="results/merged/DNA/{sample}_{read}.fastq.gz",
-        index="resources/yara/hla_alleles.index",
+        bam=get_bam_from_group_and_alias(),
+        bai=get_bam_from_group_and_alias(ext=".bai"),
+        regions="resources/hla_alleles/hla_allele_regions.expanded_1000.bed",
     output:
-        bam=temp("results/yara/{sample}_{read}.bam"),
-    threads: 12
+        bam="results/fished/{group}.{alias}.bam",
+        idx="results/fished/{group}.{alias}.bai",
     log:
-        "logs/yara/{sample}_{read}.log",
-    conda:
-        "../envs/yara.yaml"
+        "logs/get_hla_reads/{group}.{alias}.log",
     params:
-        extra=config["params"]["yara"],
-    shell:
-        "( yara_mapper {params.extra} -t {threads} -f bam {input.index} {input.reads} > {output.bam} ) 2> {log}"
-
-
-rule filter_yara:
-    input:
-        "results/yara/{sample}_{read}.bam",
-    output:
-        temp("results/yara/{sample}_{read}.filtered.bam"),
-    log:
-        "logs/filter_yara/{sample}_{read}.filtered.log",
-    threads: 3
-    params:
-        extra="-h -F 4 -b1"
+        extra=lambda wc, input: f"--regions-file {input.regions}"
     wrapper:
-        "v1.5.0/bio/samtools/view"
+        "v1.7.0/bio/samtools/view"
 
 
+ruleorder: get_hla_aligning_reads > bam_index
+
+
+rule hla_reads_single_ends:
+    input:
+        "results/fished/{group}.{alias}.bam",
+        "results/fished/{group}.{alias}.bai",
+    output:
+        bam="results/fished/{group}.{alias}.{read}.bam",
+        idx="results/fished/{group}.{alias}.{read}.bai",
+    log:
+        "logs/split_hla_reads/{group}.{alias}.{read}.log",
+    params:
+        extra=lambda wc: "-f 0x80" if wc.read == "R2" else "-f 0x40"
+    wrapper:
+        "v1.7.0/bio/samtools/view"
+
+
+ruleorder: hla_reads_single_ends > bam_index
 
 
 rule OptiType:
     input:
-        reads=get_optitype_reads_input,
+        reads=[
+            "results/fished/{group}.{alias}.R1.bam",
+            "results/fished/{group}.{alias}.R2.bam",
+        ],
     output:
         multiext(
             "results/optitype/{group}/{group}.{alias}",
@@ -85,7 +92,7 @@ rule OptiType:
         extra=config["params"]["optitype"],
         sequencing_type="dna",
     wrapper:
-        "0.63.0/bio/optitype"
+        "v1.7.0/bio/optitype"
 
 
 rule parse_Optitype:
