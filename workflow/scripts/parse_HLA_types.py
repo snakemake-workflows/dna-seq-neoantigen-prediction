@@ -1,7 +1,9 @@
 import pandas as pd
 
+# to get alleles that netMHCpan can handle, use its -listMHC option
 hlaI = ["A","B","C", "E", "G"]
 
+# to get alleles that netMHCIIpan can handle, use its -list option
 hlaII = ["DRB1", "DRB3", "DRB4", "DRB5", "DPA1", "DPB1", "DQA1", "DQB1"]
 
 hlas = pd.read_csv(snakemake.input[0], sep='\t')
