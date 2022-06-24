@@ -16,7 +16,7 @@ affinity:
     # in addition to the other edits described for a complete install. To use
     # the conda-provided tcsh installation, it needs to read (without quotes):
     # "#!/usr/bin/env tcsh"
-    location: "../netMHCpan-4.0"
+    location: "../netMHCpan-4.1"
   netMHCIIpan:
     activate: false
     params: "-length 15 -s -xls"
@@ -26,7 +26,7 @@ affinity:
     # in addition to the other edits described for a complete install. To use
     # the conda-provided tcsh installation, it needs to read (without quotes):
     # "#!/usr/bin/env tcsh"
-    location: "../netMHCIIpan-4.0"
+    location: "../netMHCIIpan-4.1"
 
 
 ref:
