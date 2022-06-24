@@ -2,7 +2,7 @@ rule bcf_index:
     input:
         "{prefix}.bcf",
     output:
-        "{prefix}.csi",
+        "{prefix}.bcf.csi",
     log:
         "logs/bcf-index/{prefix}.log",
     wrapper:
