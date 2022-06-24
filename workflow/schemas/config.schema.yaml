@@ -91,7 +91,7 @@ properties:
   params:
     type: object
     properties:
-      razers3:
+      yara:
         type: string
       optitype:
         type: string
@@ -122,7 +122,7 @@ properties:
           - peptide_len
           - variant_sets
     required:
-      - razers3
+      - yara
       - microphaser
       - optitype
 
