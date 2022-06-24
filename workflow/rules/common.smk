@@ -123,7 +123,7 @@ def get_final_output():
                     "results/HLA-LA/{group}.{tumor_alias}.hlaII.tsv",
                 ],
                 group=group,
-                tumor_alias=tumor_aliases
+                tumor_alias=tumor_aliases,
             )
 
     return final_output
@@ -134,6 +134,7 @@ caller = list(
 )
 
 ### helper functions ###
+
 
 def is_paired_end(sample, seqtype):
     sample_units = units.loc[sample].loc[seqtype]
@@ -159,10 +160,9 @@ def get_sample_from_group_and_alias(group, alias):
 
 def get_bam_from_group_and_alias(ext=".bam"):
     def inner(wildcards):
-        alias = wildcards.get("alias",
-            wildcards.get("tumor_alias",
-                wildcards.get("normal_alias", "unknown")
-            )
+        alias = wildcards.get(
+            "alias",
+            wildcards.get("tumor_alias", wildcards.get("normal_alias", "unknown")),
         )
         if alias == "unknown":
             raise CustomException(
@@ -186,8 +186,8 @@ def get_alleles_MHCI(wildcards):
 def get_alleles_MHCII(wildcards):
     alias = "normal" if wildcards.peptide_type == "normal" else wildcards.tumor_alias
     return expand(
-        #TODO: check that hlaII is correct here, and not hlaI which it previously was
+        # TODO: check that hlaII is correct here, and not hlaI which it previously was
         "results/HLA-LA/{group}.{alias}.hlaII.tsv",
         group=wildcards.group,
-        alias=alias
+        alias=alias,
     )

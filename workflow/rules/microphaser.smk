@@ -68,8 +68,12 @@ rule microphaser_normal:
         track="resources/annotation/{contig}.gtf",
         ref="resources/genome.fasta",
     output:
-        wt_fasta=("results/microphaser/fasta/{group}/{normal_alias}.{normal_set}.{contig}.fa"),
-        wt_tsv=("results/microphaser/info/{group}/{normal_alias}.{normal_set}.{contig}.tsv"),
+        wt_fasta=(
+            "results/microphaser/fasta/{group}/{normal_alias}.{normal_set}.{contig}.fa"
+        ),
+        wt_tsv=(
+            "results/microphaser/info/{group}/{normal_alias}.{normal_set}.{contig}.tsv"
+        ),
     log:
         "logs/microphaser_germline/{group}/{normal_alias}.{normal_set}-{contig}.log",
     conda:

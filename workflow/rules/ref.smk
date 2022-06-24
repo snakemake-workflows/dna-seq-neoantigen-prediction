@@ -44,7 +44,7 @@ rule get_annotation:
         "0.45.1/bio/reference/ensembl-annotation"
 
 
-#TODO: remove this rule, once microphaser is fixed to make gene_name optional
+# TODO: remove this rule, once microphaser is fixed to make gene_name optional
 rule remove_records_with_gene_name_missing:
     input:
         "resources/genome.gtf",
@@ -103,7 +103,9 @@ rule download_HLALA_graph:
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/translation"),
         "resources/graphs/PRG_MHC_GRCh38_withIMGT/sequences.txt",
     params:
-        graphs_dir=lambda w, output: output[0].replace("/PRG_MHC_GRCh38_withIMGT/PRG", ""),
+        graphs_dir=lambda w, output: output[0].replace(
+            "/PRG_MHC_GRCh38_withIMGT/PRG", ""
+        ),
     log:
         "logs/download-HLA-LA-graph.log",
     shell:

@@ -11,7 +11,9 @@ rule HLA_LA:
     params:
         graph=lambda w, input: os.path.basename(os.path.dirname(input.index)),
         graphdir=lambda w, input: os.path.dirname(os.path.dirname(input.index)),
-        workdir=lambda w, output: os.path.dirname(os.path.dirname(os.path.dirname(output[0]))),
+        workdir=lambda w, output: os.path.dirname(
+            os.path.dirname(os.path.dirname(output[0]))
+        ),
     conda:
         "../envs/hla_la.yaml"
     shell:

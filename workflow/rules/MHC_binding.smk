@@ -29,7 +29,9 @@ rule netMHCpan:
     params:
         extra=config["affinity"]["netMHCpan"]["params"],
         netMHC=config["affinity"]["netMHCpan"]["location"],
-        alleles=lambda wc, input: ",".join(pd.read_csv(input.alleles[0], sep="\t").iloc[0])
+        alleles=lambda wc, input: ",".join(
+            pd.read_csv(input.alleles[0], sep="\t").iloc[0]
+        ),
     shell:
         "if [ -s {input.peptides} ]; "
         "then "
@@ -52,7 +54,9 @@ rule netMHCIIpan:
     params:
         extra=config["affinity"]["netMHCIIpan"]["params"],
         netMHC=config["affinity"]["netMHCIIpan"]["location"],
-        alleles=lambda wc, input: ",".join(pd.read_csv(input.alleles[0], sep="\t")["Allele"].tolist())
+        alleles=lambda wc, input: ",".join(
+            pd.read_csv(input.alleles[0], sep="\t")["Allele"].tolist()
+        ),
     shell:
         "if [ -s {input.peptides} ]; "
         "then "
