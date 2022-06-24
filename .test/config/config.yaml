@@ -2,15 +2,6 @@ samples: "config/samples.tsv"
 units: "config/units.tsv"
 
 
-tmb:
-  activate: true
-  coding_genome_size: 3e7
-  # Name of the tumor sample in the scenario.yaml.
-  tumor_sample: tumor
-  somatic_events:
-    - somatic
-
-
 epitope_prediction:
   activate: true
 
