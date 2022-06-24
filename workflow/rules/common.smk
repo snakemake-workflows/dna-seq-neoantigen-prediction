@@ -116,7 +116,7 @@ def get_final_output():
                     seqtype=sequencing_types,
                 )
             )
-    else:
+        else:
             final_output = expand(
                 [
                     "results/HLA-LA/{group}.{tumor_alias}.hlaI.tsv",
