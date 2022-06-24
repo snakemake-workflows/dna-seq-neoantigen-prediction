@@ -22,7 +22,7 @@ rule merge_tumor_normal:
             ],
         ),
         index=expand(
-            "results/final-calls/{{group}}.{sets}.norm.csi",
+            "results/final-calls/{{group}}.{sets}.norm.bcf.csi",
             sets=[
                 config["params"]["microphaser"]["variant_sets"]["normal"],
                 config["params"]["microphaser"]["variant_sets"]["tumor"],
