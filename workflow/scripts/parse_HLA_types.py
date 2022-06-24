@@ -1,8 +1,8 @@
 import pandas as pd
 
-hlaI = ["A","B","C"]
+hlaI = ["A","B","C", "E", "G"]
 
-hlaII = ["DRB1", "DPA1", "DPB1", "DQA1", "DQB1"]
+hlaII = ["DRB1", "DRB3", "DRB4", "DRB5", "DPA1", "DPB1", "DQA1", "DQB1"]
 
 hlas = pd.read_csv(snakemake.input[0], sep='\t')
 
