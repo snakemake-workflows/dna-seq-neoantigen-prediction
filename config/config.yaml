@@ -10,10 +10,22 @@ affinity:
   netMHCpan:
     activate: true
     params: "-BA -l 9 -s -xls"
+    # Please download netMHCpan manually from:
+    # https://services.healthtech.dtu.dk/service.php?NetMHCpan-4.1
+    # To make the `netMHCpan` script work, you need to fix its first line in
+    # in addition to the other edits described for a complete install. To use
+    # the conda-provided tcsh installation, it needs to read (without quotes):
+    # "#!/usr/bin/env tcsh"
     location: "../netMHCpan-4.0"
   netMHCIIpan:
     activate: false
     params: "-length 15 -s -xls"
+    # Please download netMHCIIpan manually from:
+    # https://services.healthtech.dtu.dk/service.php?NetMHCIIpan-4.1
+    # To make the `netMHCIIpan` script work, you need to fix its first line in
+    # in addition to the other edits described for a complete install. To use
+    # the conda-provided tcsh installation, it needs to read (without quotes):
+    # "#!/usr/bin/env tcsh"
     location: "../netMHCIIpan-4.0"
 
 
