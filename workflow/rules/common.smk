@@ -85,12 +85,12 @@ def is_activated(xpath):
 
 def get_final_output():
     final_output = []
-        for group in pd.unique(samples["group"]):
-            smps = samples.loc[samples["group"] == group, "sample_name"]
-            tumor_aliases = samples.loc[
-                (samples["group"] == group) & (samples["alias"].str.match("tumor")),
-                "alias",
-            ]
+    for group in pd.unique(samples["group"]):
+        smps = samples.loc[samples["group"] == group, "sample_name"]
+        tumor_aliases = samples.loc[
+            (samples["group"] == group) & (samples["alias"].str.match("tumor")),
+            "alias",
+        ]
         if config["epitope_prediction"]["activate"]:
             sequencing_types = pd.unique(
                 units.loc[units["sample_name"].isin(smps), "sequencing_type"]
