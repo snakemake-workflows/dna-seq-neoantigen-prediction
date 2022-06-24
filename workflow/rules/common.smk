@@ -166,7 +166,7 @@ def get_bam_from_group_and_alias(ext=".bam"):
         )
         if alias == "unknown":
             raise CustomException(
-                "get_bam_from_group_and_alias() requires on of the following wildcards: 'alias', 'tumor_alias', 'normal_alias'."
+                "get_bam_from_group_and_alias() requires one of the following wildcards: 'alias', 'tumor_alias', 'normal_alias'."
             )
         sample = get_sample_from_group_and_alias(wildcards.group, alias)
         return f"results/recal/{sample}.sorted{ext}"
