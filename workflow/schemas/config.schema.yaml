@@ -66,33 +66,9 @@ properties:
           params:
             type: string
 
-  HLAtyping:
-    type: object
-    properties:
-      HLA_LA:
-        type: object
-        properties:
-          activate:
-            type: boolean
-
-  fusion:
-    type: object
-    properties:
-      arriba:
-        type: object
-        properties:
-          activate:
-            type: boolean
-          blacklist:
-            type: string
-          params:
-            type: string
-
   params:
     type: object
     properties:
-      optitype:
-        type: string
       microphaser:
         type: object
         properties:
@@ -121,7 +97,6 @@ properties:
           - variant_sets
     required:
       - microphaser
-      - optitype
 
 required:
   - samples
