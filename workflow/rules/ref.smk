@@ -44,9 +44,21 @@ rule get_annotation:
         "0.45.1/bio/reference/ensembl-annotation"
 
 
-rule split_annotation:
+#TODO: remove this rule, once microphaser is fixed to make gene_name optional
+rule remove_records_with_gene_name_missing:
     input:
         "resources/genome.gtf",
+    output:
+        "resources/genome.records_with_gene_name.gtf",
+    log:
+        "logs/remove_records_with_gene_name_missing.log",
+    shell:
+        '( grep "gene_name" {input} > {output} ) 2> {log}'
+
+
+rule split_annotation:
+    input:
+        "resources/genome.records_with_gene_name.gtf",
     output:
         "resources/annotation/{contig}.gtf",
     log:
