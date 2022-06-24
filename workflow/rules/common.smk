@@ -62,6 +62,9 @@ wildcard_constraints:
     tumor_alias="|".join(
         pd.unique(samples.loc[samples["alias"].str.match("tumor"), "alias"])
     ),
+    normal_alias="normal",
+    tumor_set=config["params"]["microphaser"]["variant_sets"]["tumor"],
+    normal_set=config["params"]["microphaser"]["variant_sets"]["normal"],
     group="|".join(pd.unique(samples["group"])),
     caller="|".join(["freebayes", "delly"]),
     peptide_type="|".join(["normal", "neo"]),
