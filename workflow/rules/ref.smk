@@ -102,11 +102,13 @@ rule download_HLALA_graph:
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/sampledReferenceGenomes"),
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/translation"),
         "resources/graphs/PRG_MHC_GRCh38_withIMGT/sequences.txt",
+    params:
+        graphs_dir=lambda w, output: output[0].replace("/PRG_MHC_GRCh38_withIMGT/PRG", ""),
     log:
         "logs/download-HLA-LA-graph.log",
     shell:
-        "cd resources/graphs && wget  http://www.well.ox.ac.uk/downloads/PRG_MHC_GRCh38_withIMGT.tar.gz "
-        "&& tar -xvzf PRG_MHC_GRCh38_withIMGT.tar.gz"
+        "( cd {params.graphs_dir} && wget  http://www.well.ox.ac.uk/downloads/PRG_MHC_GRCh38_withIMGT.tar.gz "
+        "&& tar -xvzf PRG_MHC_GRCh38_withIMGT.tar.gz && rm  PRG_MHC_GRCh38_withIMGT.tar.gz ) 2> {log}"
 
 
 rule index_HLALA:
