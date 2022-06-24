@@ -63,8 +63,6 @@ annotations:
       - LoFtool
 
 params:
-  yara:
-    "-e 3"
   optitype:
     ""
   microphaser:

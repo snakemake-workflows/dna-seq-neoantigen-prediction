@@ -115,8 +115,6 @@ params:
       "--exome"
     run:
       "--mode local"
-  razers3:
-    "-i 95 -m 1 -dr 0"
   optitype:
     ""
   microphaser:
