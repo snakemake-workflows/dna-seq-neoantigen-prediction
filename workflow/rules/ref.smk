@@ -118,6 +118,21 @@ rule index_HLALA:
         "HLA-LA.pl --prepareGraph 1 --customGraphDir {params.path} --graph {params.graph} > {log} 2>&1"
 
 
+
+
+rule yara_hla_index:
+    input:
+        config["HLAtyping"]["optitype_data"]
+    output:
+        "resources/yara/hla_alleles.index"
+    log:
+        "logs/yara_hla_index.log"
+    conda:
+        "../envs/yara.yaml"
+    shell:
+        "( yara_index {input} -o {output} ) 2> {log}"
+
+
 rule make_sampleheader:
     output:
         "resources/sampleheader.txt",
