@@ -118,69 +118,6 @@ rule index_HLALA:
         "HLA-LA.pl --prepareGraph 1 --customGraphDir {params.path} --graph {params.graph} > {log} 2>&1"
 
 
-rule download_hla_allele_list:
-    input:
-        HTTP.remote(
-            expand(
-                "raw.githubusercontent.com/ANHIG/IMGTHLA/{version}/Allelelist.txt",
-                version=config["HLAtyping"]["imgt_hla_version"]
-            ),
-        ),
-    output:
-        "resources/hla_alleles/Allelelist.txt",
-    log:
-        "logs/hla_alleles/download_Allelelist.log",
-    shell:
-        "( mv {input} {output} ) 2> {log}"
-
-
-rule get_hla_allele_names:
-    input:
-        "resources/hla_alleles/Allelelist.txt",
-    output:
-        "resources/hla_alleles/hla_allele_names.txt",
-    log:
-        "logs/hla_alleles/hla_allele_names.log",
-    conda:
-        "../envs/grep_sed.yaml"
-    shell:
-        '( grep -v "^\\(#\\|Allele\\)" {input} | '
-        '  cut -d "," -f 2,2 | '
-        '  cut -d "*" -f 1,1 | '
-        "  uniq | "
-        "  sed -e 's/^\\([A-Z]\\)$/HLA-\\1/' | "
-        "  sed -e 's/^\\(D[A-Z]\\{{2,2\\}}[1-9]*\\)$/HLA-\\1/' "
-        "  >{output} ) 2> {log}"
-
-
-rule get_hla_regions_from_gtf:
-    input:
-        gtf="resources/genome.gtf",
-        allele_names="resources/hla_alleles/hla_allele_names.txt",
-    output:
-        "resources/hla_alleles/hla_allele_regions.bed",
-    log:
-        "logs/hla_alleles/hla_allele_regions.log",
-    conda:
-        "../envs/rust.yaml"
-    script:
-        "../scripts/hla_regions_from_gtf.rs"
-
-
-rule expand_hla_regions:
-    input:
-        bed="resources/hla_alleles/hla_allele_regions.bed",
-        genome="resources/genome.fasta.fai",
-    output:
-        "resources/hla_alleles/hla_allele_regions.expanded_1000.bed",
-    log:
-        "logs/hla_alleles/hla_allele_regions.expanded_1000.log",
-    conda:
-        "../envs/bedtools.yaml"
-    shell:
-        "( sort {input.bed} | bedtools slop -b 1000 -g {input.genome} | bedtools merge > {output} ) 2> {log}"
-
-
 rule make_sampleheader:
     output:
         "resources/sampleheader.txt",

@@ -2,10 +2,8 @@ import glob
 
 import pandas as pd
 from snakemake.remote import FTP
-from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 from snakemake.utils import validate
 
-HTTP = HTTPRemoteProvider()
 ftp = FTP.RemoteProvider()
 
 ##### config file #####
