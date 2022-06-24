@@ -29,19 +29,6 @@ affinity:
     location: "../netMHCIIpan-4.0"
 
 
-HLAtyping:
-  # activate to use yara to pre-filter reads before using optitype
-  optitype_prefiltering:
-    activate: True
-  optitype_data: "config/HLA_Data/hla_reference_dna.fasta"
-  # version of the IMGT-IPD repository to use for determining HLA allele 
-  # regions, the repo is at: https://github.com/ANHIG/IMGTHLA
-  imgt_hla_version: "v3.48.0-alpha"
-  # activate to predict MHC-I and MHC-II alleles with HLA-LA
-  HLA_LA:
-    activate: true
-
-
 ref:
   # Number of chromosomes to consider for calling.
   # The first n entries of the FASTA will be considered.
@@ -63,8 +50,6 @@ annotations:
       - LoFtool
 
 params:
-  optitype:
-    ""
   microphaser:
     window_len:
         33

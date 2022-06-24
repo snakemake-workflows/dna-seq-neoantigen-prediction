@@ -26,16 +26,6 @@ affinity:
     location: "../netMHCIIpan-4.0"
 
 
-HLAtyping:
-  # activate to use razers3 to pre-filter reads before using optitype
-  optitype_prefiltering:
-    activate: true
-  optitype_data: "config/HLA_Data/hla_reference_dna.fasta"
-  # activate to predict MHC-I and MHC-II alleles with HLA-LA
-  HLA_LA:
-    activate: false
-
-
 ref:
   # Number of chromosomes to consider for calling.
   # The first n entries of the FASTA will be considered.
@@ -57,8 +47,6 @@ annotations:
       - LoFtool
 
 params:
-  optitype:
-    ""
   microphaser:
     window_len:
         33

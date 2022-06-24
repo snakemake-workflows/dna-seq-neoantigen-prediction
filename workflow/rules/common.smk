@@ -114,20 +114,15 @@ def get_final_output():
                 )
             )
     else:
-        if config["HLAtyping"]["HLA_LA"]["activate"]:
             final_output = expand(
                 [
-                    "results/optitype/{group}/{group}.{alias}.hla_alleles.tsv",
-                    "results/HLA-LA/{group}.{alias}.hlaI.tsv",
-                    "results/HLA-LA/{group}.{alias}.hlaII.tsv",
+                    "results/HLA-LA/{group}.{tumor_alias}.hlaI.tsv",
+                    "results/HLA-LA/{group}.{tumor_alias}.hlaII.tsv",
                 ],
-                sample=samples["sample_name"],
+                group=group,
+                tumor_alias=tumor_aliases
             )
-        else:
-            final_output = expand(
-                "results/optitype/{group}/{group}.{alias}.hla_alleles.tsv",
-                sample=samples["sample_name"],
-            )
+
     return final_output
 
 
@@ -157,21 +152,6 @@ def get_sample_from_group_and_alias(group, alias):
         (samples["group"] == group) & (samples["alias"] == alias), "sample_name"
     ].squeeze()
     return sample
-
-
-def get_optitype_reads_input(wildcards):
-    sample = get_sample_from_group_and_alias(wildcards.group, wildcards.alias)
-    if is_activated("HLAtyping/optitype_prefiltering"):
-        if is_paired_end(sample, "DNA"):
-            return expand(
-                "results/razers3/fastq/{sample}_{read}.fished.fastq",
-                sample=sample,
-                read=["R1", "R2"],
-            )
-        return f"results/razers3/fastq/{sample}_single.fastq"
-    else:
-        wildcards["sample"] = sample
-        return get_map_reads_input(wildcards)
 
 
 def get_bam_from_group_and_alias(ext=".bam"):
