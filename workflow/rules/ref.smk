@@ -115,12 +115,8 @@ rule index_HLALA:
     input:
         "resources/graphs/PRG_MHC_GRCh38_withIMGT/sequences.txt",
     output:
-        multiext(
-            "resources/graphs/PRG_MHC_GRCh38_withIMGT/",
-            "serializedGRAPH",
-            "serializedGRAPH_preGapPathindex",
-        ),
-    cache: True
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH",
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH_preGapPathIndex",
     conda:
         "../envs/hla_la.yaml"
     params:
