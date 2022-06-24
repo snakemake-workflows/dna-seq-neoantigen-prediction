@@ -177,7 +177,7 @@ def get_bam_from_group_and_alias(ext=".bam"):
 def get_alleles_MHCI(wildcards):
     alias = "normal" if wildcards.peptide_type == "normal" else wildcards.tumor_alias
     return expand(
-        "results/optitype/{group}/{group}.{alias}.hla_alleles.tsv",
+        "results/HLA-LA/{group}.{alias}.hlaI.tsv",
         group=wildcards.group,
         alias=alias,
     )
@@ -187,5 +187,7 @@ def get_alleles_MHCII(wildcards):
     alias = "normal" if wildcards.peptide_type == "normal" else wildcards.tumor_alias
     return expand(
         #TODO: check that hlaII is correct here, and not hlaI which it previously was
-        "results/HLA-LA/{group}.{alias}.hlaII.tsv", group=wildcards.group, alias=alias
+        "results/HLA-LA/{group}.{alias}.hlaII.tsv",
+        group=wildcards.group,
+        alias=alias
     )
