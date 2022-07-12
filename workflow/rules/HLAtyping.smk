@@ -3,6 +3,7 @@ rule HLA_LA:
         bam=get_bam_from_group_and_alias(),
         bai=get_bam_from_group_and_alias(ext=".bai"),
         index="resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH",
+        ext_idx="resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.pac",
     output:
         "results/HLA-LA/output/{group}_{alias}/hla/R1_bestguess_G.txt",
     threads: 7

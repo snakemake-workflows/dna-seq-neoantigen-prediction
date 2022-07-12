@@ -94,13 +94,13 @@ rule genome_dict:
 rule download_HLALA_graph:
     output:
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/PRG"),
-        directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome"),
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/knownReferences"),
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/mapping"),
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/mapping_PRGonly"),
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/referenceGenomeSimulations"),
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/sampledReferenceGenomes"),
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/translation"),
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.fa",
         "resources/graphs/PRG_MHC_GRCh38_withIMGT/sequences.txt",
     params:
         graphs_dir=lambda w, output: output[0].replace(
@@ -128,6 +128,23 @@ rule index_HLALA:
         "logs/index-HLA-LA-graph.log",
     shell:
         "HLA-LA.pl --prepareGraph 1 --customGraphDir {params.path} --graph {params.graph} > {log} 2>&1"
+
+
+rule index_HLALA_extended_ref:
+    input:
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.fa",
+    output:
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.amb",
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.ann",
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.bwt",
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.pac",
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.sa",
+    conda:
+        "../envs/hla_la.yaml"
+    log:
+        "logs/index_HLA-LA_extended_ref.log",
+    shell:
+        "bwa index {input} > {log} 2>&1"
 
 
 rule make_sampleheader:
