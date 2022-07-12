@@ -31,7 +31,7 @@ rule merge_tumor_normal:
     output:
         "results/final-calls/{group}.merged_tumor_normal.norm.bcf",
     log:
-        "bcftools/concat-tumor-normal/{group}.merged_tumor_normal.log",
+        "logs/bcftools/concat-tumor-normal/{group}.merged_tumor_normal.log",
     params:
         extra="-O b -a",
     wrapper:
