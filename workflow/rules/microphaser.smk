@@ -12,20 +12,43 @@ rule norm_bcf:
         "0.65.0/bio/bcftools/norm"
 
 
+rule add_somatic_flag:
+    input:
+        bcf="results/final-calls/{group}.{set}.norm.bcf",
+        header_line="resources/somatic_flag_header_line.txt",
+        flag_bed="resources/genome.somatic_flag.bed.gz",
+        flag_bed_idx="resources/genome.somatic_flag.bed.gz.tbi",
+    output:
+        "results/final-calls/{group}.{set}.somatic_flag.norm.bcf",
+    log:
+        "logs/bcftools_annotate/{group}.{set}.somatic_flag.norm.log"
+    conda:
+        "../envs/bcftools.yaml"
+    shell:
+        "( bcftools annotate "
+        "  --annotations {input.flag_bed} "
+        "  --mark-sites +SOMATIC "
+        "  --columns CHROM,FROM,TO "
+        "  --header-lines {input.header_line} "
+        "  -O b -o {output} "
+        "  {input.bcf} "
+        ") 2> {log}"
+
+
 rule merge_tumor_normal:
     input:
         calls=expand(
             "results/final-calls/{{group}}.{sets}.norm.bcf",
             sets=[
                 config["params"]["microphaser"]["variant_sets"]["normal"],
-                config["params"]["microphaser"]["variant_sets"]["tumor"],
+                config["params"]["microphaser"]["variant_sets"]["tumor"] + ".somatic_flag",
             ],
         ),
         index=expand(
             "results/final-calls/{{group}}.{sets}.norm.bcf.csi",
             sets=[
                 config["params"]["microphaser"]["variant_sets"]["normal"],
-                config["params"]["microphaser"]["variant_sets"]["tumor"],
+                config["params"]["microphaser"]["variant_sets"]["tumor"] + ".somatic_flag",
             ],
         ),
     output:

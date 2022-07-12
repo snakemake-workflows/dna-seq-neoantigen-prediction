@@ -79,6 +79,57 @@ rule genome_faidx:
         "0.45.1/bio/samtools/faidx"
 
 
+rule create_somatic_flag_header_line:
+    output:
+        "resources/somatic_flag_header_line.txt",
+    log:
+        "logs/create_somatic_flag_header_line.log"
+    shell:
+        """
+        ( echo '##INFO=<ID=SOMATIC,Number=0,Type=Flag,Description="Somatic tumor variant">' > {output} ) 2> {log}
+        """
+
+
+rule create_genome_somatic_flag_bed:
+    input:
+        "resources/genome.fasta.fai",
+    output:
+        "resources/genome.somatic_flag.bed",
+    log:
+        "logs/create_genome_somatic_flag_bed.log"
+    conda:
+        "../envs/gawk.yaml"
+    cache: True
+    shell:
+        """
+        ( awk 'BEGIN {{ OFS="\\t" }} {{ print $1,0,$2 }}' {input} > {output} ) 2> {log}
+        """
+
+
+rule bgzip_genome_somatic_flag_bed:
+    input:
+        "resources/genome.somatic_flag.bed",
+    output:
+        "resources/genome.somatic_flag.bed.gz",
+    log:
+        "logs/bgzip/genome.somatic_flag.log",
+    wrapper:
+        "v1.7.0/bio/bgzip"
+
+
+rule tabix_genome_somatic_flag_bed:
+    input:
+        "resources/genome.somatic_flag.bed.gz",
+    output:
+        "resources/genome.somatic_flag.bed.gz.tbi",
+    conda:
+        "../envs/htslib.yaml"
+    log:
+        "logs/tabix/genome.somatic_flag.log",
+    shell:
+        "( tabix -p bed {input} ) 2> {log}"
+
+
 rule genome_dict:
     input:
         "resources/genome.fasta",
