@@ -2,4 +2,4 @@ channels:
   - bioconda
   - conda-forge
 dependencies:
-  - microphaser =0.2
+  - microphaser =0.4
