@@ -65,6 +65,12 @@ wildcard_constraints:
     normal_alias="normal",
     tumor_set=config["params"]["microphaser"]["variant_sets"]["tumor"],
     normal_set=config["params"]["microphaser"]["variant_sets"]["normal"],
+    set="|".join(
+        [
+            config["params"]["microphaser"]["variant_sets"]["tumor"],
+            config["params"]["microphaser"]["variant_sets"]["normal"],
+        ]
+    ),
     group="|".join(pd.unique(samples["group"])),
     caller="|".join(["freebayes", "delly"]),
     peptide_type="|".join(["normal", "neo"]),
