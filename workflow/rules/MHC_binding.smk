@@ -33,12 +33,14 @@ rule netMHCpan:
             pd.read_csv(input.alleles[0], sep="\t").iloc[0]
         ),
     shell:
+        "( "
         "if [ -s {input.peptides} ]; "
         "then "
         "  {params.netMHC}/netMHCpan {params.extra} -xlsfile {output} -a {params.alleles} -f {input.peptides} > {log}; "
         "else "
         "  touch {output}; "
-        "fi"
+        "fi "
+        " ) 2> {log}"
 
 
 rule netMHCIIpan:
@@ -58,12 +60,14 @@ rule netMHCIIpan:
             pd.read_csv(input.alleles[0], sep="\t")["Allele"].tolist()
         ),
     shell:
+        "( "
         "if [ -s {input.peptides} ]; "
         "then "
         "  {params.netMHC}/netMHCIIpan {params.extra} -xlsfile {output} -a {params.alleles} -f {input.peptides} > {log}; "
         "else "
         "  touch {output}; "
-        "fi"
+        "fi "
+        " ) 2> {log}"
 
 
 rule parse_mhc_out:
