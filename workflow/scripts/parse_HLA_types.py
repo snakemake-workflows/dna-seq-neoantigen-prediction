@@ -1,3 +1,7 @@
+import sys
+
+sys.stderr = open(snakemake.log[0], "w")
+
 import pandas as pd
 
 # to get alleles that netMHCpan can handle, use its -listMHC option

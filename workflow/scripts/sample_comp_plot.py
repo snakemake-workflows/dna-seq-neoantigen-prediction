@@ -1,3 +1,7 @@
+import sys
+
+sys.stderr = open(snakemake.log[0], "w")
+
 import os
 import glob
 import pandas as pd
