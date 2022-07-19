@@ -98,7 +98,7 @@ rule microphaser_normal:
             "results/microphaser/info/{group}/{normal_alias}.{normal_set}.{contig}.tsv"
         ),
     log:
-        "logs/microphaser_germline/{group}/{normal_alias}.{normal_set}-{contig}.log",
+        "logs/microphaser_normal/{group}/{normal_alias}.{normal_set}-{contig}.log",
     conda:
         "../envs/microphaser.yaml"
     params:
@@ -117,7 +117,7 @@ rule concat_normal_proteome:
     output:
         "results/microphaser/fasta/{group}.{normal_set}.normal_proteome.fa",
     log:
-        "logs/microphaser/concat_normal_proteome/{group}.{normal_set}.log",
+        "logs/microphaser_concat_normal_proteome/{group}.{normal_set}.log",
     shell:
         "cat {input} > {output} 2> {log}"
 
@@ -129,7 +129,7 @@ rule build_normal_proteome_db:
         bin="results/microphaser/bin/{group}.{normal_set}.{mhc}.normal_proteome.bin",
         fasta="results/microphaser/fasta/{group}.{normal_set}.{mhc}.normal_proteome.peptides.fasta",
     log:
-        "logs/microphaser/build_normal_proteome_db/{group}.{normal_set}-{mhc}.log",
+        "logs/microphaser_build_normal_proteome_db/{group}.{normal_set}-{mhc}.log",
     conda:
         "../envs/microphaser.yaml"
     params:
@@ -137,7 +137,7 @@ rule build_normal_proteome_db:
             wildcards.mhc
         ],
     shell:
-        "microphaser build_reference -r {input} -o {output.bin} -l {params.length} --peptides {output.fasta} > {log} 2>&1"
+        "( microphaser build_reference -r {input} -o {output.bin} -l {params.length} > {output.fasta} ) 2> {log}"
 
 
 rule microphaser_filter:
@@ -177,7 +177,7 @@ rule concat_tsvs:
     output:
         "results/microphaser/info/filtered/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.tsv",
     log:
-        "logs/concat_tsvs/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.log",
+        "logs/microphaser_concat_tsvs/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.log",
     conda:
         "../envs/xsv.yaml"
     shell:
