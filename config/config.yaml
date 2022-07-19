@@ -51,13 +51,11 @@ annotations:
 
 params:
   microphaser:
-    window_len:
-        33
+    # window_len should be at least 3 times the longest peptide_len specified below
+    window_len: 45
     peptide_len:
-      netMHCpan:
-          9
-      netMHCIIpan:
-          15
+      netMHCpan: 9
+      netMHCIIpan: 15
     variant_sets:
       normal: "normal_only"
       tumor: "tumor_only"
