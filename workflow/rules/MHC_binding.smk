@@ -27,16 +27,15 @@ rule netMHCpan:
     conda:
         "../envs/tcsh.yaml"
     params:
-        extra=config["affinity"]["netMHCpan"]["params"],
-        netMHC=config["affinity"]["netMHCpan"]["location"],
-        alleles=lambda wc, input: ",".join(
-            pd.read_csv(input.alleles[0], sep="\t").iloc[0]
-        ),
+        extra=config["params"]["netMHCpan"]["params"],
+        netMHC=config["params"]["netMHCpan"]["location"],
+        length=config["params"]["netMHCpan"]["peptide_len"],
+        alleles=lambda wc, input: ",".join( pd.read_csv(input.alleles[0], header=None)[0] ),
     shell:
         "( "
         "if [ -s {input.peptides} ]; "
         "then "
-        "  {params.netMHC}/netMHCpan {params.extra} -xlsfile {output} -a {params.alleles} -f {input.peptides} > {log}; "
+        "  {params.netMHC}/netMHCpan {params.extra} -l {params.length} -xls -xlsfile {output} -a {params.alleles} -f {input.peptides} > {log}; "
         "else "
         "  touch {output}; "
         "fi "
@@ -54,16 +53,15 @@ rule netMHCIIpan:
     conda:
         "../envs/tcsh.yaml"
     params:
-        extra=config["affinity"]["netMHCIIpan"]["params"],
-        netMHC=config["affinity"]["netMHCIIpan"]["location"],
-        alleles=lambda wc, input: ",".join(
-            pd.read_csv(input.alleles[0], sep="\t")["Allele"].tolist()
-        ),
+        extra=config["params"]["netMHCIIpan"]["params"],
+        netMHC=config["params"]["netMHCIIpan"]["location"],
+        length=config["params"]["netMHCIIpan"]["peptide_len"],
+        alleles=lambda wc, input: ",".join( pd.read_csv(input.alleles[0], header=None)[0] ),
     shell:
         "( "
         "if [ -s {input.peptides} ]; "
         "then "
-        "  {params.netMHC}/netMHCIIpan {params.extra} -xlsfile {output} -a {params.alleles} -f {input.peptides} > {log}; "
+        "  {params.netMHC}/netMHCIIpan {params.extra} -length {params.length} -xls -xlsfile {output} -a {params.alleles} -f {input.peptides} > {log}; "
         "else "
         "  touch {output}; "
         "fi "

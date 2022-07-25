@@ -111,10 +111,10 @@ def get_final_output():
                             None,
                             [
                                 "netMHCpan"
-                                if is_activated("affinity/netMHCpan")
+                                if is_activated("params/netMHCpan")
                                 else None,
                                 "netMHCIIpan"
-                                if is_activated("affinity/netMHCIIpan")
+                                if is_activated("params/netMHCIIpan")
                                 else None,
                             ],
                         )
