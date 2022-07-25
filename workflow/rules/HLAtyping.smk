@@ -23,14 +23,14 @@ rule HLA_LA:
 
 rule parse_HLA_LA:
     input:
-        "results/HLA-LA/output/{group}_{alias}/hla/R1_bestguess_G.txt",
+        hla_la_bestguess="results/HLA-LA/output/{group}_{alias}/hla/R1_bestguess_G.txt",
     output:
-        report(
+        hlaI=report(
             "results/HLA-LA/{group}.{alias}.hlaI.tsv",
             caption="../report/HLA_Types.rst",
             category="HLA-Typing(HLA-LA)",
         ),
-        report(
+        hlaII=report(
             "results/HLA-LA/{group}.{alias}.hlaII.tsv",
             caption="../report/HLA_Types.rst",
             category="HLA-Typing(HLA-LA)",

@@ -2,10 +2,7 @@ import sys
 
 sys.stderr = open(snakemake.log[0], "w")
 
-import os
 import pandas as pd
-import numpy as np
-
 
 def select_columns(mhc):
     rank_cols = [c for c in mhc.columns if "Rank" in c]
@@ -82,9 +79,9 @@ def diffEpitope(e1,e2):
 
 
 def main():
-    info = pd.read_csv(snakemake.input[0], sep = '\t', dtype=str)
-    tumor = pd.read_csv(snakemake.input[1], sep = '\t')
-    normal = pd.read_csv(snakemake.input[2], sep = '\t')
+    info = pd.read_csv(snakemake.input.info, sep = '\t', dtype=str)
+    tumor = pd.read_csv(snakemake.input.neo, sep = '\t')
+    normal = pd.read_csv(snakemake.input.normal, sep = '\t')
     outfile = snakemake.output[0]
     merge(info, tumor, normal, outfile)
 
