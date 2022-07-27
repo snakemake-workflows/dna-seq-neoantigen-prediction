@@ -4,10 +4,10 @@ sys.stderr = open(snakemake.log[0], "w")
 
 import pandas as pd
 
-def select_columns(mhc):
+def select_columns(mhc: pd.DataFrame) -> pd.DataFrame:
     rank_cols = [c for c in mhc.columns if "Rank" in c]
     affinity_cols = [c for c in mhc.columns if "nM" in c]
-    mhc_cols = ["Pos"] + ["ID"] + ["Peptide"] + rank_cols + affinity_cols + ["NB"]
+    mhc_cols = ["Pos", "ID", "Peptide"] + rank_cols + affinity_cols + ["NB"]
     mhc = mhc[mhc_cols]
     mhc["Rank_min"] = mhc[rank_cols].min(axis=1)
     mhc["Aff_min"] = mhc[affinity_cols].min(axis=1)
@@ -17,7 +17,7 @@ def select_columns(mhc):
     mhc["Top_affinity_HLA"] = mhc["Top_affinity_HLA"].str.replace("_nM","")
     return mhc
 
-def merge(info, tumor, normal, outfile):
+def merge(info: pd.DataFrame, tumor: pd.DataFrame, normal: pd.DataFrame) -> pd.DataFrame:
     tumor = select_columns(tumor)
     normal = select_columns(normal)
     id_length = len(tumor.ID[0])
@@ -60,7 +60,7 @@ def merge(info, tumor, normal, outfile):
     ### Remove Duplicate kmers
     data = data.drop_duplicates(["Transcript_ID", "Peptide_tumor", "Somatic_AminoAcid_Change", "Peptide_normal"])
 
-    data.to_csv(outfile, index=False, sep = '\t')
+    return data
 
 
 ## highlight the difference between mutated neopeptide and wildtype
@@ -83,7 +83,8 @@ def main():
     tumor = pd.read_csv(snakemake.input.neo, sep = '\t')
     normal = pd.read_csv(snakemake.input.normal, sep = '\t')
     outfile = snakemake.output[0]
-    merge(info, tumor, normal, outfile)
+    data = merge(info, tumor, normal)
+    data.to_csv(outfile, index=False, sep = '\t')
 
 if __name__ == '__main__':
     sys.exit(main())
