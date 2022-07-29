@@ -42,7 +42,7 @@ properties:
       - build
       - n_chromosomes
 
-  epitope_prediction:
+  neoantigen_prediction:
     type: object
     properties:
       activate:
@@ -51,36 +51,12 @@ properties:
   affinity:
     type: object
     properties:
-      netMHCpan:
-        type: object
-        properties:
-          activate:
-            type: boolean
-          params:
-            type: string
-      netMHCIIpan:
-        type: object
-        properties:
-          activate:
-            type: boolean
-          params:
-            type: string
-
   params:
     type: object
     properties:
       microphaser:
         type: object
         properties:
-          window_len:
-            type: integer
-          peptide_len:
-            type: object
-            properties:
-              netMHCpan:
-                type: integer
-              netMHCIIpan:
-                type: integer
           variant_sets:
             type: object
             properties:
@@ -91,12 +67,35 @@ properties:
             required:
               - normal
               - tumor
+      netMHCpan:
+        type: object
+        properties:
+          activate:
+            type: boolean
+          peptide_len:
+            type: integer
+          extra:
+            type: string
+          location:
+            type: string
         required:
-          - window_len
-          - peptide_len
-          - variant_sets
+          - activate
+      netMHCIIpan:
+        type: object
+        properties:
+          activate:
+            type: boolean
+          peptide_len:
+            type: integer
+          extra:
+            type: string
+        required:
+          - activate
     required:
       - microphaser
+      - netMHCpan
+      - netMHCIIpan
+
 
 required:
   - samples

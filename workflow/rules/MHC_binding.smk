@@ -27,7 +27,7 @@ rule netMHCpan:
     conda:
         "../envs/tcsh.yaml"
     params:
-        extra=config["params"]["netMHCpan"]["params"],
+        extra=config["params"]["netMHCpan"]["extra"],
         netMHC=config["params"]["netMHCpan"]["location"],
         length=config["params"]["netMHCpan"]["peptide_len"],
         alleles=lambda wc, input: ",".join( pd.read_csv(input.alleles[0], header=None)[0] ),
@@ -35,7 +35,7 @@ rule netMHCpan:
         "( "
         "if [ -s {input.peptides} ]; "
         "then "
-        "  {params.netMHC}/netMHCpan {params.extra} -l {params.length} -xls -xlsfile {output} -a {params.alleles} -f {input.peptides} > {log}; "
+        "  {params.netMHC}/netMHCpan {params.extra} -BA -s -l {params.length} -xls -xlsfile {output} -a {params.alleles} -f {input.peptides} > {log}; "
         "else "
         "  touch {output}; "
         "fi "
@@ -53,7 +53,7 @@ rule netMHCIIpan:
     conda:
         "../envs/tcsh.yaml"
     params:
-        extra=config["params"]["netMHCIIpan"]["params"],
+        extra=config["params"]["netMHCIIpan"]["extra"],
         netMHC=config["params"]["netMHCIIpan"]["location"],
         length=config["params"]["netMHCIIpan"]["peptide_len"],
         alleles=lambda wc, input: ",".join( pd.read_csv(input.alleles[0], header=None)[0] ),
@@ -61,7 +61,7 @@ rule netMHCIIpan:
         "( "
         "if [ -s {input.peptides} ]; "
         "then "
-        "  {params.netMHC}/netMHCIIpan {params.extra} -length {params.length} -xls -xlsfile {output} -a {params.alleles} -f {input.peptides} > {log}; "
+        "  {params.netMHC}/netMHCIIpan {params.extra} -BA -s -length {params.length} -xls -xlsfile {output} -a {params.alleles} -f {input.peptides} > {log}; "
         "else "
         "  touch {output}; "
         "fi "

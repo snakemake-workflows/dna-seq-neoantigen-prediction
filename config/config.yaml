@@ -27,7 +27,7 @@ params:
   netMHCpan:
     activate: true
     peptide_len: 9
-    params: "-BA -s"
+    extra: ""
     # Please download netMHCpan manually from:
     # https://services.healthtech.dtu.dk/service.php?NetMHCpan-4.1
     # To make the `netMHCpan` script work, you need to fix its first line in
@@ -38,7 +38,7 @@ params:
   netMHCIIpan:
     activate: false
     peptide_len: 15
-    params: "-BA -s"
+    extra: ""
     # Please download netMHCIIpan manually from:
     # https://services.healthtech.dtu.dk/service.php?NetMHCIIpan-4.1
     # To make the `netMHCIIpan` script work, you need to fix its first line in
