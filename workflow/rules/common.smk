@@ -97,7 +97,7 @@ def get_final_output():
             (samples["group"] == group) & (samples["alias"].str.match("tumor")),
             "alias",
         ]
-        if config["epitope_prediction"]["activate"]:
+        if config["neoantigen_prediction"]["activate"]:
             sequencing_types = pd.unique(
                 units.loc[units["sample_name"].isin(smps), "sequencing_type"]
             )
