@@ -50,18 +50,18 @@ rule netMHCIIpan:
         " ) 2> {log}"
 
 
-rule parse_mhc_out:
+rule clean_mhc_out:
     input:
         expand(
-            "results/{{mhc}}/{{group}}/{{tumor_alias}}.merged_tumor_normal.{contig}.{{peptide_type}}.xls",
+            "results/{{mhc}}/{{group}}/{{tumor_alias}}.merged_tumor_normal.{contig}.{{peptide_type}}.tsv",
             contig=contigs,
         ),
     output:
-        "results/{mhc}/{group}.{tumor_alias}.merged_tumor_normal.mhc.{peptide_type}.tsv",
+        joined_mhc_out="results/{mhc}/{group}.{tumor_alias}.merged_tumor_normal.mhc.{peptide_type}.tsv",
     log:
         "logs/parse_mhc_out/{mhc}/{group}.{tumor_alias}.merged_tumor_normal.{peptide_type}.log",
     script:
-        "../scripts/group_mhc_output.py"
+        "../scripts/clean_mhc_output.py"
 
 
 rule mhc_csv_table:
