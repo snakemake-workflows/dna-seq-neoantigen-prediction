@@ -1,17 +1,17 @@
-rule netMHCpan:
+rule net_mhc_pan:
     input:
-        peptides="results/microphaser/fasta/filtered/{group}/{tumor_alias}.merged_tumor_normal.netMHCpan.{contig}.{peptide_type}.fa",
+        peptides="results/microphaser/fasta/filtered/{group}/{tumor_alias}.merged_tumor_normal.net_mhc_pan.{contig}.{peptide_type}.fa",
         alleles=get_alleles_MHCI,
     output:
-        "results/netMHCpan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.tsv",
+        "results/net_mhc_pan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.tsv",
     log:
-        "logs/netMHCpan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.log",
+        "logs/net_mhc_pan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.log",
     conda:
         "../envs/tcsh.yaml"
     params:
-        extra=config["params"]["netMHCpan"]["extra"],
-        netMHC=config["params"]["netMHCpan"]["location"],
-        length=config["params"]["netMHCpan"]["peptide_len"],
+        extra=config["params"]["net_mhc_pan"]["extra"],
+        netMHC=config["params"]["net_mhc_pan"]["location"],
+        length=config["params"]["net_mhc_pan"]["peptide_len"],
         alleles=lambda wc, input: ",".join( pd.read_csv(input.alleles[0], header=None)[0] ),
     shell:
         "( "
@@ -24,20 +24,20 @@ rule netMHCpan:
         " ) 2> {log}"
 
 
-rule netMHCIIpan:
+rule net_mhc_two_pan:
     input:
-        peptides="results/microphaser/fasta/filtered/{group}/{tumor_alias}.merged_tumor_normal.netMHCIIpan.{contig}.{peptide_type}.fa",
+        peptides="results/microphaser/fasta/filtered/{group}/{tumor_alias}.merged_tumor_normal.net_mhc_two_pan.{contig}.{peptide_type}.fa",
         alleles=get_alleles_MHCII,
     output:
-        "results/netMHCIIpan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.tsv",
+        "results/net_mhc_two_pan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.tsv",
     log:
-        "logs/netMHCIIpan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.log",
+        "logs/net_mhc_two_pan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.log",
     conda:
         "../envs/tcsh.yaml"
     params:
-        extra=config["params"]["netMHCIIpan"]["extra"],
-        netMHC=config["params"]["netMHCIIpan"]["location"],
-        length=config["params"]["netMHCIIpan"]["peptide_len"],
+        extra=config["params"]["net_mhc_two_pan"]["extra"],
+        netMHC=config["params"]["net_mhc_two_pan"]["location"],
+        length=config["params"]["net_mhc_two_pan"]["peptide_len"],
         alleles=lambda wc, input: ",".join( pd.read_csv(input.alleles[0], header=None)[0] ),
     shell:
         "( "

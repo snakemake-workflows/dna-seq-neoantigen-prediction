@@ -23,7 +23,7 @@ params:
     events:
       tumor: "tumor_only"
       normal: "normal_only"
-  netMHCpan:
+  net_mhc_pan:
     activate: true
     peptide_len: 9
     extra: ""
@@ -34,7 +34,7 @@ params:
     # the conda-provided tcsh installation, it needs to read (without quotes):
     # "#!/usr/bin/env tcsh"
     location: "../netMHCpan-4.1"
-  netMHCIIpan:
+  net_mhc_two_pan:
     activate: false
     peptide_len: 15
     extra: ""

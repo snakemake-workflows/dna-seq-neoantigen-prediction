@@ -67,7 +67,7 @@ properties:
             required:
               - normal
               - tumor
-      netMHCpan:
+      net_mhc_pan:
         type: object
         properties:
           activate:
@@ -80,7 +80,7 @@ properties:
             type: string
         required:
           - activate
-      netMHCIIpan:
+      net_mhc_two_pan:
         type: object
         properties:
           activate:
@@ -93,8 +93,8 @@ properties:
           - activate
     required:
       - microphaser
-      - netMHCpan
-      - netMHCIIpan
+      - net_mhc_pan
+      - net_mhc_two_pan
 
 
 required:

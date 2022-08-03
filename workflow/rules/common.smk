@@ -110,11 +110,11 @@ def get_final_output():
                         filter(
                             None,
                             [
-                                "netMHCpan"
-                                if is_activated("params/netMHCpan")
+                                "net_mhc_pan"
+                                if is_activated("params/net_mhc_pan")
                                 else None,
-                                "netMHCIIpan"
-                                if is_activated("params/netMHCIIpan")
+                                "net_mhc_two_pan"
+                                if is_activated("params/net_mhc_two_pan")
                                 else None,
                             ],
                         )
