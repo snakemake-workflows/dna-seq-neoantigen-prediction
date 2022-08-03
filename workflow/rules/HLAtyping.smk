@@ -31,7 +31,7 @@ rule net_mhc_pan_alleles:
     params:
         net_mhc=config["params"]["net_mhc_pan"]["location"],
     shell:
-        "{params.net_mhc}/net_mhc_pan -listMHC > {output.mhc_one_alleles} 2> {log}"
+        "{params.net_mhc}/netMHCpan -listMHC > {output.mhc_one_alleles} 2> {log}"
 
 
 rule net_mhc_two_pan_alleles:
@@ -44,7 +44,7 @@ rule net_mhc_two_pan_alleles:
     params:
         net_mhc=config["params"]["net_mhc_two_pan"]["location"],
     shell:
-        "{params.net_mhc}/net_mhc_two_pan -list > {output.mhc_two_alleles} 2> {log}"
+        "{params.net_mhc}/netMHCIIpan -list > {output.mhc_two_alleles} 2> {log}"
 
 
 rule parse_and_filter_hla_alleles_for_netmhc:
