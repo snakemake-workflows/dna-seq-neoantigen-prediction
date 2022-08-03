@@ -3,7 +3,7 @@ rule netMHCpan:
         peptides="results/microphaser/fasta/filtered/{group}/{tumor_alias}.merged_tumor_normal.netMHCpan.{contig}.{peptide_type}.fa",
         alleles=get_alleles_MHCI,
     output:
-        "results/netMHCpan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.xls",
+        "results/netMHCpan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.tsv",
     log:
         "logs/netMHCpan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.log",
     conda:
@@ -29,7 +29,7 @@ rule netMHCIIpan:
         peptides="results/microphaser/fasta/filtered/{group}/{tumor_alias}.merged_tumor_normal.netMHCIIpan.{contig}.{peptide_type}.fa",
         alleles=get_alleles_MHCII,
     output:
-        "results/netMHCIIpan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.xls",
+        "results/netMHCIIpan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.tsv",
     log:
         "logs/netMHCIIpan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.log",
     conda:
