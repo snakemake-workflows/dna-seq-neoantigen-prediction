@@ -64,7 +64,7 @@ rule tidy_mhc_out:
         "../scripts/clean_mhc_output.py"
 
 
-rule mhc_csv_table:
+rule merge_neoantigen_info:
     input:
         info="results/microphaser/info/filtered/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.tsv",
         neo="results/{mhc}/{group}.{tumor_alias}.merged_tumor_normal.mhc.neo.tsv",
@@ -78,7 +78,7 @@ rule mhc_csv_table:
     log:
         "logs/mhc_csv_table/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.log",
     script:
-        "../scripts/merge_data.py"
+        "../scripts/merge_neoantigen_info.py"
 
 
 rule add_RNA_info:
