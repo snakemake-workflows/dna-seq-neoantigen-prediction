@@ -50,7 +50,7 @@ rule netMHCIIpan:
         " ) 2> {log}"
 
 
-rule clean_mhc_out:
+rule tidy_mhc_out:
     input:
         expand(
             "results/{{mhc}}/{{group}}/{{tumor_alias}}.merged_tumor_normal.{contig}.{{peptide_type}}.tsv",
