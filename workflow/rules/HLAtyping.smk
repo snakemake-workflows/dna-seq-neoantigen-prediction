@@ -21,7 +21,7 @@ rule HLA_LA:
         "HLA-LA.pl --bam {input.bam} --sampleID {wildcards.group}_{wildcards.alias} --graph {params.graph} --customGraphDir {params.graphdir} --workingDir {params.workdir} --maxThreads {threads} > {log} 2>&1"
 
 
-rule parse_HLA_LA:
+rule parse_and_filter_hla_alleles_for_netmhc:
     input:
         hla_la_bestguess="results/HLA-LA/output/{group}_{alias}/hla/R1_bestguess_G.txt",
     output:
@@ -38,4 +38,4 @@ rule parse_HLA_LA:
     log:
         "logs/parse-HLA-LA/{group}.{alias}.log",
     script:
-        "../scripts/parse_HLA_types.py"
+        "../scripts/parse_and_filter_hla_alleles_for_netmhc.py"
