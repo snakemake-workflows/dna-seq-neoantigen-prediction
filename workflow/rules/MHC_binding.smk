@@ -61,7 +61,7 @@ rule tidy_mhc_out:
     log:
         "logs/parse_mhc_out/{mhc}/{group}.{tumor_alias}.merged_tumor_normal.{peptide_type}.log",
     script:
-        "../scripts/clean_mhc_output.py"
+        "../scripts/tidy_mhc_output.py"
 
 
 rule merge_neoantigen_info:
