@@ -29,7 +29,7 @@ COLUMN_NAMES = {
 }
 
 
-def parse_file(mhc_in: FileIO):
+def parse_file(mhc_in: str):
     """
     Parse an netMHCpan or netMHCIIpan output file from the `-xls -xlsfile <filename>`
     directive into a tidy pandas data frame.
