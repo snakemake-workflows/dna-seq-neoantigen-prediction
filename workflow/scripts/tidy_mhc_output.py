@@ -13,7 +13,8 @@ from itertools import cycle
 # * generated with the `-BA` option to include binding affinity prediction
 
 # The mapping of index column names used here to original names in netMHCpan files
-# is (please excuse the pd.NA tuples, they make it easier further down the line):
+# is (please excuse the pd.NA tuples, they make header and index handling 
+# easier further down the line):
 INDEX_NAMES = {
     (pd.NA, "Pos"): "position_in_protein_sequence",
     (pd.NA, "Peptide"): "peptide_sequence",
