@@ -4,7 +4,7 @@ sys.stderr = open(snakemake.log[0], "w")
 
 import pandas as pd
 
-def get_minimum_rank_per_peptide(df: pd.DataFrame, rank_type: str) -> pd.DataFrame:
+def get_best_rank_per_peptide(df: pd.DataFrame, rank_type: str) -> pd.DataFrame:
     df = df.set_index(['id', 'pos_in_id_seq', 'pep_seq', 'allele'])
     rank_col = f"{rank_type}_rank"
     score_col = f"{rank_type}_score"
@@ -25,37 +25,41 @@ def select_columns(mhc: pd.DataFrame) -> pd.DataFrame:
     mhc["Top_affinity_HLA"] = mhc["Top_affinity_HLA"].str.replace("_nM","")
     return mhc
 
-def get_filtered_per_sample(sample: pd.DataFrame, alias: str) -> pd.DataFrame:
+def get_filtered_per_alias(sample: pd.DataFrame, alias: str) -> pd.DataFrame:
     common_info = sample.set_index(['id', 'pos_in_id_seq', 'pep_seq']).loc[:, ['ave_el_score', 'num_binders']].reset_index(level=['id', 'pos_in_id_seq']).drop_duplicates().set_index(['id', 'pos_in_id_seq'], append=True)
-    sample_el = get_minimum_rank_per_peptide(sample, "el")
-    sample_ba = get_minimum_rank_per_peptide(sample, "ba")
+    sample_el = get_best_rank_per_peptide(sample, "el")
+    sample_ba = get_best_rank_per_peptide(sample, "ba")
     sample_filtered = sample_el.join(sample_ba)
     return sample_filtered.join(common_info, how='left').assign(alias=alias).set_index('alias', append=True)
 
-def tidy_info(info: pd.DataFrame, alias: str) -> pd.DataFrame:
+def tidy_info(info: pd.DataFrame, tumor_alias: str) -> pd.DataFrame:
+    """
+    Get the -o info output of the microphaser filter command into tidy data format.
+    """
     info = info.set_index(['id', 'transcript', 'gene_id', 'gene_name', 'chrom', 'offset', 'frame', 'freq', 'credible_interval', 'depth', 'strand'])
     int_cols = ['nvar', 'nsomatic', 'nvariant_sites', 'nsomvariant_sites']
     info[int_cols] = info[int_cols].astype('int32')
-    num_var_tidy = info.assign(ngermline = lambda x: x.nvar - x.nsomatic).melt(var_name='alias', value_name='num_var', value_vars=['ngermline', 'nsomatic'], ignore_index=False).replace({'ngermline': 'normal', 'nsomatic': alias}).set_index('alias', append=True)
-    num_var_sites_tidy = info.assign(ngermvariant_sites = lambda x: x.nvariant_sites - x.nsomvariant_sites).melt(var_name='alias', value_name='num_var_sites', value_vars=['ngermvariant_sites', 'nsomvariant_sites'], ignore_index=False).replace({'ngermvariant_sites': 'normal', 'nsomvariant_sites': alias}).set_index('alias', append=True)
-    sites_tidy = info.copy()
-    sites_tidy['sites'] = sites_tidy['variant_sites'].apply(lambda x: set(str(x).split('|')))
-    sites_tidy['somatic_sites'] = sites_tidy['somatic_positions'].apply(lambda x: set(str(x).split('|')))
-    sites_tidy['germline_sites'] = sites_tidy[['sites', 'somatic_sites']].apply(lambda row: [s for s in row['sites'] if s not in row['somatic_sites']], axis=1)
-    sites_tidy = sites_tidy.melt(var_name='alias', value_name='genomic_pos', value_vars=['somatic_sites', 'germline_sites'], ignore_index=False).replace({'somatic_sites': 'normal', 'germline_sites': 'tumor_alias'}).set_index('alias', append=True)['genomic_pos'].apply(lambda r: '|'.join(r))
-    sites_tidy = info.melt(var_name='alias', value_name='genomic_pos', value_vars=['somatic_positions', 'germline_positions'], ignore_index=False).replace({'somatic_positions': 'tumor_resection', 'germline_positions': 'normal'}).set_index('alias', append=True)
-
-    seq_tidy = info.melt(var_name='alias', value_name='sequence', value_vars=['normal_sequence', 'mutant_sequence'], ignore_index=False).replace({'normal_sequence': 'normal', 'mutant_sequence': alias}).set_index('alias', append=True)
+    # TODO: Ensure that microphaser output contains only one entry per id.
+    # If there is more than one entry per index, ensure that they are identical
+    if len(info.groupby(info.index).filter(lambda g: (g.nunique() > 1).any())) > 0:
+        sys.exit(f"Found multiple differing entries for an 'id' in file '{snakemake.input.info}'. Please ensure that entries are unique per 'id'.")
+    # Always take the first entry for each index.
+    info = info.groupby(info.index).head(1)    
+    # TODO: Ensure that microphaser output is tidy data, with one row each for tumor and normal.
+    num_var_tidy = info.assign(ngermline = lambda x: x.nvar - x.nsomatic).melt(var_name='alias', value_name='num_var', value_vars=['ngermline', 'nsomatic'], ignore_index=False).replace({'ngermline': 'normal', 'nsomatic': tumor_alias}).set_index('alias', append=True)
+    num_var_sites_tidy = info.assign(ngermvariant_sites = lambda x: x.nvariant_sites - x.nsomvariant_sites).melt(var_name='alias', value_name='num_var_sites', value_vars=['ngermvariant_sites', 'nsomvariant_sites'], ignore_index=False).replace({'ngermvariant_sites': 'normal', 'nsomvariant_sites': tumor_alias}).set_index('alias', append=True)
+    genomic_pos_tidy = info.melt(var_name='alias', value_name='genomic_pos', value_vars=['somatic_positions', 'germline_positions'], ignore_index=False).replace({'somatic_positions': tumor_alias, 'germline_positions': 'normal'}).set_index('alias', append=True)
+    aa_changes_tidy = info.melt(var_name='alias', value_name='aa_changes', value_vars=['somatic_aa_change', 'germline_aa_change'], ignore_index=False).replace({'somatic_aa_change': tumor_alias, 'germline_aa_change': 'normal'}).set_index('alias', append=True)
+    nt_seq_tidy = info.melt(var_name='alias', value_name='nt_seq', value_vars=['normal_sequence', 'mutant_sequence'], ignore_index=False).replace({'normal_sequence': 'normal', 'mutant_sequence': tumor_alias}).set_index('alias', append=True)
+    return num_var_tidy.join([num_var_sites_tidy, genomic_pos_tidy, aa_changes_tidy, nt_seq_tidy])
 
 def merge_data_frames(info: pd.DataFrame, tumor: pd.DataFrame, normal: pd.DataFrame) -> pd.DataFrame:
     # get and merge tumor and normal
-    tumor_filtered = get_filtered_per_sample(tumor, snakemake.wildcards.tumor_alias)
-    normal_filtered = get_filtered_per_sample(normal, "normal")
-    all_filtered = pd.concat([tumor_filtered, normal_filtered]).reset_index(level='pep_seq').sort_index()
+    tumor_filtered = get_filtered_per_alias(tumor, snakemake.wildcards.tumor_alias)
+    normal_filtered = get_filtered_per_alias(normal, "normal")
+    all_filtered = pd.concat([tumor_filtered, normal_filtered]).reset_index(level='pep_seq').groupby('id', group_keys=False).apply(diff_tumor_normal_peptides, column='pep_seq', tumor_alias='tumor_resection').sort_index()
     info_tidy = tidy_info(info, snakemake.wildcards.tumor_alias)
-
-    # tidy up info
-    all_annotated = all_filtered.merge(info, on='id', how='left')
+    all_annotated = all_filtered.merge(info_tidy, on=['id', 'alias'], how='left')
 #    tumor = select_columns(tumor)
 #    normal = select_columns(normal)
 #    id_length = len(tumor.ID[0])
@@ -81,7 +85,7 @@ def merge_data_frames(info: pd.DataFrame, tumor: pd.DataFrame, normal: pd.DataFr
 #        })
 #    merged_dataframe = merged_mhc.merge(info, how='left', on = 'ID')
 
-    merged_dataframe["Peptide_tumor"] = merged_dataframe[["Peptide_tumor","Peptide_normal"]].apply(lambda x: diffEpitope(*x), axis=1)
+    merged_dataframe["Peptide_tumor"] = merged_dataframe[["Peptide_tumor","Peptide_normal"]].apply(lambda x: diff_peptides(*x), axis=1)
     ## Are all possible variants in the peptide ("Cis") or not ("Trans")
     merged_dataframe["Variant_Orientation"] = "Cis"
     trans = merged_dataframe.nvariant_sites > merged_dataframe.nvar
@@ -116,19 +120,31 @@ def merge_data_frames(info: pd.DataFrame, tumor: pd.DataFrame, normal: pd.DataFr
     return data
 
 
-## highlight the difference between mutated neopeptide and wildtype
-def diffEpitope(e1,e2):
-    if str(e2) == 'nan' or str(e2) == '':
-        return(e1)
-    e1 = str(e1)
-    e2 = str(e2)
-    diff_pos = [i for i in range(len(e1)) if e1[i] != e2[i]]
-    e_new = e1
-    e2_new = e2
+def diff_tumor_normal_peptides(group: pd.DataFrame, column: str, tumor_alias: str) -> pd.DataFrame:
+    group = group.reset_index(level='alias')
+    normal_pep = group.loc[group['alias'] == 'normal', column].fillna('')
+    if normal_pep.empty:
+        normal_pep = ''
+    else:
+        normal_pep = normal_pep.squeeze()
+    tumor_pep = group.loc[group['alias'] == tumor_alias, column].fillna('').squeeze()
+    ( group.loc[group['alias'] == tumor_alias, column], group.loc[group['alias'] == 'normal', column] )= diff_peptides(tumor_pep, normal_pep)
+    return group.set_index('alias', append=True)
+
+
+def diff_peptides(tumor_p: str, normal_p: str) -> (str, str):
+    """
+    Highlight the difference between mutated neopeptide and normal peptide
+    """
+    if normal_p == 'nan' or normal_p == '':
+        return (tumor_p, normal_p)
+    diff_pos = [i for i in range(len(tumor_p)) if tumor_p[i] != normal_p[i]]
+    tp_changed = tumor_p
+    np_changed = normal_p
     for p in diff_pos:
-        e_new = e_new[:p] + e_new[p].lower() + e_new[p+1:]
-        e2_new = e2_new[:p] + e2_new[p].lower() + e2_new[p+1:]
-    return(e_new)
+        tp_changed = tp_changed[:p] + tp_changed[p].lower() + tp_changed[p+1:]
+        np_changed = np_changed[:p] + np_changed[p].lower() + np_changed[p+1:]
+    return (tp_changed, np_changed)
 
 
 def main():
