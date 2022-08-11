@@ -131,7 +131,7 @@ def merge_data_frames(info: pd.DataFrame, tumor: pd.DataFrame, normal: pd.DataFr
         'freq_credible_interval',
     ]
 
-    return all_annotated.reindex(columns=column_order).sort_values(['chrom', 'genomic_pos', 'id'])
+    return all_annotated.reindex(columns=column_order).sort_values(by = ['chrom', 'genomic_pos', 'id'])
 
 
 def main():
