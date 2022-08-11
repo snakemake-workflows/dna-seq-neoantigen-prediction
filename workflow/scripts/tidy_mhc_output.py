@@ -16,30 +16,30 @@ from itertools import cycle
 # is (please excuse the pd.NA tuples, they make header and index handling 
 # easier further down the line):
 INDEX_NAMES = {
-    (pd.NA, "Pos"): "position_in_protein_sequence",
-    (pd.NA, "Peptide"): "peptide_sequence",
-    (pd.NA, "ID"): "peptide_ID",
-    (pd.NA, "Ave"): "average_el_score",
-    (pd.NA, "NB"): "number_of_binders",
+    (pd.NA, "Pos"): "pos_in_id_seq",
+    (pd.NA, "Peptide"): "pep_seq",
+    (pd.NA, "ID"): "id",
+    (pd.NA, "Ave"): "ave_el_score",
+    (pd.NA, "NB"): "num_binders",
 }
 
 if snakemake.wildcards.mhc == "net_mhc_pan":
     # The mapping of column names used here to original names in netMHCpan files is:
     COLUMN_NAMES = {
-        "BA-score": "binding_affinity_score",
-        "BA_Rank": "binding_affinity_percent_rank",
-        "EL-score": "elution_ligang_score",
-        "EL_Rank": "elution_ligand_percent_rank",
-        "core": "binding_core",
+        "BA-score": "ba_score",
+        "BA_Rank": "ba_rank",
+        "EL-score": "el_score",
+        "EL_Rank": "el_rank",
+        "core": "bind_core",
     }
 elif snakemake.wildcards.mhc == "net_mhc_two_pan":
     # The mapping of column names used here to original names in netMHCIIpan files is:
     COLUMN_NAMES = {
-        "Score_BA": "binding_affinity_score",
-        "Rank_BA": "binding_affinity_percent_rank",
-        "Score": "elution_ligang_score",
-        "Rank": "elution_ligand_percent_rank",
-        "Core": "binding_core",
+        "Score_BA": "ba_score",
+        "Rank_BA": "ba_rank",
+        "Score": "el_score",
+        "Rank": "el_rank",
+        "Core": "bind_core",
     }
 else:
     sys.exit(f"Wildcard `mhc` has unknown value: {snakemake.wildcards.mhc}")
@@ -88,7 +88,9 @@ def parse_file(mhc_in: str):
     header = pd.concat([first_header_line, second_header_line], axis="columns")
     header = header.fillna(method="ffill")
     header.loc[
-        header.column_name.isin({"Pos", "Peptide", "ID", "Target", "Ave", "NB"}),
+        header.column_name.isin(
+            [ index_col for (_, index_col) in INDEX_NAMES.keys() ]
+        ),
         "allele",
     ] = pd.NA
 
