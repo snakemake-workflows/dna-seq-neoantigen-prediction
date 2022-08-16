@@ -58,7 +58,7 @@ def highlight_peptides_diff(tumor_p: str, normal_p: str) -> Tuple[str, str]:
 def diff_tumor_normal_peptides(
     group: pd.DataFrame, column: str, tumor_alias: str
 ) -> pd.DataFrame:
-    group = group.reset_index(level="alias")
+    group = group
     normal_pep = group.loc[group["alias"] == "normal", column].fillna("")
     if normal_pep.empty:
         normal_pep = ""
@@ -80,7 +80,7 @@ def diff_tumor_normal_peptides(
     t_diff, n_diff = highlight_peptides_diff(tumor_pep, normal_pep)
     group.loc[group["alias"] == tumor_alias, column] = t_diff
     group.loc[group["alias"] == "normal", column] = n_diff
-    return group.set_index("alias", append=True)
+    return group
 
 
 def tidy_info(info: pd.DataFrame, tumor_alias: str) -> pd.DataFrame:
@@ -174,7 +174,7 @@ def tidy_info(info: pd.DataFrame, tumor_alias: str) -> pd.DataFrame:
     return all_tidy.reset_index()
 
 
-def check_duplicates(df: pd.DataFrame, cols: List[str], specific_error: str):
+def check_duplicates(df: pd.DataFrame, cols: List[str], specific_error: str = ""):
     if (
         sum(
             df.duplicated(
@@ -218,9 +218,9 @@ def merge_data_frames(
     assert len_tumor_id == len_normal_id, f"'id's' are of different length, tumor: {len_tumor_id}, normal: {len_normal_id}, please check your input data.\n"
     info_tidy["id"] = info_tidy["id"].str[:len_tumor_id]
     # Double-check for duplicates resulting from the id truncation
-    check_duplicates(info_tidy, ["id", "alias"])
+    check_duplicates(info_tidy, ["id", "alias"], specific_error="Here, the problem is most likely the truncation of 'id's by netMHCpan.\n")
 
-    all_annotated = all_filtered.join(info_tidy, how="left", on=["id", "alias"])
+    all_annotated = all_filtered.merge(info_tidy, how="left", on=["id", "alias"])
 
     # Double-check for weird duplicates, as previously done in Jan's code.
     check_duplicates(all_annotated, ["transcript", "offset", "pep_seq", "aa_changes"])
