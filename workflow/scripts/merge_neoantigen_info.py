@@ -3,7 +3,7 @@ import sys
 sys.stderr = open(snakemake.log[0], "w")
 
 import pandas as pd
-from typing import Tuple
+from typing import List, Tuple
 
 
 def get_best_rank_per_peptide(df: pd.DataFrame, rank_type: str) -> pd.DataFrame:
@@ -176,6 +176,29 @@ def tidy_info(info: pd.DataFrame, tumor_alias: str) -> pd.DataFrame:
     )
 
 
+def check_duplicates(df: pd.DataFrame, cols: List[str], specific_error: str):
+    if (
+        sum(
+            df.duplicated(
+                subset=cols
+            )
+        )
+        > 0
+    ):
+        duplicates = all_annotated[
+            df.duplicated(
+                subset=cols
+            )
+        ]
+        raise ValueError(
+            f"Found multiple rows with identical [ \"{'\", \"'.join(cols)}\" ] entries.\n"
+            "This indicates an upstream issue, please fix this.\n"
+            f"{specific_error}"
+            "The offending entries are:\n"
+            f"{duplicates}\n"
+        )
+
+
 def merge_data_frames(
     info: pd.DataFrame, tumor: pd.DataFrame, normal: pd.DataFrame, tumor_alias: str
 ) -> pd.DataFrame:
@@ -190,29 +213,22 @@ def merge_data_frames(
         .sort_index()
     )
     info_tidy = tidy_info(info, tumor_alias)
+
+    # netMHCpan 4.1 truncates the fasta entry IDs, so we have to cut down the IDs
+    # that microphaser originally provided to make the following .join() work
+    len_tumor_id = len(tumor_filtered["id"][0])
+    len_normal_id = len(normal_filtered["id"][0])
+    assert len_tumor_id == len_normal_id, f"'id's' are of different length, tumor: {len_tumor_id}, normal: {len_normal_id}, please check your input data.\n"
+    info_tidy['id'] = info_tidy['id'].str[:len_tumor_id]
+    # Double-check for duplicates resulting from the id truncation
+    check_duplicates(info_tidy, ["id", "alias"])
+
     all_annotated = all_filtered.join(info_tidy, how="left").reset_index(
         level=["id", "alias"]
     )
 
     # Double-check for weird duplicates, as previously done in Jan's code.
-    if (
-        sum(
-            all_annotated.duplicated(
-                subset=["transcript", "offset", "pep_seq", "aa_changes"]
-            )
-        )
-        > 0
-    ):
-        duplicates = all_annotated[
-            all_annotated.duplicated(
-                subset=["transcript", "offset", "pep_seq", "aa_changes"]
-            )
-        ]
-        raise ValueError(
-            "Found multiple rows with identical 'transcript', 'offset', 'pep_seq' and 'aa_changes' entries.\n"
-            "This indicates an upstream issue, please fix this. The offending entries are:\n"
-            f"{duplicates}\n"
-        )
+    check_duplicates(all_annotated, ["transcript", "offset", "pep_seq", "aa_changes"])
 
     column_order = [
         "id",
