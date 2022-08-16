@@ -35,7 +35,7 @@ def get_filtered_per_alias(sample: pd.DataFrame, alias: str) -> pd.DataFrame:
     return (
         sample_filtered.join(common_info, how="left")
         .assign(alias=alias)
-        .set_index("alias", append=True)
+        .reset_index()
     )
 
 
@@ -171,9 +171,7 @@ def tidy_info(info: pd.DataFrame, tumor_alias: str) -> pd.DataFrame:
     all_tidy = num_var_in_pep_tidy.join(
         [num_var_sites_tidy, genomic_pos_tidy, aa_changes_tidy, nt_seq_tidy]
     )
-    return all_tidy.reset_index(
-        level=[i for i in all_tidy.index.names if i not in ["id", "alias"]]
-    )
+    return all_tidy.reset_index()
 
 
 def check_duplicates(df: pd.DataFrame, cols: List[str], specific_error: str):
@@ -190,8 +188,9 @@ def check_duplicates(df: pd.DataFrame, cols: List[str], specific_error: str):
                 subset=cols
             )
         ]
+        cols_str = '", "'.join(cols)
         raise ValueError(
-            f"Found multiple rows with identical [ \"{'\", \"'.join(cols)}\" ] entries.\n"
+            f'Found multiple rows with identical [ "{cols_str}" ] entries.\n'
             "This indicates an upstream issue, please fix this.\n"
             f"{specific_error}"
             "The offending entries are:\n"
@@ -207,10 +206,8 @@ def merge_data_frames(
     normal_filtered = get_filtered_per_alias(normal, "normal")
     all_filtered = (
         pd.concat([tumor_filtered, normal_filtered])
-        .reset_index(level=["pep_seq", "pos_in_id_seq"])
         .groupby("id", group_keys=False)
         .apply(diff_tumor_normal_peptides, column="pep_seq", tumor_alias=tumor_alias)
-        .sort_index()
     )
     info_tidy = tidy_info(info, tumor_alias)
 
@@ -219,13 +216,11 @@ def merge_data_frames(
     len_tumor_id = len(tumor_filtered["id"][0])
     len_normal_id = len(normal_filtered["id"][0])
     assert len_tumor_id == len_normal_id, f"'id's' are of different length, tumor: {len_tumor_id}, normal: {len_normal_id}, please check your input data.\n"
-    info_tidy['id'] = info_tidy['id'].str[:len_tumor_id]
+    info_tidy["id"] = info_tidy["id"].str[:len_tumor_id]
     # Double-check for duplicates resulting from the id truncation
     check_duplicates(info_tidy, ["id", "alias"])
 
-    all_annotated = all_filtered.join(info_tidy, how="left").reset_index(
-        level=["id", "alias"]
-    )
+    all_annotated = all_filtered.join(info_tidy, how="left", on=["id", "alias"])
 
     # Double-check for weird duplicates, as previously done in Jan's code.
     check_duplicates(all_annotated, ["transcript", "offset", "pep_seq", "aa_changes"])
