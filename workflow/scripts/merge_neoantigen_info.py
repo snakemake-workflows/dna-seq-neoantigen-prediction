@@ -1,5 +1,4 @@
 import sys
-from xml.sax.handler import all_properties
 
 sys.stderr = open(snakemake.log[0], "w")
 
@@ -46,6 +45,7 @@ def highlight_peptides_diff(tumor_p: str, normal_p: str) -> Tuple[str, str]:
     """
     if normal_p == "nan" or normal_p == "":
         return (tumor_p, normal_p)
+    assert len(tumor_p) == len(normal_p), f"Tumor peptide '{tumor_p}' and normal peptide '{normal_p}' have different lengths."
     diff_pos = [i for i in range(len(tumor_p)) if tumor_p[i] != normal_p[i]]
     tp_changed = tumor_p
     np_changed = normal_p
@@ -67,18 +67,19 @@ def diff_tumor_normal_peptides(
     tumor_pep = group.loc[group["alias"] == tumor_alias, column].fillna("").squeeze()
     # Silent mutations should not be included in microphaser output.
     if normal_pep == tumor_pep:
-        sys.exit(
+        raise ValueError(
             f"For peptide '{group['id'][0]}' the normal and the tumor peptide have an identical sequence ({normal_pep}).\n"
             "Please fix this upstream or comment out this check to ignore this problem.\n"
         )
     # Remove groups where the tumor peptide contains a stop codon.
     # TODO: Maybe this should be a hard fail complaining to fix this upstream?
+    # TODO: Write out warning.
     if "X" in tumor_pep:
+        print(f"Warning: ", file=sys.stderr)
         return group.loc[[], :]
-    (
-        group.loc[group["alias"] == tumor_alias, column],
-        group.loc[group["alias"] == "normal", column],
-    ) = highlight_peptides_diff(tumor_pep, normal_pep)
+    t_diff, n_diff = highlight_peptides_diff(tumor_pep, normal_pep)
+    group.loc[group["alias"] == tumor_alias, column] = t_diff
+    group.loc[group["alias"] == "normal", column] = n_diff
     return group.set_index("alias", append=True)
 
 
@@ -108,12 +109,13 @@ def tidy_info(info: pd.DataFrame, tumor_alias: str) -> pd.DataFrame:
     # TODO: Ensure that microphaser output contains only one entry per id.
     # If there is more than one entry per index, ensure that they are identical
     if len(info.groupby(info.index).filter(lambda g: (g.nunique() > 1).any())) > 0:
-        sys.exit(
+        raise ValueError(
             f"Found multiple differing entries for an 'id' in file '{snakemake.input.info}'. Please ensure that entries are unique per 'id'.\n"
         )
     # Always take the first entry for each index.
     info = info.groupby(info.index).head(1)
     # TODO: Ensure that microphaser output is tidy data, with one row each for tumor and normal.
+    # TODO: factor out tidying of column pairs into a function.
     num_var_in_pep_tidy = (
         info.assign(ngermline=lambda x: x.nvar - x.nsomatic)
         .melt(
@@ -206,7 +208,7 @@ def merge_data_frames(
                 subset=["transcript", "offset", "pep_seq", "aa_changes"]
             )
         ]
-        sys.exit(
+        raise ValueError(
             "Found multiple rows with identical 'transcript', 'offset', 'pep_seq' and 'aa_changes' entries.\n"
             "This indicates an upstream issue, please fix this. The offending entries are:\n"
             f"{duplicates}\n"
@@ -245,17 +247,12 @@ def merge_data_frames(
     ]
 
     return all_annotated.reindex(columns=column_order).sort_values(
-        by=["chrom", "genomic_pos", "id"]
+        by=["chrom", "offset", "id", "alias"]
     )
 
 
-def main():
-    info = pd.read_csv(snakemake.input.info, sep="\t", dtype=str)
-    tumor = pd.read_csv(snakemake.input.neo, sep="\t", dtype={"pos_in_id_seq": str})
-    normal = pd.read_csv(snakemake.input.normal, sep="\t", dtype={"pos_in_id_seq": str})
-    data = merge_data_frames(info, tumor, normal, snakemake.wildcards.tumor_alias)
-    data.to_csv(snakemake.output[0], index=False, sep="\t")
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+info = pd.read_csv(snakemake.input.info, sep="\t", dtype=str)
+tumor = pd.read_csv(snakemake.input.neo, sep="\t", dtype={"pos_in_id_seq": str})
+normal = pd.read_csv(snakemake.input.normal, sep="\t", dtype={"pos_in_id_seq": str})
+data = merge_data_frames(info, tumor, normal, snakemake.wildcards.tumor_alias)
+data.to_csv(snakemake.output[0], index=False, sep="\t")
