@@ -55,13 +55,13 @@ rule parse_and_filter_hla_alleles_for_netmhc:
     output:
         hlaI=report(
             "results/HLA-LA/{group}.{alias}.hlaI.tsv",
-            caption="../report/HLA_Types.rst",
-            category="HLA-Typing(HLA-LA)",
+            caption="../report/hla_alleles.rst",
+            category="HLA alleles",
         ),
         hlaII=report(
             "results/HLA-LA/{group}.{alias}.hlaII.tsv",
-            caption="../report/HLA_Types.rst",
-            category="HLA-Typing(HLA-LA)",
+            caption="../report/hla_alleles.rst",
+            category="HLA alleles",
         ),
     log:
         "logs/parse-HLA-LA/{group}.{alias}.log",
