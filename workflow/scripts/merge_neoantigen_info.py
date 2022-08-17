@@ -85,21 +85,27 @@ def tidy_info(info: pd.DataFrame, tumor_alias: str) -> pd.DataFrame:
     """
     info = info.rename(
         columns={"credible_interval": "freq_credible_interval"}
-    ).set_index(
-        [
-            "id",
-            "transcript",
-            "gene_id",
-            "gene_name",
-            "chrom",
-            "offset",
-            "frame",
-            "freq",
-            "freq_credible_interval",
-            "depth",
-            "strand",
-        ]
     )
+    # Aggregate multiple identical entries that differ only in 'id' and 'transcript'
+    # into one, taking the first 'id' and collecting all 'transcript's into a '|'-separated
+    # list.
+    cols = [ c for c in info.columns if c not in ['id', 'transcript'] ]
+    aggregation_functions = {'id': lambda i: list(i), 'transcript': lambda t: '|'.join(set(t)) }
+    info = info.groupby(cols, dropna=False).agg(aggregation_functions).reset_index().explode('id').set_index(
+            [
+                "id",
+                "transcript",
+                "gene_id",
+                "gene_name",
+                "chrom",
+                "offset",
+                "frame",
+                "freq",
+                "freq_credible_interval",
+                "depth",
+                "strand",
+            ]
+        )
     int_cols = ["nvar", "nsomatic", "nvariant_sites", "nsomvariant_sites"]
     info[int_cols] = info[int_cols].astype("int32")
     # TODO: Ensure that microphaser output contains only one entry per id.
