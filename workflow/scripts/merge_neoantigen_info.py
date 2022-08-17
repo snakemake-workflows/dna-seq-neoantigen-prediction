@@ -62,18 +62,17 @@ def diff_tumor_normal_peptides(
     else:
         normal_pep = normal_pep.squeeze()
     tumor_pep = group.loc[group["alias"] == tumor_alias, column].fillna("").squeeze()
+    # Remove groups where the tumor peptide contains a stop codon.
+    # TODO: Maybe this should be a hard fail complaining to fix this upstream?
+    if "X" in tumor_pep:
+        print(f"Warning: ", file=sys.stderr)
+        return group.loc[[], :]
     # Silent mutations should not be included in microphaser output.
     if normal_pep == tumor_pep:
         raise ValueError(
             f"For peptide '{group['id'][0]}' the normal and the tumor peptide have an identical sequence ({normal_pep}).\n"
             "Please fix this upstream or comment out this check to ignore this problem.\n"
         )
-    # Remove groups where the tumor peptide contains a stop codon.
-    # TODO: Maybe this should be a hard fail complaining to fix this upstream?
-    # TODO: Write out warning.
-    if "X" in tumor_pep:
-        print(f"Warning: ", file=sys.stderr)
-        return group.loc[[], :]
     t_diff, n_diff = highlight_peptides_diff(tumor_pep, normal_pep)
     group.loc[group["alias"] == tumor_alias, column] = t_diff
     group.loc[group["alias"] == "normal", column] = n_diff
