@@ -185,9 +185,10 @@ def check_duplicates(df: pd.DataFrame, cols: List[str], specific_error: str = ""
         )
         > 0
     ):
-        duplicates = all_annotated[
+        duplicates = df[
             df.duplicated(
-                subset=cols
+                subset=cols,
+                keep=False,
             )
         ]
         cols_str = '", "'.join(cols)
@@ -225,7 +226,11 @@ def merge_data_frames(
     all_annotated = all_filtered.merge(info_tidy, how="left", on=["id", "alias"])
 
     # Double-check for weird duplicates, as previously done in Jan's code.
-    check_duplicates(all_annotated, ["transcript", "offset", "pep_seq", "aa_changes"])
+    # Jan's code was only checking for ["transcript", "offset", "pep_seq", "aa_changes"],
+    # we check for everything except id.
+    cols_without_id = [ c for c in all_annotated.columns if c not in ['id'] ]
+    all_annotated = all_annotated.drop_duplicates(subset=cols_without_id)
+    check_duplicates(all_annotated, cols_without_id)
 
     column_order = [
         "id",
