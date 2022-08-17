@@ -257,9 +257,13 @@ def merge_data_frames(
         "freq_credible_interval",
     ]
 
-    return all_annotated.reindex(columns=column_order).sort_values(
-        by=["chrom", "offset", "id", "alias"]
-    )
+    def get_id_rank(group: pd.DataFrame, tumor_alias: str):
+        return group.loc[group["alias"] == tumor_alias, 'top_el_rank_el_rank'].squeeze()
+    
+    sort_rank = all_annotated.groupby('id').apply(get_id_rank, tumor_alias).rename('sort_rank')
+    all_sorted = all_annotated.merge(sort_rank, on=['id'], how='left').sort_values(['sort_rank', 'id', 'alias'], ascending=[True, True, False]).drop(columns='sort_rank')
+
+    return all_sorted.reindex(columns=column_order)
 
 
 info = pd.read_csv(snakemake.input.info, sep="\t", dtype=str)
