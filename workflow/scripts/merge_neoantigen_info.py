@@ -15,27 +15,24 @@ def get_best_rank_per_peptide(df: pd.DataFrame, rank_type: str) -> pd.DataFrame:
     return (
         df.loc[df.groupby(["pep_seq", "id"])[rank_col].idxmin(), columns_to_keep]
         .reset_index(level="allele")
-        .sort_index()
-        .drop_duplicates()
         .add_prefix(prefix)
+        .reset_index()
+        .drop_duplicates()
     )
 
 
 def get_filtered_per_alias(sample: pd.DataFrame, alias: str) -> pd.DataFrame:
+    merge_cols = ["id", "pos_in_id_seq", "pep_seq"]
     common_info = (
-        sample.set_index(["id", "pos_in_id_seq", "pep_seq"])
-        .loc[:, ["ave_el_score", "num_binders"]]
-        .reset_index(level=["id", "pos_in_id_seq"])
+        sample.loc[:, merge_cols + ["ave_el_score", "num_binders"]]
         .drop_duplicates()
-        .set_index(["id", "pos_in_id_seq"], append=True)
     )
     sample_el = get_best_rank_per_peptide(sample, "el")
     sample_ba = get_best_rank_per_peptide(sample, "ba")
-    sample_filtered = sample_el.join(sample_ba)
+    sample_filtered = sample_el.merge(sample_ba, on=merge_cols)
     return (
-        sample_filtered.join(common_info, how="left")
+        sample_filtered.merge(common_info, how="left", on=merge_cols)
         .assign(alias=alias)
-        .reset_index()
     )
 
 
