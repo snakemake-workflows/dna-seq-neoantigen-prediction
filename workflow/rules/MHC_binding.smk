@@ -72,8 +72,8 @@ rule merge_neoantigen_info:
     output:
         report(
             "results/neoantigens/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.DNA.tsv",
-            caption="../report/WES_results.rst",
-            category="Results WES (netMHC)",
+            caption="../report/neoantigens.DNA.rst",
+            category="Neoantigens",
         ),
     log:
         "logs/mhc_csv_table/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.log",
