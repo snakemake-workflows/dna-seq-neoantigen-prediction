@@ -13,7 +13,7 @@ from itertools import cycle
 # * generated with the `-BA` option to include binding affinity prediction
 
 # The mapping of index column names used here to original names in netMHCpan files
-# is (please excuse the pd.NA tuples, they make header and index handling 
+# is (please excuse the pd.NA tuples, they make header and index handling
 # easier further down the line):
 INDEX_NAMES = {
     (pd.NA, "Pos"): "pos_in_id_seq",
@@ -88,9 +88,7 @@ def parse_file(mhc_in: str):
     header = pd.concat([first_header_line, second_header_line], axis="columns")
     header = header.fillna(method="ffill")
     header.loc[
-        header.column_name.isin(
-            [ index_col for (_, index_col) in INDEX_NAMES.keys() ]
-        ),
+        header.column_name.isin([index_col for (_, index_col) in INDEX_NAMES.keys()]),
         "allele",
     ] = pd.NA
 

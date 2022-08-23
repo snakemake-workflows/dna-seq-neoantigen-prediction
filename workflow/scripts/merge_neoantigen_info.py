@@ -23,16 +23,14 @@ def get_best_rank_per_peptide(df: pd.DataFrame, rank_type: str) -> pd.DataFrame:
 
 def get_filtered_per_alias(sample: pd.DataFrame, alias: str) -> pd.DataFrame:
     merge_cols = ["id", "pos_in_id_seq", "pep_seq"]
-    common_info = (
-        sample.loc[:, merge_cols + ["ave_el_score", "num_binders"]]
-        .drop_duplicates()
-    )
+    common_info = sample.loc[
+        :, merge_cols + ["ave_el_score", "num_binders"]
+    ].drop_duplicates()
     sample_el = get_best_rank_per_peptide(sample, "el")
     sample_ba = get_best_rank_per_peptide(sample, "ba")
     sample_filtered = sample_el.merge(sample_ba, on=merge_cols)
-    return (
-        sample_filtered.merge(common_info, how="left", on=merge_cols)
-        .assign(alias=alias)
+    return sample_filtered.merge(common_info, how="left", on=merge_cols).assign(
+        alias=alias
     )
 
 
@@ -42,7 +40,9 @@ def highlight_peptides_diff(tumor_p: str, normal_p: str) -> Tuple[str, str]:
     """
     if normal_p == "nan" or normal_p == "":
         return (tumor_p, normal_p)
-    assert len(tumor_p) == len(normal_p), f"Tumor peptide '{tumor_p}' and normal peptide '{normal_p}' have different lengths."
+    assert len(tumor_p) == len(
+        normal_p
+    ), f"Tumor peptide '{tumor_p}' and normal peptide '{normal_p}' have different lengths."
     diff_pos = [i for i in range(len(tumor_p)) if tumor_p[i] != normal_p[i]]
     tp_changed = tumor_p
     np_changed = normal_p
@@ -83,15 +83,21 @@ def tidy_info(info: pd.DataFrame, tumor_alias: str) -> pd.DataFrame:
     """
     Get the -o info output of the microphaser filter command into tidy data format.
     """
-    info = info.rename(
-        columns={"credible_interval": "freq_credible_interval"}
-    )
+    info = info.rename(columns={"credible_interval": "freq_credible_interval"})
     # Aggregate multiple identical entries that differ only in 'id' and 'transcript'
     # into one, taking the first 'id' and collecting all 'transcript's into a '|'-separated
     # list.
-    cols = [ c for c in info.columns if c not in ['id', 'transcript'] ]
-    aggregation_functions = {'id': lambda i: list(i), 'transcript': lambda t: '|'.join(set(t)) }
-    info = info.groupby(cols, dropna=False).agg(aggregation_functions).reset_index().explode('id').set_index(
+    cols = [c for c in info.columns if c not in ["id", "transcript"]]
+    aggregation_functions = {
+        "id": lambda i: list(i),
+        "transcript": lambda t: "|".join(set(t)),
+    }
+    info = (
+        info.groupby(cols, dropna=False)
+        .agg(aggregation_functions)
+        .reset_index()
+        .explode("id")
+        .set_index(
             [
                 "id",
                 "transcript",
@@ -106,6 +112,7 @@ def tidy_info(info: pd.DataFrame, tumor_alias: str) -> pd.DataFrame:
                 "strand",
             ]
         )
+    )
     int_cols = ["nvar", "nsomatic", "nvariant_sites", "nsomvariant_sites"]
     info[int_cols] = info[int_cols].astype("int32")
     # TODO: Ensure that microphaser output contains only one entry per id.
@@ -177,14 +184,7 @@ def tidy_info(info: pd.DataFrame, tumor_alias: str) -> pd.DataFrame:
 
 
 def check_duplicates(df: pd.DataFrame, cols: List[str], specific_error: str = ""):
-    if (
-        sum(
-            df.duplicated(
-                subset=cols
-            )
-        )
-        > 0
-    ):
+    if sum(df.duplicated(subset=cols)) > 0:
         duplicates = df[
             df.duplicated(
                 subset=cols,
@@ -218,17 +218,23 @@ def merge_data_frames(
     # that microphaser originally provided to make the following .join() work
     len_tumor_id = len(tumor_filtered["id"][0])
     len_normal_id = len(normal_filtered["id"][0])
-    assert len_tumor_id == len_normal_id, f"'id's' are of different length, tumor: {len_tumor_id}, normal: {len_normal_id}, please check your input data.\n"
+    assert (
+        len_tumor_id == len_normal_id
+    ), f"'id's' are of different length, tumor: {len_tumor_id}, normal: {len_normal_id}, please check your input data.\n"
     info_tidy["id"] = info_tidy["id"].str[:len_tumor_id]
     # Double-check for duplicates resulting from the id truncation
-    check_duplicates(info_tidy, ["id", "alias"], specific_error="Here, the problem is most likely the truncation of 'id's by netMHCpan.\n")
+    check_duplicates(
+        info_tidy,
+        ["id", "alias"],
+        specific_error="Here, the problem is most likely the truncation of 'id's by netMHCpan.\n",
+    )
 
     all_annotated = all_filtered.merge(info_tidy, how="left", on=["id", "alias"])
 
     # Double-check for weird duplicates, as previously done in Jan's code.
     # Jan's code was only checking for ["transcript", "offset", "pep_seq", "aa_changes"],
     # we check for everything except id.
-    cols_without_id = [ c for c in all_annotated.columns if c not in ['id'] ]
+    cols_without_id = [c for c in all_annotated.columns if c not in ["id"]]
     all_annotated = all_annotated.drop_duplicates(subset=cols_without_id)
     check_duplicates(all_annotated, cols_without_id)
 
@@ -265,10 +271,16 @@ def merge_data_frames(
     ]
 
     def get_id_rank(group: pd.DataFrame, tumor_alias: str):
-        return group.loc[group["alias"] == tumor_alias, 'top_el_rank_el_rank'].squeeze()
-    
-    sort_rank = all_annotated.groupby('id').apply(get_id_rank, tumor_alias).rename('sort_rank')
-    all_sorted = all_annotated.merge(sort_rank, on=['id'], how='left').sort_values(['sort_rank', 'id', 'alias'], ascending=[True, True, False]).drop(columns='sort_rank')
+        return group.loc[group["alias"] == tumor_alias, "top_el_rank_el_rank"].squeeze()
+
+    sort_rank = (
+        all_annotated.groupby("id").apply(get_id_rank, tumor_alias).rename("sort_rank")
+    )
+    all_sorted = (
+        all_annotated.merge(sort_rank, on=["id"], how="left")
+        .sort_values(["sort_rank", "id", "alias"], ascending=[True, True, False])
+        .drop(columns="sort_rank")
+    )
 
     return all_sorted.reindex(columns=column_order)
 
