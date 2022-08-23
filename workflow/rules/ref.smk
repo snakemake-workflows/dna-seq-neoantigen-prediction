@@ -83,7 +83,7 @@ rule create_somatic_flag_header_line:
     output:
         "resources/somatic_flag_header_line.txt",
     log:
-        "logs/create_somatic_flag_header_line.log"
+        "logs/create_somatic_flag_header_line.log",
     shell:
         """
         ( echo '##INFO=<ID=SOMATIC,Number=0,Type=Flag,Description="Somatic tumor variant">' > {output} ) 2> {log}
@@ -96,7 +96,7 @@ rule create_genome_somatic_flag_bed:
     output:
         "resources/genome.somatic_flag.bed",
     log:
-        "logs/create_genome_somatic_flag_bed.log"
+        "logs/create_genome_somatic_flag_bed.log",
     conda:
         "../envs/gawk.yaml"
     cache: True

@@ -12,7 +12,9 @@ rule net_mhc_pan:
         extra=config["params"]["net_mhc_pan"]["extra"],
         netMHC=config["params"]["net_mhc_pan"]["location"],
         length=config["params"]["net_mhc_pan"]["peptide_len"],
-        alleles=lambda wc, input: ",".join( pd.read_csv(input.alleles[0], header=None)[0] ),
+        alleles=lambda wc, input: ",".join(
+            pd.read_csv(input.alleles[0], header=None)[0]
+        ),
     shell:
         "( "
         "if [ -s {input.peptides} ]; "
@@ -38,7 +40,9 @@ rule net_mhc_two_pan:
         extra=config["params"]["net_mhc_two_pan"]["extra"],
         netMHC=config["params"]["net_mhc_two_pan"]["location"],
         length=config["params"]["net_mhc_two_pan"]["peptide_len"],
-        alleles=lambda wc, input: ",".join( pd.read_csv(input.alleles[0], header=None)[0] ),
+        alleles=lambda wc, input: ",".join(
+            pd.read_csv(input.alleles[0], header=None)[0]
+        ),
     shell:
         "( "
         "if [ -s {input.peptides} ]; "

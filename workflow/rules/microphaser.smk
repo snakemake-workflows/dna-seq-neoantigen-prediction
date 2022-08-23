@@ -21,7 +21,7 @@ rule add_somatic_flag:
     output:
         "results/final-calls/{group}.{set}.somatic_flag.norm.bcf",
     log:
-        "logs/bcftools_annotate/{group}.{set}.somatic_flag.norm.log"
+        "logs/bcftools_annotate/{group}.{set}.somatic_flag.norm.log",
     conda:
         "../envs/bcftools.yaml"
     shell:
@@ -41,14 +41,16 @@ rule merge_tumor_normal:
             "results/final-calls/{{group}}.{sets}.norm.bcf",
             sets=[
                 config["params"]["microphaser"]["variant_sets"]["normal"],
-                config["params"]["microphaser"]["variant_sets"]["tumor"] + ".somatic_flag",
+                config["params"]["microphaser"]["variant_sets"]["tumor"]
+                + ".somatic_flag",
             ],
         ),
         index=expand(
             "results/final-calls/{{group}}.{sets}.norm.bcf.csi",
             sets=[
                 config["params"]["microphaser"]["variant_sets"]["normal"],
-                config["params"]["microphaser"]["variant_sets"]["tumor"] + ".somatic_flag",
+                config["params"]["microphaser"]["variant_sets"]["tumor"]
+                + ".somatic_flag",
             ],
         ),
     output:
@@ -77,7 +79,11 @@ rule microphaser_tumor:
     conda:
         "../envs/microphaser.yaml"
     params:
-        window_length=lambda w: max(config["params"]["net_mhc_pan"]["peptide_len"],config["params"]["net_mhc_two_pan"]["peptide_len"])*3,
+        window_length=lambda w: max(
+            config["params"]["net_mhc_pan"]["peptide_len"],
+            config["params"]["net_mhc_two_pan"]["peptide_len"],
+        )
+        * 3,
     shell:
         "microphaser somatic {input.bam} --variants {input.bcf} --ref {input.ref} --tsv {output.tsv} -n {output.wt_fasta} -w {params.window_length} "
         "< {input.track} > {output.mt_fasta} 2> {log}"
@@ -102,7 +108,11 @@ rule microphaser_normal:
     conda:
         "../envs/microphaser.yaml"
     params:
-        window_length=lambda w: max(config["params"]["net_mhc_pan"]["peptide_len"],config["params"]["net_mhc_two_pan"]["peptide_len"])*3,
+        window_length=lambda w: max(
+            config["params"]["net_mhc_pan"]["peptide_len"],
+            config["params"]["net_mhc_two_pan"]["peptide_len"],
+        )
+        * 3,
     shell:
         "microphaser normal {input.bam} --variants {input.bcf} --ref {input.ref} -t {output.wt_tsv} -w {params.window_length} "
         "< {input.track} > {output.wt_fasta} 2> {log}"
@@ -133,7 +143,7 @@ rule build_normal_proteome_db:
     conda:
         "../envs/microphaser.yaml"
     params:
-        length=lambda wildcards: config["params"][ wildcards.mhc]["peptide_len"],
+        length=lambda wildcards: config["params"][wildcards.mhc]["peptide_len"],
     shell:
         "( microphaser build_reference -r {input} -o {output.bin} -l {params.length} > {output.fasta} ) 2> {log}"
 
@@ -159,7 +169,7 @@ rule microphaser_filter:
     conda:
         "../envs/microphaser.yaml"
     params:
-        length=lambda wildcards: config["params"][ wildcards.mhc]["peptide_len"],
+        length=lambda wildcards: config["params"][wildcards.mhc]["peptide_len"],
     shell:
         "microphaser filter -r {input.proteome} -t {input.tsv} -o {output.tsv} -n {output.wt_fasta} -s {output.removed} -l {params.length} > {output.mt_fasta} 2>{log}"
 
