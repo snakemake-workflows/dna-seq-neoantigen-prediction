@@ -155,7 +155,7 @@ rule download_hla_la_graph:
         "resources/graphs/PRG_MHC_GRCh38_withIMGT/sequences.txt",
     params:
         graphs_dir=lambda w, output: output[0].replace(
-            "/PRG_MHC_GRCh38_withIMGT/PRG", ""
+            "graphs/PRG_MHC_GRCh38_withIMGT/PRG", "graphs"
         ),
     log:
         "logs/download_hla_la_graph.log",
