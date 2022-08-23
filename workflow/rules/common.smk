@@ -63,12 +63,12 @@ wildcard_constraints:
         pd.unique(samples.loc[samples["alias"].str.match("tumor"), "alias"])
     ),
     normal_alias="normal",
-    tumor_set=config["params"]["microphaser"]["variant_sets"]["tumor"],
-    normal_set=config["params"]["microphaser"]["variant_sets"]["normal"],
+    tumor_set=config["params"]["microphaser"]["events"]["tumor"],
+    normal_set=config["params"]["microphaser"]["events"]["normal"],
     set="|".join(
         [
-            config["params"]["microphaser"]["variant_sets"]["tumor"],
-            config["params"]["microphaser"]["variant_sets"]["normal"],
+            config["params"]["microphaser"]["events"]["tumor"],
+            config["params"]["microphaser"]["events"]["normal"],
         ]
     ),
     group="|".join(pd.unique(samples["group"])),

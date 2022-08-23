@@ -21,7 +21,7 @@ ref:
 params:
   microphaser:
     # window_len should be at least 3 times the longest peptide_len specified below
-    variant_sets:
+    events:
       normal: "normal_only"
       tumor: "tumor_only"
   net_mhc_pan:

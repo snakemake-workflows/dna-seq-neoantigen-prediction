@@ -39,7 +39,7 @@ properties:
       microphaser:
         type: object
         properties:
-          variant_sets:
+          events:
             type: object
             properties:
               normal:

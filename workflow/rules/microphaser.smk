@@ -40,16 +40,16 @@ rule merge_tumor_normal:
         calls=expand(
             "results/final-calls/{{group}}.{sets}.norm.bcf",
             sets=[
-                config["params"]["microphaser"]["variant_sets"]["normal"],
-                config["params"]["microphaser"]["variant_sets"]["tumor"]
+                config["params"]["microphaser"]["events"]["normal"],
+                config["params"]["microphaser"]["events"]["tumor"]
                 + ".somatic_flag",
             ],
         ),
         index=expand(
             "results/final-calls/{{group}}.{sets}.norm.bcf.csi",
             sets=[
-                config["params"]["microphaser"]["variant_sets"]["normal"],
-                config["params"]["microphaser"]["variant_sets"]["tumor"]
+                config["params"]["microphaser"]["events"]["normal"],
+                config["params"]["microphaser"]["events"]["tumor"]
                 + ".somatic_flag",
             ],
         ),
@@ -153,7 +153,7 @@ rule microphaser_filter:
         tsv="results/microphaser/info/{group}/{tumor_alias}.merged_tumor_normal.{contig}.tsv",
         proteome=expand(
             "results/microphaser/bin/{{group}}.{normal_set}.{{mhc}}.normal_proteome.bin",
-            normal_set=config["params"]["microphaser"]["variant_sets"]["normal"],
+            normal_set=config["params"]["microphaser"]["events"]["normal"],
         ),
     output:
         mt_fasta=(
