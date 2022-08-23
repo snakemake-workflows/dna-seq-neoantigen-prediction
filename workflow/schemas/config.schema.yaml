@@ -4,21 +4,6 @@ description: snakemake configuration file
 
 type: object
 
-definitions:
-  filterentry:
-    type: object
-    additionalProperties:
-      type: string
-  evententry:
-    type: object
-    properties:
-      varlociraptor:
-        type: array
-        items: 
-          type: string
-      filter:
-        type: string
-
 properties:
   samples:
     type: string
@@ -48,9 +33,6 @@ properties:
       activate:
         type: boolean
   
-  affinity:
-    type: object
-    properties:
   params:
     type: object
     properties:
@@ -103,4 +85,3 @@ required:
   - ref
   - params
   - neoantigen_prediction
-  - affinity
