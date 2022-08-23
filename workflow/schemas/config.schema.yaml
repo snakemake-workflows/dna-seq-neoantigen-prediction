@@ -102,5 +102,5 @@ required:
   - units
   - ref
   - params
-  - epitope_prediction
+  - neoantigen_prediction
   - affinity
