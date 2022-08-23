@@ -1,14 +1,14 @@
-rule HLA_LA:
+rule hla_la:
     input:
         bam=get_bam_from_group_and_alias(),
         bai=get_bam_from_group_and_alias(ext=".bai"),
         index="resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH",
         ext_idx="resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.pac",
     output:
-        "results/HLA-LA/output/{group}_{alias}/hla/R1_bestguess_G.txt",
+        "results/hla_la/output/{group}_{alias}/hla/R1_bestguess_G.txt",
     threads: 7
     log:
-        "logs/HLA-LA/{group}_{alias}.log",
+        "logs/hla_la/{group}_{alias}.log",
     params:
         graph=lambda w, input: os.path.basename(os.path.dirname(input.index)),
         graphdir=lambda w, input: os.path.dirname(os.path.dirname(input.index)),
@@ -49,21 +49,21 @@ rule net_mhc_two_pan_alleles:
 
 rule parse_and_filter_hla_alleles_for_netmhc:
     input:
-        hla_la_bestguess="results/HLA-LA/output/{group}_{alias}/hla/R1_bestguess_G.txt",
+        hla_la_bestguess="results/hla_la/output/{group}_{alias}/hla/R1_bestguess_G.txt",
         mhc_one_alleles="resources/hla_alleles/available_alleles.net_mhc_pan.txt",
         mhc_two_alleles="resources/hla_alleles/available_alleles.net_mhc_two_pan.txt",
     output:
         hlaI=report(
-            "results/HLA-LA/{group}.{alias}.hlaI.tsv",
+            "results/hla_la/{group}.{alias}.hlaI.tsv",
             caption="../report/hla_alleles.rst",
             category="HLA alleles",
         ),
         hlaII=report(
-            "results/HLA-LA/{group}.{alias}.hlaII.tsv",
+            "results/hla_la/{group}.{alias}.hlaII.tsv",
             caption="../report/hla_alleles.rst",
             category="HLA alleles",
         ),
     log:
-        "logs/parse-HLA-LA/{group}.{alias}.log",
+        "logs/parse_hla_la/{group}.{alias}.log",
     script:
         "../scripts/parse_and_filter_hla_alleles_for_netmhc.py"

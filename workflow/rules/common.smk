@@ -125,8 +125,8 @@ def get_final_output():
         else:
             final_output = expand(
                 [
-                    "results/HLA-LA/{group}.{tumor_alias}.hlaI.tsv",
-                    "results/HLA-LA/{group}.{tumor_alias}.hlaII.tsv",
+                    "results/hla_la/{group}.{tumor_alias}.hlaI.tsv",
+                    "results/hla_la/{group}.{tumor_alias}.hlaII.tsv",
                 ],
                 group=group,
                 tumor_alias=tumor_aliases,
@@ -183,7 +183,7 @@ def get_bam_from_group_and_alias(ext=".bam"):
 def get_alleles_MHCI(wildcards):
     alias = "normal" if wildcards.peptide_type == "normal" else wildcards.tumor_alias
     return expand(
-        "results/HLA-LA/{group}.{alias}.hlaI.tsv",
+        "results/hla_la/{group}.{alias}.hlaI.tsv",
         group=wildcards.group,
         alias=alias,
     )
@@ -193,7 +193,7 @@ def get_alleles_MHCII(wildcards):
     alias = "normal" if wildcards.peptide_type == "normal" else wildcards.tumor_alias
     return expand(
         # TODO: check that hlaII is correct here, and not hlaI which it previously was
-        "results/HLA-LA/{group}.{alias}.hlaII.tsv",
+        "results/hla_la/{group}.{alias}.hlaII.tsv",
         group=wildcards.group,
         alias=alias,
     )

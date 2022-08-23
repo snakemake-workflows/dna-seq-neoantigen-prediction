@@ -72,7 +72,7 @@ rule merge_neoantigen_info:
     output:
         report(
             "results/neoantigens/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.DNA.tsv",
-            caption="../report/neoantigens.DNA.rst",
+            caption="../report/neoantigens.dna.rst",
             category="Neoantigens",
         ),
     log:
@@ -81,19 +81,19 @@ rule merge_neoantigen_info:
         "../scripts/merge_neoantigen_info.py"
 
 
-rule add_RNA_info:
+rule add_rna_info:
     input:
         counts="results/kallisto/{group}.{tumor_alias}",
         table="results/neoantigens/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.DNA.tsv",
     output:
         report(
             "results/neoantigens/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.RNA.tsv",
-            caption="../report/RNA_results.rst",
-            category="Results RNA",
+            caption="../report/neoantigens.rna.rst",
+            category="Neoantigens",
         ),
     params:
         abundance=lambda wc, input: "{}/abundance.tsv".format(input.counts),
     log:
-        "logs/add-RNA/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.log",
+        "logs/add_rna/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.log",
     script:
         "../scripts/add_rna_info.py"

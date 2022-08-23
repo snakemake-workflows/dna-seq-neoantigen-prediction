@@ -29,8 +29,8 @@ include: "rules/common.smk"
 include: "rules/utils.smk"
 include: "rules/ref.smk"
 include: "rules/microphaser.smk"
-include: "rules/HLAtyping.smk"
-include: "rules/MHC_binding.smk"
+include: "rules/hla_typing.smk"
+include: "rules/mhc_binding.smk"
 
 
 rule all:

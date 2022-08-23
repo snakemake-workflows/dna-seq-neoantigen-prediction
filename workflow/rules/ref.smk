@@ -142,7 +142,7 @@ rule genome_dict:
         "0.45.1/bio/picard/createsequencedictionary"
 
 
-rule download_HLALA_graph:
+rule download_hla_la_graph:
     output:
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/PRG"),
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/knownReferences"),
@@ -158,13 +158,13 @@ rule download_HLALA_graph:
             "/PRG_MHC_GRCh38_withIMGT/PRG", ""
         ),
     log:
-        "logs/download-HLA-LA-graph.log",
+        "logs/download_hla_la_graph.log",
     shell:
         "( cd {params.graphs_dir} && wget  http://www.well.ox.ac.uk/downloads/PRG_MHC_GRCh38_withIMGT.tar.gz "
         "&& tar -xvzf PRG_MHC_GRCh38_withIMGT.tar.gz && rm  PRG_MHC_GRCh38_withIMGT.tar.gz ) 2> {log}"
 
 
-rule index_HLALA:
+rule index_hla_la:
     input:
         "resources/graphs/PRG_MHC_GRCh38_withIMGT/sequences.txt",
     output:
@@ -176,12 +176,12 @@ rule index_HLALA:
         path=lambda wc, input: os.path.dirname(os.path.dirname(input[0])),
         graph=lambda wc, input: os.path.basename(os.path.dirname(input[0])),
     log:
-        "logs/index-HLA-LA-graph.log",
+        "logs/index_hla_la_graph.log",
     shell:
         "HLA-LA.pl --prepareGraph 1 --customGraphDir {params.path} --graph {params.graph} > {log} 2>&1"
 
 
-rule index_HLALA_extended_ref:
+rule index_hla_la_extended_ref:
     input:
         "resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.fa",
     output:
@@ -193,7 +193,7 @@ rule index_HLALA_extended_ref:
     conda:
         "../envs/hla_la.yaml"
     log:
-        "logs/index_HLA-LA_extended_ref.log",
+        "logs/index_hla_la_extended_ref.log",
     shell:
         "bwa index {input} > {log} 2>&1"
 
