@@ -41,16 +41,14 @@ rule merge_tumor_normal:
             "results/final-calls/{{group}}.{sets}.norm.bcf",
             sets=[
                 config["params"]["microphaser"]["events"]["normal"],
-                config["params"]["microphaser"]["events"]["tumor"]
-                + ".somatic_flag",
+                config["params"]["microphaser"]["events"]["tumor"] + ".somatic_flag",
             ],
         ),
         index=expand(
             "results/final-calls/{{group}}.{sets}.norm.bcf.csi",
             sets=[
                 config["params"]["microphaser"]["events"]["normal"],
-                config["params"]["microphaser"]["events"]["tumor"]
-                + ".somatic_flag",
+                config["params"]["microphaser"]["events"]["tumor"] + ".somatic_flag",
             ],
         ),
     output:
