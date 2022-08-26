@@ -87,10 +87,13 @@ def tidy_info(info: pd.DataFrame, tumor_alias: str) -> pd.DataFrame:
     # Aggregate multiple identical entries that differ only in 'id' and 'transcript'
     # into one, taking the first 'id' and collecting all 'transcript's into a '|'-separated
     # list.
-    cols = [c for c in info.columns if c not in ["id", "transcript"]]
+    cols = [c for c in info.columns if c not in ["id", "transcript", "depth", "freq", "freq_credible_interval"]]
     aggregation_functions = {
         "id": lambda i: list(i),
-        "transcript": lambda t: "|".join(set(t)),
+        "transcript": lambda t: "|".join(list(t)),
+        "depth": lambda d: "|".join(list(d)),
+        "freq": lambda f: "|".join(list(f)),
+        "freq_credible_interval": lambda c: "|".join(list(c)),
     }
     info = (
         info.groupby(cols, dropna=False)
