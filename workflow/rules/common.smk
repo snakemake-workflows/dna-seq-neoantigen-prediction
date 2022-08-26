@@ -1,6 +1,7 @@
 import glob
 
 import pandas as pd
+from os import path
 from snakemake.remote import FTP
 from snakemake.utils import validate
 

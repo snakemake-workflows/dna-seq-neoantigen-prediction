@@ -46,4 +46,11 @@ params:
     # the conda-provided tcsh installation, it needs to read (without quotes):
     # "#!/usr/bin/env tcsh"
     location: "../netMHCIIpan-4.1"
+  neo_fox:
+    activate: false
+    # This should be at least as long as the desired net_mhc_two_pan peptide length
+    peptide_len: 15
+    # update the version number to get a newer release of the reference set of HLA Alleles
+    hla_alleles: "https://raw.githubusercontent.com/ANHIG/IMGTHLA/Latest/allelelist/Allelelist.3480.txt"
+    extra: ""
 

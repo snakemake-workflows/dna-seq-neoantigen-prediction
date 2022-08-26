@@ -45,6 +45,7 @@ include: "rules/ref.smk"
 include: "rules/microphaser.smk"
 include: "rules/hla_typing.smk"
 include: "rules/mhc_binding.smk"
+include: "rules/annotate_neoantigens.smk"
 
 
 rule all:
