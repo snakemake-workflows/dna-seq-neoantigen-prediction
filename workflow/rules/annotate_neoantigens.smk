@@ -5,7 +5,7 @@ rule prepare_neo_fox_config_and_resources:
     conda:
         "../envs/neo_fox_deps.yaml"
     params:
-        hla_alleles=config["params"]["neofox"]["hla_alleles"],
+        hla_alleles=config["params"]["neo_fox"]["hla_alleles"],
     shell:
         """
         # environment variables necessary for neofox-configure
@@ -47,16 +47,16 @@ rule neo_fox:
         candidates="results/microphaser/info/filtered/{group}.{tumor_alias}.merged_tumor_normal.neo_fox.tsv",
         patient_annotation="results/neo_fox/patient_data/{group}.{tumor_alias}.hla_alleles.tumor_type.tsv",
     output:
-        tsv="results/neo_fox/annotated/{group}.{tumor_alias}.annotated_neoantigens.tsv"
-        json="results/neo_fox/annotated/{group}.{tumor_alias}.annotated_neoantigens.json"
-        meta_json="results/neo_fox/annotated/{group}.{tumor_alias}.meta_annotations.json"
+        tsv="results/neo_fox/annotated/{group}.{tumor_alias}.annotated_neoantigens.tsv",
+        json="results/neo_fox/annotated/{group}.{tumor_alias}.annotated_neoantigens.json",
+        meta_json="results/neo_fox/annotated/{group}.{tumor_alias}.meta_annotations.json",
     threads: 8
     conda:
         "../envs/neo_fox_deps.yaml"
     params:
         folder=lambda wc, output: path.dirname(output.annotated),
         prefix=lambda wc, output: path.plitext(path.basename(output.annotated))[0],
-        organism="human" if config["ref"]["species"]=="homo_sapiens" else "mouse" if config["ref"]["species"]=="mus_musculus" else "unsupported"
+        organism="human" if config["ref"]["species"]=="homo_sapiens" else "mouse" if config["ref"]["species"]=="mus_musculus" else "unsupported",
     shell:
         "(neofox "
         "  --num_cpus {threads} "
