@@ -11,6 +11,20 @@ configfile: "config/config.yaml"
 scattergather:
     calling=24,
 
+##### required envvars #####
+
+envvars:
+    # For NeoFox installation:
+    # The tarballs for both netMHCpan and netMHCIIpan
+    # need to be donwloaded manually after registering
+    # online and deposited at a filesystem location
+    # that needs to be available as a shell environment
+    # variable when running snakemake.
+    # For downloading, see the "Downloads" tab at:
+    # https://services.healthtech.dtu.dk/service.php?NetMHCpan-4.1
+    "NET_MHC_PAN_4_1_TARBALL",
+    # https://services.healthtech.dtu.dk/service.php?NetMHCIIpan-4.0
+    "NET_MHC_TWO_PAN_4_0_TARBALL",
 
 ##### setup report #####
 
