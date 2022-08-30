@@ -69,19 +69,15 @@ rule microphaser_tumor:
         track="resources/annotation/{contig}.gtf",
         ref="resources/genome.fasta",
     output:
-        mt_fasta="results/microphaser/fasta/{group}/{tumor_alias}.merged_tumor_normal.{contig}.neo.fa",
-        wt_fasta="results/microphaser/fasta/{group}/{tumor_alias}.merged_tumor_normal.{contig}.normal.fa",
-        tsv="results/microphaser/info/{group}/{tumor_alias}.merged_tumor_normal.{contig}.tsv",
+        mt_fasta="results/microphaser/fasta/contigs/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.{contig}.neo.fa",
+        wt_fasta="results/microphaser/fasta/contigs/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.{contig}.normal.fa",
+        tsv="results/microphaser/info/contigs/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.{contig}.tsv",
     log:
-        "logs/microphaser_tumor/{group}/{tumor_alias}.merged_tumor_normal.{contig}.log",
+        "logs/microphaser_tumor/{group}/{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.{contig}.log",
     conda:
         "../envs/microphaser.yaml"
     params:
-        window_length=lambda w: max(
-            config["params"]["net_mhc_pan"]["peptide_len"],
-            config["params"]["net_mhc_two_pan"]["peptide_len"],
-        )
-        * 3,
+        window_length=lambda wc: int(wc.peptide_length) * 3
     shell:
         "microphaser somatic {input.bam} --variants {input.bcf} --ref {input.ref} --tsv {output.tsv} -n {output.wt_fasta} -w {params.window_length} "
         "< {input.track} > {output.mt_fasta} 2> {log}"
@@ -96,21 +92,17 @@ rule microphaser_normal:
         ref="resources/genome.fasta",
     output:
         wt_fasta=(
-            "results/microphaser/fasta/{group}/{normal_alias}.{normal_set}.{contig}.fa"
+            "results/microphaser/fasta/contigs/{group}.{normal_alias}.{normal_set}.pep_len_{peptide_length}.{contig}.fa"
         ),
         wt_tsv=(
-            "results/microphaser/info/{group}/{normal_alias}.{normal_set}.{contig}.tsv"
+            "results/microphaser/info/contigs/{group}.{normal_alias}.{normal_set}.pep_len_{peptide_length}.{contig}.tsv"
         ),
     log:
-        "logs/microphaser_normal/{group}/{normal_alias}.{normal_set}-{contig}.log",
+        "logs/microphaser_normal/contigs/{group}/{normal_alias}.{normal_set}.pep_len_{peptide_length}.{contig}.log",
     conda:
         "../envs/microphaser.yaml"
     params:
-        window_length=lambda w: max(
-            config["params"]["net_mhc_pan"]["peptide_len"],
-            config["params"]["net_mhc_two_pan"]["peptide_len"],
-        )
-        * 3,
+        window_length=lambda wc: int(wc.peptide_length) * 3
     shell:
         "microphaser normal {input.bam} --variants {input.bcf} --ref {input.ref} -t {output.wt_tsv} -w {params.window_length} "
         "< {input.track} > {output.wt_fasta} 2> {log}"
@@ -119,69 +111,65 @@ rule microphaser_normal:
 rule concat_normal_proteome:
     input:
         expand(
-            "results/microphaser/fasta/{{group}}/normal.{{normal_set}}.{contig}.fa",
+            "results/microphaser/fasta/contigs/{{group}}.normal.{{normal_set}}.pep_len_{{peptide_length}}.{contig}.fa",
             contig=contigs,
         ),
     output:
-        "results/microphaser/fasta/{group}.{normal_set}.normal_proteome.fa",
+        "results/microphaser/fasta/{group}.{normal_set}.normal_proteome.pep_len_{peptide_length}.fa",
     log:
-        "logs/microphaser_concat_normal_proteome/{group}.{normal_set}.log",
+        "logs/microphaser_concat_normal_proteome/{group}.{normal_set}.pep_len_{peptide_length}.log",
     shell:
         "cat {input} > {output} 2> {log}"
 
 
 rule build_normal_proteome_db:
     input:
-        "results/microphaser/fasta/{group}.{normal_set}.normal_proteome.fa",
+        "results/microphaser/fasta/{group}.{normal_set}.normal_proteome.pep_len_{peptide_length}.fa",
     output:
-        bin="results/microphaser/bin/{group}.{normal_set}.{mhc}.normal_proteome.bin",
-        fasta="results/microphaser/fasta/{group}.{normal_set}.{mhc}.normal_proteome.peptides.fasta",
+        bin="results/microphaser/bin/{group}.{normal_set}.normal_proteome.pep_len_{peptide_length}.bin",
+        fasta="results/microphaser/fasta/{group}.{normal_set}.normal_proteome.pep_len_{peptide_length}.peptides.fasta",
     log:
-        "logs/microphaser_build_normal_proteome_db/{group}.{normal_set}-{mhc}.log",
+        "logs/microphaser_build_normal_proteome_db/{group}.{normal_set}.pep_len_{peptide_length}.log",
     conda:
         "../envs/microphaser.yaml"
-    params:
-        length=lambda wildcards: config["params"][wildcards.mhc]["peptide_len"],
     shell:
-        "( microphaser build_reference -r {input} -o {output.bin} -l {params.length} > {output.fasta} ) 2> {log}"
+        "( microphaser build_reference -r {input} -o {output.bin} -l {wildcards.peptide_length} > {output.fasta} ) 2> {log}"
 
 
 rule microphaser_filter:
     input:
-        tsv="results/microphaser/info/{group}/{tumor_alias}.merged_tumor_normal.{contig}.tsv",
+        tsv="results/microphaser/info/contigs/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.{contig}.tsv",
         proteome=expand(
-            "results/microphaser/bin/{{group}}.{normal_set}.{{mhc}}.normal_proteome.bin",
+            "results/microphaser/bin/{{group}}.{normal_set}.normal_proteome.pep_len_{{peptide_length}}.bin",
             normal_set=config["params"]["microphaser"]["events"]["normal"],
         ),
     output:
         mt_fasta=(
-            "results/microphaser/fasta/filtered/{group}/{tumor_alias}.merged_tumor_normal.{mhc}.{contig}.neo.fa"
+            "results/microphaser/fasta/filtered/contigs/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.{contig}.neo.fa"
         ),
         wt_fasta=(
-            "results/microphaser/fasta/filtered/{group}/{tumor_alias}.merged_tumor_normal.{mhc}.{contig}.normal.fa"
+            "results/microphaser/fasta/filtered/contigs/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.{contig}.normal.fa"
         ),
-        tsv="results/microphaser/info/filtered/{group}/{tumor_alias}.merged_tumor_normal.{mhc}.{contig}.tsv",
-        removed="results/microphaser/info/removed/{group}/{tumor_alias}.merged_tumor_normal.{mhc}.{contig}.removed.tsv",
+        tsv="results/microphaser/info/filtered/contigs/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.{contig}.tsv",
+        removed="results/microphaser/info/removed/contigs/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.{contig}.removed.tsv",
     log:
-        "logs/microphaser_filter/{group}/{tumor_alias}.merged_tumor_normal.{mhc}.{contig}.log",
+        "logs/microphaser_filter/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.{contig}.log",
     conda:
         "../envs/microphaser.yaml"
-    params:
-        length=lambda wildcards: config["params"][wildcards.mhc]["peptide_len"],
     shell:
-        "microphaser filter -r {input.proteome} -t {input.tsv} -o {output.tsv} -n {output.wt_fasta} -s {output.removed} -l {params.length} > {output.mt_fasta} 2>{log}"
+        "microphaser filter -r {input.proteome} -t {input.tsv} -o {output.tsv} -n {output.wt_fasta} -s {output.removed} -l {wildcards.peptide_length} > {output.mt_fasta} 2>{log}"
 
 
 rule concat_tsvs:
     input:
         expand(
-            "results/microphaser/info/filtered/{{group}}/{{tumor_alias}}.merged_tumor_normal.{{mhc}}.{contig}.tsv",
+            "results/microphaser/info/filtered/contigs/{{group}}.{{tumor_alias}}.merged_tumor_normal.pep_len_{{peptide_length}}.{contig}.tsv",
             contig=contigs,
         ),
     output:
-        "results/microphaser/info/filtered/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.tsv",
+        "results/microphaser/info/filtered/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.tsv",
     log:
-        "logs/microphaser_concat_tsvs/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.log",
+        "logs/microphaser_concat_tsvs/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.log",
     conda:
         "../envs/xsv.yaml"
     shell:

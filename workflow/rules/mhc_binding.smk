@@ -1,11 +1,14 @@
 rule net_mhc_pan:
     input:
-        peptides="results/microphaser/fasta/filtered/{group}/{tumor_alias}.merged_tumor_normal.net_mhc_pan.{contig}.{peptide_type}.fa",
+        peptides=expand(
+            "results/microphaser/fasta/filtered/contigs/{{group}}.{{tumor_alias}}.merged_tumor_normal.pep_len_{peptide_length}.{{contig}}.{{peptide_type}}.fa",
+            peptide_length=config["params"]["net_mhc_pan"]["peptide_len"],
+        ),
         alleles=get_alleles_MHCI,
     output:
-        "results/net_mhc_pan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.tsv",
+        "results/net_mhc_pan/contigs/{group}.{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.tsv",
     log:
-        "logs/net_mhc_pan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.log",
+        "logs/net_mhc_pan/{group}.{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.log",
     conda:
         "../envs/tcsh.yaml"
     params:
@@ -28,12 +31,15 @@ rule net_mhc_pan:
 
 rule net_mhc_two_pan:
     input:
-        peptides="results/microphaser/fasta/filtered/{group}/{tumor_alias}.merged_tumor_normal.net_mhc_two_pan.{contig}.{peptide_type}.fa",
+        peptides=expand(
+            "results/microphaser/fasta/filtered/contigs/{{group}}.{{tumor_alias}}.merged_tumor_normal.pep_len_{peptide_length}.{{contig}}.{{peptide_type}}.fa",
+            peptide_length=config["params"]["net_mhc_two_pan"]["peptide_len"],
+        ),
         alleles=get_alleles_MHCII,
     output:
-        "results/net_mhc_two_pan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.tsv",
+        "results/net_mhc_two_pan/contigs/{group}.{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.tsv",
     log:
-        "logs/net_mhc_two_pan/{group}/{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.log",
+        "logs/net_mhc_two_pan/{group}.{tumor_alias}.merged_tumor_normal.{contig}.{peptide_type}.log",
     conda:
         "../envs/tcsh.yaml"
     params:
@@ -57,7 +63,7 @@ rule net_mhc_two_pan:
 rule tidy_mhc_out:
     input:
         expand(
-            "results/{{mhc}}/{{group}}/{{tumor_alias}}.merged_tumor_normal.{contig}.{{peptide_type}}.tsv",
+            "results/{{mhc}}/contigs/{{group}}.{{tumor_alias}}.merged_tumor_normal.{contig}.{{peptide_type}}.tsv",
             contig=contigs,
         ),
     output:
