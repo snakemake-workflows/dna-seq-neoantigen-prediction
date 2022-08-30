@@ -40,11 +40,26 @@ rule prepare_neo_fox_config_and_resources:
         """
 
 
+rule adjust_microphaser_output_for_neo_fox:
+    input:
+        candidates="results/microphaser/info/filtered/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.tsv",
+    output:
+        candidates="results/neo_fox/candidates/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.tsv",
+    threads: 1
+    conda:
+        "../envs/polars.yaml"
+    script:
+        "../scripts/adjust_microphaser_output_for_neo_fox.py"
+
+
 rule neo_fox:
     input:
         config="resources/neo_fox/neo_fox_config.txt",
         references=directory("resources/neo_fox/references/"),
-        candidates="results/microphaser/info/filtered/{group}.{tumor_alias}.merged_tumor_normal.neo_fox.tsv",
+        candidates=expand(
+            "results/neo_fox/candidates/{{group}}.{{tumor_alias}}.merged_tumor_normal.pep_len_{peptide_length}.tsv",
+            peptide_length=config["params"]["neo_fox"]["peptide_len"],
+        ),
         patient_annotation="results/neo_fox/patient_data/{group}.{tumor_alias}.hla_alleles.tumor_type.tsv",
     output:
         tsv="results/neo_fox/annotated/{group}.{tumor_alias}.annotated_neoantigens.tsv",
