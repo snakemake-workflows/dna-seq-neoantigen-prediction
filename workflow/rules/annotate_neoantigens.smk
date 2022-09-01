@@ -9,18 +9,23 @@ rule prepare_neo_fox_config_and_resources:
     shell:
         """
         # environment variables necessary for neofox-configure
+        # NOTE: we have to provide all binaries with hard-coded
+        # paths, because NeoFox checks that the file at the path
+        # exists (and not simply that a binary exists):
+        # https://github.com/TRON-Bioinformatics/neofox/blob/629443b637fc41b1ab81f4f770e7a8a1c976d3f2/neofox/references/references.py#L90
+        CONDA_BIN=$CONDA_PREFIX/bin
 
         ## pre-installed via conda
-        export NEOFOX_MAKEBLASTDB=makeblastdb
-        echo 'NEOFOX_MAKEBLASTDB=makeblastdb' > {output.config}
-        export NEOFOX_RSCRIPT=Rscript
-        echo 'NEOFOX_RSCRIPT=Rscript' >> {output.config}
+        export NEOFOX_MAKEBLASTDB=$CONDA_BIN/makeblastdb
+        echo 'NEOFOX_MAKEBLASTDB=$CONDA_BIN/makeblastdb' > {output.config}
+        export NEOFOX_RSCRIPT=$CONDA_BIN/Rscript
+        echo 'NEOFOX_RSCRIPT=$CONDA_BIN/Rscript' >> {output.config}
 
         ## pre-installed into conda environment via post-deploy script
-        export NEOFOX_NETMHCPAN=netMHCpan
-        echo 'NEOFOX_NETMHCPAN=netMHCpan' >> {output.config}
-        export NEOFOX_NETMHC2PAN=netMHCIIpan
-        echo 'NEOFOX_NETMHC2PAN=netMHCIIpan' >> {output.config}
+        export NEOFOX_NETMHCPAN=$CONDA_BIN/netMHCpan
+        echo 'NEOFOX_NETMHCPAN=$CONDA_BIN/netMHCpan' >> {output.config}
+        export NEOFOX_NETMHC2PAN=$CONDA_BIN/netMHCIIpan
+        echo 'NEOFOX_NETMHC2PAN=$CONDA_BIN/netMHCIIpan' >> {output.config}
 
         ## specification of hla_allele link via config.yaml
         export NEOFOX_HLA_DATABASE={params.hla_alleles}
@@ -31,12 +36,12 @@ rule prepare_neo_fox_config_and_resources:
         # further environment variables needed for the config file
 
         ## pre-installed via conda
-        echo 'NEOFOX_BLASTP=blastp' >> {output.config}
+        echo 'NEOFOX_BLASTP=$CONDA_BIN/blastp' >> {output.config}
         
         ## pre-installed into conda environment via post-deploy script
-        echo 'NEOFOX_MIXMHCPRED=MixMHCpred' >> {output.config}
-        echo 'NEOFOX_MIXMHC2PRED=MixMHC2pred_unix' >> {output.config}
-        echo 'NEOFOX_PRIME=PRIME' >> {output.config}
+        echo 'NEOFOX_MIXMHCPRED=$CONDA_BIN/MixMHCpred' >> {output.config}
+        echo 'NEOFOX_MIXMHC2PRED=$CONDA_BIN/MixMHC2pred_unix' >> {output.config}
+        echo 'NEOFOX_PRIME=$CONDA_BIN/PRIME' >> {output.config}
         """
 
 
