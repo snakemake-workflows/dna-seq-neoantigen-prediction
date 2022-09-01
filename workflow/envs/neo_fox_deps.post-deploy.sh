@@ -114,7 +114,7 @@ NET_MHC_TWO_PAN_4_0_LIB="${CONDA_LIB}/netMHCIIpan_4_0/"
 mkdir -p ${NET_MHC_TWO_PAN_4_0_LIB}
 NET_MHC_TWO_PAN_4_0_ETC="${CONDA_ETC}/netMHCIIpan_4_0/"
 mkdir -p ${NET_MHC_TWO_PAN_4_0_ETC}
-tar xzf ${NET_MHC_PAN_TWO_4_0_TARBALL}
+tar xzf ${NET_MHC_TWO_PAN_4_0_TARBALL}
 cd netMHCIIpan-4.0
 wget https://services.healthtech.dtu.dk/services/NetMHCIIpan-4.0/data.tar.gz 
 tar xzf data.tar.gz
