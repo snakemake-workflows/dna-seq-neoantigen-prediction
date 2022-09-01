@@ -1,7 +1,14 @@
 rule prepare_neo_fox_config_and_resources:
     output:
         config="resources/neo_fox/neo_fox_config.txt",
+        # we cannot put the exact files generated into the
+        # output, as snakemake will generate the respective
+        # subdirectories and NeoFox has default exist_ok=False
+        # set for os.makedirs:
+        # https://github.com/TRON-Bioinformatics/neofox/blob/fb6cdf9f10e77c409d0fa44657ef520eedca6994/neofox/references/installer.py#L221
         references=directory("resources/neo_fox/references/"),
+    log:
+        "logs/neo_fox/neo_fox_config.log",
     conda:
         "../envs/neo_fox_deps.yaml"
     params:
@@ -62,7 +69,6 @@ rule adjust_microphaser_output_for_neo_fox:
 rule neo_fox:
     input:
         config="resources/neo_fox/neo_fox_config.txt",
-        references=directory("resources/neo_fox/references/"),
         candidates=expand(
             "results/neo_fox/candidates/{{group}}.{{tumor_alias}}.merged_tumor_normal.pep_len_{peptide_length}.tsv",
             peptide_length=config["params"]["neo_fox"]["peptide_len"],
@@ -72,6 +78,8 @@ rule neo_fox:
         tsv="results/neo_fox/annotated/{group}.{tumor_alias}.annotated_neoantigens.tsv",
         json="results/neo_fox/annotated/{group}.{tumor_alias}.annotated_neoantigens.json",
         meta_json="results/neo_fox/annotated/{group}.{tumor_alias}.meta_annotations.json",
+    log:
+        "logs/neo_fox/annotated/{group}.{tumor_alias}.log",
     threads: 8
     conda:
         "../envs/neo_fox_deps.yaml"
