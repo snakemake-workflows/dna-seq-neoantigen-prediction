@@ -17,7 +17,7 @@ mkdir -p $CONDA_ETC
 # https://github.com/GfellerLab/MixMHCpred/blob/v2.1/README
 MIX_MHC_PRED_VERSION="2.1"
 MIX_MHC_PRED_LIB_PATH="$CONDA_PREFIX/lib/mix_mhc_pred/"
-wget https://github.com/GfellerLab/MixMHCpred/archive/refs/tags/v${MIX_MHC_PRED_VERSION}.tar.gz
+wget -q https://github.com/GfellerLab/MixMHCpred/archive/refs/tags/v${MIX_MHC_PRED_VERSION}.tar.gz
 tar xzf v${MIX_MHC_PRED_VERSION}.tar.gz
 cd MixMHCpred-${MIX_MHC_PRED_VERSION}
 g++ -O3 lib/MixMHCpred.cc -o lib/MixMHCpred.x
@@ -42,7 +42,7 @@ rm -r MixMHCpred-${MIX_MHC_PRED_VERSION}
 # https://github.com/GfellerLab/MixMHC2pred/blob/v1.2/README.md
 MIX_MHC_TWO_PRED_VERSION="1.2"
 MIX_MHC_TWO_PRED_LIB_PATH="${CONDA_LIB}/mix_mhc_two_pred/"
-wget https://github.com/GfellerLab/MixMHC2pred/archive/refs/tags/v${MIX_MHC_TWO_PRED_VERSION}.tar.gz
+wget -q https://github.com/GfellerLab/MixMHC2pred/archive/refs/tags/v${MIX_MHC_TWO_PRED_VERSION}.tar.gz
 tar xzf v${MIX_MHC_TWO_PRED_VERSION}.tar.gz
 cd MixMHC2pred-${MIX_MHC_TWO_PRED_VERSION}
 mv -t ${CONDA_BIN} MixMHC2pred MixMHC2pred_unix
@@ -59,7 +59,7 @@ rm -r MixMHC2pred-${MIX_MHC_TWO_PRED_VERSION}
 # https://github.com/GfellerLab/PRIME/blob/v1.0/README
 PRIME_VERSION="1.0"
 PRIME_LIB_PATH="${CONDA_LIB}/prime/"
-wget https://github.com/GfellerLab/PRIME/archive/refs/tags/v${PRIME_VERSION}.tar.gz
+wget -q https://github.com/GfellerLab/PRIME/archive/refs/tags/v${PRIME_VERSION}.tar.gz
 tar xzf v${PRIME_VERSION}.tar.gz
 cd PRIME-${PRIME_VERSION}
 PRIME_PLACEHOLDER="/app/PRIME/lib"
@@ -90,7 +90,7 @@ NET_MHC_PAN_4_1_ETC="${CONDA_ETC}/netMHCpan_4_1/"
 mkdir -p ${NET_MHC_PAN_4_1_ETC}
 tar xzf ${NET_MHC_PAN_4_1_TARBALL}
 cd netMHCpan-4.1
-wget https://services.healthtech.dtu.dk/services/NetMHCpan-4.1/data.tar.gz
+wget -q https://services.healthtech.dtu.dk/services/NetMHCpan-4.1/data.tar.gz
 tar xzf data.tar.gz
 rm data.tar.gz
 grep "${TCSH_ROOT}" netMHCpan
@@ -117,7 +117,7 @@ NET_MHC_TWO_PAN_4_0_ETC="${CONDA_ETC}/netMHCIIpan_4_0/"
 mkdir -p ${NET_MHC_TWO_PAN_4_0_ETC}
 tar xzf ${NET_MHC_TWO_PAN_4_0_TARBALL}
 cd netMHCIIpan-4.0
-wget https://services.healthtech.dtu.dk/services/NetMHCIIpan-4.0/data.tar.gz 
+wget -q https://services.healthtech.dtu.dk/services/NetMHCIIpan-4.0/data.tar.gz 
 tar xzf data.tar.gz
 rm data.tar.gz
 grep "${TCSH_ROOT}" netMHCIIpan
