@@ -47,9 +47,11 @@ rule prepare_neo_fox_config_and_resources:
 
 rule adjust_microphaser_output_for_neo_fox:
     input:
-        candidates="results/microphaser/info/filtered/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.tsv",
+        microphaser="results/microphaser/info/filtered/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.tsv",
     output:
-        candidates="results/neo_fox/candidates/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.tsv",
+        neo_fox="results/neo_fox/candidates/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.tsv",
+    log:
+        "logs/neo_fox/candidates/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.log",
     threads: 1
     conda:
         "../envs/polars.yaml"
