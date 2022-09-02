@@ -15,7 +15,7 @@ rule merge_snvs:
     params:
         "--use-header final-calls/sampleheader.txt --force-samples",
     wrapper:
-        "0.36.0/bio/bcftools/merge"
+        "v1.12.0/bio/bcftools/merge"
 
 
 rule query:

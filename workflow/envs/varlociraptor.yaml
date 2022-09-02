@@ -3,4 +3,4 @@ channels:
   - bioconda
 dependencies:
   - varlociraptor =2.3.0
-  - bcftools =1.10
+  - bcftools =1.14

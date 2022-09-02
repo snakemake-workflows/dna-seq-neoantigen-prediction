@@ -9,7 +9,7 @@ rule norm_bcf:
     params:
         lambda w, input: "-f {} -O b -m-".format(input.genome),  # optional parameters for bcftools norm (except -o)
     wrapper:
-        "0.65.0/bio/bcftools/norm"
+        "v1.12.0/bio/bcftools/norm"
 
 
 rule add_somatic_flag:
@@ -58,7 +58,7 @@ rule merge_tumor_normal:
     params:
         extra="-O b -a",
     wrapper:
-        "0.64.0/bio/bcftools/concat"
+        "v1.12.0/bio/bcftools/concat"
 
 
 rule microphaser_tumor:

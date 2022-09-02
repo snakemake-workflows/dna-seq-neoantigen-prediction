@@ -10,7 +10,7 @@ rule get_genome:
         release=config["ref"]["release"],
     cache: True
     wrapper:
-        "0.45.1/bio/reference/ensembl-sequence"
+        "v1.12.0/bio/reference/ensembl-sequence"
 
 
 rule get_cdna:
@@ -25,7 +25,7 @@ rule get_cdna:
         release=config["ref"]["release"],
     cache: True
     wrapper:
-        "0.45.1/bio/reference/ensembl-sequence"
+        "v1.12.0/bio/reference/ensembl-sequence"
 
 
 rule get_annotation:
@@ -41,7 +41,7 @@ rule get_annotation:
     log:
         "logs/get-annotation.log",
     wrapper:
-        "0.45.1/bio/reference/ensembl-annotation"
+        "v1.12.0/bio/reference/ensembl-annotation"
 
 
 # TODO: remove this rule, once microphaser is fixed to make gene_name optional
@@ -76,7 +76,7 @@ rule genome_faidx:
         "logs/genome-faidx.log",
     cache: True
     wrapper:
-        "0.45.1/bio/samtools/faidx"
+        "v1.12.0/bio/samtools/faidx"
 
 
 rule create_somatic_flag_header_line:
@@ -114,7 +114,7 @@ rule bgzip_genome_somatic_flag_bed:
     log:
         "logs/bgzip/genome.somatic_flag.log",
     wrapper:
-        "v1.7.0/bio/bgzip"
+        "v1.12.0/bio/bgzip"
 
 
 rule tabix_genome_somatic_flag_bed:
@@ -139,7 +139,7 @@ rule genome_dict:
         "logs/picard/create-dict.log",
     cache: True
     wrapper:
-        "0.45.1/bio/picard/createsequencedictionary"
+        "v1.12.0/bio/picard/createsequencedictionary"
 
 
 rule download_hla_la_graph:
