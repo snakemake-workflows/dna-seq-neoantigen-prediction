@@ -2,4 +2,6 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - polars =0.14
+  - pip
+  - pip:
+    - polars-lts-cpu==0.14.8
