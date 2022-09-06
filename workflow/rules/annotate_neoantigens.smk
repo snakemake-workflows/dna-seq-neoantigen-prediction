@@ -99,8 +99,8 @@ rule neo_fox:
     conda:
         "../envs/neo_fox_deps.yaml"
     params:
-        folder=lambda wc, output: path.dirname(output.annotated),
-        prefix=lambda wc, output: path.plitext(path.basename(output.annotated))[0],
+        folder=lambda wc, output: path.dirname(output.tsv),
+        prefix=lambda wc, output: path.splitext(path.basename(output.tsv))[0],
         organism="human"
         if config["ref"]["species"] == "homo_sapiens"
         else "mouse"
@@ -117,7 +117,7 @@ rule neo_fox:
         "  --organism {params.organism} "
         "  --output-folder {params.folder} "
         "  --output-prefix {params.prefix} ; "
-        " mv {params_folder}/{params.prefix}_neoantigen_candidates_annotated.tsv {output.tsv}; "
-        " mv {params_folder}/{params.prefix}_neoantigen_candidates_annotated.json {output.json}; "
-        " mv {params_folder}/{params.prefix}_neoantigen_features.json {output.meta_json}; "
+        " mv {params.folder}/{params.prefix}_neoantigen_candidates_annotated.tsv {output.tsv}; "
+        " mv {params.folder}/{params.prefix}_neoantigen_candidates_annotated.json {output.json}; "
+        " mv {params.folder}/{params.prefix}_neoantigen_features.json {output.meta_json}; "
         ") 2> {log} "
