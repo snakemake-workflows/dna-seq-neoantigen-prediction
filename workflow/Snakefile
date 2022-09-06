@@ -11,7 +11,9 @@ configfile: "config/config.yaml"
 scattergather:
     calling=24,
 
+
 ##### required envvars #####
+
 
 envvars:
     # For NeoFox installation:
@@ -25,6 +27,7 @@ envvars:
     "NET_MHC_PAN_4_1_TARBALL",
     # https://services.healthtech.dtu.dk/service.php?NetMHCIIpan-4.0
     "NET_MHC_TWO_PAN_4_0_TARBALL",
+
 
 ##### setup report #####
 

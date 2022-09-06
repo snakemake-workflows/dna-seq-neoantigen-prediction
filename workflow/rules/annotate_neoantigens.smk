@@ -44,7 +44,7 @@ rule prepare_neo_fox_config_and_resources:
 
         ## pre-installed via conda
         echo 'NEOFOX_BLASTP=$CONDA_BIN/blastp' >> {output.config}
-        
+
         ## pre-installed into conda environment via post-deploy script
         echo 'NEOFOX_MIXMHCPRED=$CONDA_BIN/MixMHCpred' >> {output.config}
         echo 'NEOFOX_MIXMHC2PRED=$CONDA_BIN/MixMHC2pred_unix' >> {output.config}
@@ -70,16 +70,16 @@ rule create_neo_fox_group_sheet:
     input:
         hla_la_bestguess="results/hla_la/output/{group}_{tumor_alias}/hla/R1_bestguess_G.txt",
     output:
-        group_sheet="results/neo_fox/patient_data/{group}.{tumor_alias}.hla_alleles.tumor_type.tsv"
+        group_sheet="results/neo_fox/patient_data/{group}.{tumor_alias}.hla_alleles.tumor_type.tsv",
     log:
-        "logs/neo_fox/patient_data/{group}.{tumor_alias}.hla_alleles.tumor_type.log"
+        "logs/neo_fox/patient_data/{group}.{tumor_alias}.hla_alleles.tumor_type.log",
     conda:
         "../envs/pandas.yaml"
     params:
-        group=lambda wc: group_annotation.loc[wc.group]
+        group=lambda wc: group_annotation.loc[wc.group],
     script:
         "../scripts/create_neo_fox_group_sheet.py"
-    
+
 
 rule neo_fox:
     input:
@@ -101,7 +101,11 @@ rule neo_fox:
     params:
         folder=lambda wc, output: path.dirname(output.annotated),
         prefix=lambda wc, output: path.plitext(path.basename(output.annotated))[0],
-        organism="human" if config["ref"]["species"]=="homo_sapiens" else "mouse" if config["ref"]["species"]=="mus_musculus" else "unsupported",
+        organism="human"
+        if config["ref"]["species"] == "homo_sapiens"
+        else "mouse"
+        if config["ref"]["species"] == "mus_musculus"
+        else "unsupported",
     shell:
         "(neofox "
         "  --num_cpus {threads} "

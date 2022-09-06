@@ -77,7 +77,7 @@ rule microphaser_tumor:
     conda:
         "../envs/microphaser.yaml"
     params:
-        window_length=lambda wc: int(wc.peptide_length) * 3
+        window_length=lambda wc: int(wc.peptide_length) * 3,
     shell:
         "microphaser somatic {input.bam} --variants {input.bcf} --ref {input.ref} --tsv {output.tsv} -n {output.wt_fasta} -w {params.window_length} "
         "< {input.track} > {output.mt_fasta} 2> {log}"
@@ -102,7 +102,7 @@ rule microphaser_normal:
     conda:
         "../envs/microphaser.yaml"
     params:
-        window_length=lambda wc: int(wc.peptide_length) * 3
+        window_length=lambda wc: int(wc.peptide_length) * 3,
     shell:
         "microphaser normal {input.bam} --variants {input.bcf} --ref {input.ref} -t {output.wt_tsv} -w {params.window_length} "
         "< {input.track} > {output.wt_fasta} 2> {log}"
