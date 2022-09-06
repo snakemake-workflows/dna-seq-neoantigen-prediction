@@ -48,6 +48,19 @@ units = (
 )
 validate(units, schema="../schemas/units.schema.yaml")
 
+groups = samples["group"].unique()
+
+if "groups" in config:
+    group_annotation = (
+        pd.read_csv(config["groups"], sep="\t", dtype={"group": str})
+        .set_index("group")
+        .sort_index()
+    )
+    group_annotation = group_annotation.loc[groups]
+else:
+    group_annotation = pd.DataFrame({"group": groups}).set_index("group")
+
+
 contigs = [c for c in range(1, 23)]
 contigs.extend(["X", "Y"])
 

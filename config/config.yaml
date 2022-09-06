@@ -1,5 +1,6 @@
 samples: "config/samples.tsv"
 units: "config/units.tsv"
+groups: "config/groups.tsv"
 
 
 neoantigen_prediction:
