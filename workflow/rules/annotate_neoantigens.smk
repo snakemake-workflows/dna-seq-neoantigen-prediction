@@ -61,7 +61,7 @@ rule adjust_microphaser_output_for_neo_fox:
         "logs/neo_fox/candidates/{group}.{tumor_alias}.merged_tumor_normal.pep_len_{peptide_length}.log",
     threads: 1
     conda:
-        "../envs/polars.yaml"
+        "../envs/pandas.yaml"
     script:
         "../scripts/adjust_microphaser_output_for_neo_fox.py"
 

@@ -2,7 +2,7 @@ import sys
 
 sys.stderr = open(snakemake.log[0], "w")
 
-import polars as pl
+import pandas as pd
 
 columns_mapping = {
     "gene_name": "gene",
@@ -12,9 +12,9 @@ columns_mapping = {
 }
 
 candidates = (
-    pl.read_tsv(snakemake.input.microphaser, sep="\t", quote="")
-    .rename(columns_mapping)
-    .with_column(pl.lit(snakemake.wildcards.group).alias("patientIdentifier"))
+    pd.read_csv(snakemake.input.microphaser, sep="\t", quoting=3)
+    .rename(columns=columns_mapping)
+    .assign(patientIdentifier=snakemake.wildcards.group)
 )
 
-candidates.write_csv(snakemake.output.neo_fox, sep="\t", quote="")
+candidates.to_csv(snakemake.output.neo_fox, sep="\t", quoting=3)

@@ -1,7 +1,0 @@
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-  - pip
-  - pip:
-    - polars-lts-cpu==0.14.8
