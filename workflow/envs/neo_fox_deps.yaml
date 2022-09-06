@@ -8,7 +8,7 @@ dependencies:
   # implicit unmentioned dependency of MixMHCpred and PRIME
   - perl
   # https://neofox.readthedocs.io/en/latest/02_installation.html#install-blastp
-  - blast =2.10
+  - blast =2
   # https://github.com/GfellerLab/MixMHCpred/blob/75374a7a0de214278c1cda00bb9dee4b2f475ec3/README#L64
   - cxx-compiler
   # needed for netMHCpan and netMHCIIpan, as their executables are tcsh-scripts
