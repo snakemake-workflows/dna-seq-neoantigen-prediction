@@ -66,6 +66,21 @@ rule adjust_microphaser_output_for_neo_fox:
         "../scripts/adjust_microphaser_output_for_neo_fox.py"
 
 
+rule create_neo_fox_group_sheet:
+    input:
+        hla_la_bestguess="results/hla_la/output/{group}_{tumor_alias}/hla/R1_bestguess_G.txt",
+    output:
+        group_sheet="results/neo_fox/patient_data/{group}.{tumor_alias}.hla_alleles.tumor_type.tsv"
+    log:
+        "logs/neo_fox/patient_data/{group}.{tumor_alias}.hla_alleles.tumor_type.log"
+    conda:
+        "../envs/pandas.yaml"
+    params:
+        group=lambda wc: group_annotation.loc[wc.group]
+    script:
+        "../scripts/create_neo_fox_group_sheet.py"
+    
+
 rule neo_fox:
     input:
         config="resources/neo_fox/neo_fox_config.txt",
@@ -73,7 +88,7 @@ rule neo_fox:
             "results/neo_fox/candidates/{{group}}.{{tumor_alias}}.merged_tumor_normal.pep_len_{peptide_length}.tsv",
             peptide_length=config["params"]["neo_fox"]["peptide_len"],
         ),
-        patient_annotation="results/neo_fox/patient_data/{group}.{tumor_alias}.hla_alleles.tumor_type.tsv",
+        group_sheet="results/neo_fox/patient_data/{group}.{tumor_alias}.hla_alleles.tumor_type.tsv",
     output:
         tsv="results/neo_fox/annotated/{group}.{tumor_alias}.annotated_neoantigens.tsv",
         json="results/neo_fox/annotated/{group}.{tumor_alias}.annotated_neoantigens.json",
@@ -92,7 +107,7 @@ rule neo_fox:
         "  --num_cpus {threads} "
         "  --config {input.config} "
         "  --candidate-file {input.candidates} "
-        "  --patient-data {input.patient_annotation} "
+        "  --patient-data {input.group_sheet} "
         "  --with-table "
         "  --with-json "
         "  --organism {params.organism} "
