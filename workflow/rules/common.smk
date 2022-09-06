@@ -119,30 +119,30 @@ def get_final_output():
                     tumor_alias=tumor_aliases,
                 )
             )
-            #sequencing_types = pd.unique(
-            #    units.loc[units["sample_name"].isin(smps), "sequencing_type"]
-            #)
-            #final_output.extend(
-            #    expand(
-            #        "results/neoantigens/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.{seqtype}.tsv",
-            #        group=group,
-            #        tumor_alias=tumor_aliases,
-            #        mhc=list(
-            #            filter(
-            #                None,
-            #                [
-            #                    "net_mhc_pan"
-            #                    if is_activated("params/net_mhc_pan")
-            #                    else None,
-            #                    "net_mhc_two_pan"
-            #                    if is_activated("params/net_mhc_two_pan")
-            #                    else None,
-            #                ],
-            #            )
-            #        ),
-            #        seqtype=sequencing_types,
-            #    )
-            #)
+        #    sequencing_types = pd.unique(
+        #       units.loc[units["sample_name"].isin(smps), "sequencing_type"]
+        #    )
+        #    final_output.extend(
+        #       expand(
+        #           "results/neoantigens/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.{seqtype}.tsv",
+        #           group=group,
+        #           tumor_alias=tumor_aliases,
+        #           mhc=list(
+        #               filter(
+        #                   None,
+        #                   [
+        #                       "net_mhc_pan"
+        #                       if is_activated("params/net_mhc_pan")
+        #                       else None,
+        #                       "net_mhc_two_pan"
+        #                       if is_activated("params/net_mhc_two_pan")
+        #                       else None,
+        #                   ],
+        #               )
+        #           ),
+        #           seqtype=sequencing_types,
+        #       )
+        #    )
         else:
             final_output = expand(
                 [
