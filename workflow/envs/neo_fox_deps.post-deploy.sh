@@ -4,6 +4,9 @@ set -euo pipefail
 # set all the necessary conda paths and
 # ensure they exist
 CONDA_BIN="${CONDA_PREFIX}/bin/"
+# this is needed for the allele list files of MixMHCpred, MixMHC2pred
+# and PRIME, where NeoFox expects some of the files in that directory
+mkdir -p ${CONDA_BIN}/lib/
 CONDA_MAN1="${CONDA_PREFIX}/share/man/man1/"
 mkdir -p $CONDA_MAN1
 CONDA_INFO="${CONDA_PREFIX}/share/info/"
@@ -26,8 +29,11 @@ g++ -O3 lib/MixMHCpred.cc -o lib/MixMHCpred.x
 MMP_PLACEHOLDER="YOUR PATH TO MixMHCpred/lib FOLDER"
 grep "${MMP_PLACEHOLDER}" MixMHCpred
 sed -i "s%${MMP_PLACEHOLDER}%${MIX_MHC_PRED_LIB_PATH}%" MixMHCpred
-mv lib $MIX_MHC_PRED_LIB_PATH
 mv MixMHCpred ${CONDA_BIN}
+# The allele_list.txt file needs to be in the a `lib/` subdirectory of the `bin/` dir, this is hard-coded here:
+# https://github.com/TRON-Bioinformatics/neofox/blob/629443b637fc41b1ab81f4f770e7a8a1c976d3f2/neofox/references/references.py#L123
+cp lib/allele_list.txt ${CONDA_BIN}/lib/
+mv lib $MIX_MHC_PRED_LIB_PATH
 # TODO: when updating to v2.2, change this line to:
 # mv MixMHCpred_license.pdf ${CONDA_INFO}/MixMHCpred_license.pdf
 mv license.pdf ${CONDA_INFO}/MixMHCpred_license.pdf
@@ -46,6 +52,9 @@ wget -q https://github.com/GfellerLab/MixMHC2pred/archive/refs/tags/v${MIX_MHC_T
 tar xzf v${MIX_MHC_TWO_PRED_VERSION}.tar.gz
 cd MixMHC2pred-${MIX_MHC_TWO_PRED_VERSION}
 mv -t ${CONDA_BIN} MixMHC2pred MixMHC2pred_unix
+# The Alleles_list.txt file needs to be in the same directory as the binaries, this is hard-coded here:
+# https://github.com/TRON-Bioinformatics/neofox/blob/629443b637fc41b1ab81f4f770e7a8a1c976d3f2/neofox/references/references.py#L114
+mv -t ${CONDA_BIN} Alleles_list.txt
 mv rpep ${CONDA_ETC}
 ln -s ${CONDA_ETC}/rpep ${CONDA_BIN}/rpep
 mv LICENSE ${CONDA_INFO}/MixMHC2pred_unix_LICENSE
@@ -65,8 +74,11 @@ cd PRIME-${PRIME_VERSION}
 PRIME_PLACEHOLDER="/app/PRIME/lib"
 grep "${PRIME_PLACEHOLDER}" PRIME
 sed -i "s%${PRIME_PLACEHOLDER}%${PRIME_LIB_PATH}%" PRIME
-mv lib $PRIME_LIB_PATH
 mv PRIME ${CONDA_BIN}
+# The alleles.txt file needs to be in the a `lib/` subdirectory of the `bin/` dir, this is hard-coded here:
+# https://github.com/TRON-Bioinformatics/neofox/blob/629443b637fc41b1ab81f4f770e7a8a1c976d3f2/neofox/references/references.py#L132
+cp lib/alleles.txt ${CONDA_BIN}/lib/
+mv lib $PRIME_LIB_PATH
 mv PRIME_license.pdf ${CONDA_INFO}
 PRIME -i test/test.txt -o test/out.txt -a A0201,A0101
 diff <(sed '4d' test/out.txt) <(sed '4d' test/out_compare.txt)
