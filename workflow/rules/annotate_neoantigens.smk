@@ -24,31 +24,31 @@ rule prepare_neo_fox_config_and_resources:
 
         ## pre-installed via conda
         export NEOFOX_MAKEBLASTDB=$CONDA_BIN/makeblastdb
-        echo 'NEOFOX_MAKEBLASTDB=$CONDA_BIN/makeblastdb' > {output.config}
+        echo "NEOFOX_MAKEBLASTDB=$CONDA_BIN/makeblastdb" > {output.config}
         export NEOFOX_RSCRIPT=$CONDA_BIN/Rscript
-        echo 'NEOFOX_RSCRIPT=$CONDA_BIN/Rscript' >> {output.config}
+        echo "NEOFOX_RSCRIPT=$CONDA_BIN/Rscript" >> {output.config}
 
         ## pre-installed into conda environment via post-deploy script
         export NEOFOX_NETMHCPAN=$CONDA_BIN/netMHCpan
-        echo 'NEOFOX_NETMHCPAN=$CONDA_BIN/netMHCpan' >> {output.config}
+        echo "NEOFOX_NETMHCPAN=$CONDA_BIN/netMHCpan" >> {output.config}
         export NEOFOX_NETMHC2PAN=$CONDA_BIN/netMHCIIpan
-        echo 'NEOFOX_NETMHC2PAN=$CONDA_BIN/netMHCIIpan' >> {output.config}
+        echo "NEOFOX_NETMHC2PAN=$CONDA_BIN/netMHCIIpan" >> {output.config}
 
         ## specification of hla_allele link via config.yaml
         export NEOFOX_HLA_DATABASE={params.hla_alleles}
 
         neofox-configure --reference-folder {output.references}
-        echo 'NEOFOX_REFERENCE_FOLDER={output.references}' >> {output.config}
+        echo "NEOFOX_REFERENCE_FOLDER={output.references}" >> {output.config}
 
         # further environment variables needed for the config file
 
         ## pre-installed via conda
-        echo 'NEOFOX_BLASTP=$CONDA_BIN/blastp' >> {output.config}
+        echo "NEOFOX_BLASTP=$CONDA_BIN/blastp" >> {output.config}
 
         ## pre-installed into conda environment via post-deploy script
-        echo 'NEOFOX_MIXMHCPRED=$CONDA_BIN/MixMHCpred' >> {output.config}
-        echo 'NEOFOX_MIXMHC2PRED=$CONDA_BIN/MixMHC2pred_unix' >> {output.config}
-        echo 'NEOFOX_PRIME=$CONDA_BIN/PRIME' >> {output.config}
+        echo "NEOFOX_MIXMHCPRED=$CONDA_BIN/MixMHCpred" >> {output.config}
+        echo "NEOFOX_MIXMHC2PRED=$CONDA_BIN/MixMHC2pred_unix" >> {output.config}
+        echo "NEOFOX_PRIME=$CONDA_BIN/PRIME" >> {output.config}
         """
 
 
@@ -108,7 +108,7 @@ rule neo_fox:
         else "unsupported",
     shell:
         "(neofox "
-        "  --num_cpus {threads} "
+        "  --num-cpus {threads} "
         "  --config {input.config} "
         "  --candidate-file {input.candidates} "
         "  --patient-data {input.group_sheet} "
