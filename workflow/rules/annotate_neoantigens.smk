@@ -92,7 +92,6 @@ rule neo_fox:
     output:
         tsv="results/neo_fox/annotated/{group}.{tumor_alias}.annotated_neoantigens.tsv",
         json="results/neo_fox/annotated/{group}.{tumor_alias}.annotated_neoantigens.json",
-        meta_json="results/neo_fox/annotated/{group}.{tumor_alias}.meta_annotations.json",
     log:
         "logs/neo_fox/annotated/{group}.{tumor_alias}.log",
     threads: 8
@@ -119,5 +118,4 @@ rule neo_fox:
         "  --output-prefix {params.prefix} ; "
         " mv {params.folder}/{params.prefix}_neoantigen_candidates_annotated.tsv {output.tsv}; "
         " mv {params.folder}/{params.prefix}_neoantigen_candidates_annotated.json {output.json}; "
-        " mv {params.folder}/{params.prefix}_neoantigen_features.json {output.meta_json}; "
         ") 2> {log} "
