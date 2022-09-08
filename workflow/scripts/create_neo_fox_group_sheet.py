@@ -28,9 +28,11 @@ mhc_alleles = pd.read_csv(
         sep="\t",
     )
 # the Allele column can contain multiple ";"-separated entries for the
-# same locus
+# same locus -- NeoFox does a hard assertion that only two alleles per
+# gene exist, so we chose to only ever keep the first of such multiple
+# possibilities
 mhc_alleles.loc[:, "Allele"] = mhc_alleles["Allele"].str.split(pat=";")
-mhc_alleles = mhc_alleles.explode(["Allele"])
+mhc_alleles = mhc_alleles.explode(["Allele"]).drop_duplicates(subset=["Locus", "Chromosome"])
 mhc_alleles = mhc_alleles[mhc_alleles["Locus"].isin(ALLOWED_LOCI)]
 mhc_alleles.loc[:, "Allele"] = (
     mhc_alleles["Allele"]
