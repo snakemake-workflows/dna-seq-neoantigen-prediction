@@ -17,4 +17,4 @@ candidates = (
     .assign(patientIdentifier=snakemake.wildcards.group)
 )
 
-candidates.to_csv(snakemake.output.neo_fox, sep="\t", quoting=3)
+candidates.to_csv(snakemake.output.neo_fox, sep="\t", quoting=3, index=False)

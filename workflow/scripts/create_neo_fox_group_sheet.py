@@ -57,4 +57,4 @@ patient_info = pd.DataFrame(
     }
 )
 
-patient_info.to_csv(snakemake.output.group_sheet, sep="\t", quoting=3)
+patient_info.to_csv(snakemake.output.group_sheet, sep="\t", quoting=3, index=False)
