@@ -118,4 +118,7 @@ rule neo_fox:
         "  --output-prefix {params.prefix} ; "
         " mv {params.folder}/{params.prefix}_neoantigen_candidates_annotated.tsv {output.tsv}; "
         " mv {params.folder}/{params.prefix}_neoantigen_candidates_annotated.json {output.json}; "
+        # this implicitly created log does not seem to contain all of stderr,
+        # so we rather do our own capturing below
+        " rm {params.folder}/{params.prefix}.log; "
         ") 2> {log} "
