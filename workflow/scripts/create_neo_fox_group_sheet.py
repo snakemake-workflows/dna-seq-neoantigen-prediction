@@ -57,6 +57,8 @@ patient_info = pd.DataFrame(
         "mhcIAlleles": [ mhc_one_alleles ],
         "mhcIIAlleles": [ mhc_two_alleles ],
     }
-)
+# This is required for cases where no tumorType is available, as NeoFox does not
+# seem to be able to handle empty entries, here -- so we remove the whole column
+).dropna(axis="columns")
 
 patient_info.to_csv(snakemake.output.group_sheet, sep="\t", quoting=3, index=False)
