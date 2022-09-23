@@ -83,7 +83,7 @@ rule merge_neoantigen_info:
         report(
             "results/neoantigens/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.DNA.tsv",
             caption="../report/neoantigens.dna.rst",
-            category="Neoantigens",
+            category="Neopeptides",
         ),
     log:
         "logs/mhc_csv_table/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.log",
@@ -99,7 +99,7 @@ rule add_rna_info:
         report(
             "results/neoantigens/{group}.{tumor_alias}.merged_tumor_normal.{mhc}.RNA.tsv",
             caption="../report/neoantigens.rna.rst",
-            category="Neoantigens",
+            category="Neopeptides",
         ),
     params:
         abundance=lambda wc, input: "{}/abundance.tsv".format(input.counts),

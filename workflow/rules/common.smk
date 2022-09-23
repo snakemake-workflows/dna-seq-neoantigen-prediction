@@ -114,9 +114,10 @@ def get_final_output():
         if config["neoantigen_prediction"]["activate"]:
             final_output.extend(
                 expand(
-                    "results/neo_fox/annotated/{group}.{tumor_alias}.annotated_neoantigens.tsv",
+                    "results/datavzrd/neoprint/{group}.{tumor_alias}.{mhc}",
                     group=group,
                     tumor_alias=tumor_aliases,
+                    mhc=["I", "II"],
                 )
             )
         #    sequencing_types = pd.unique(

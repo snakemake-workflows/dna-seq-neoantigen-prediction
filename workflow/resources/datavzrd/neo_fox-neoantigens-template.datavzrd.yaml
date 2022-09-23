@@ -1,0 +1,16 @@
+name: ?f"Neopeptide candidates for {wildcards.group}, tumor sample {wildcards.tumor_alias}"
+
+default-view: "overview"
+
+datasets:
+  neoprint:
+    path: ?input.neopeptides
+    separator: "\t"
+
+views:
+  overview:
+    desc: ?f"Neopeptide candidates for {wildcards.group} tumor sample {wildcards.tumor_alias}, with annotations gathered and provided by NeoFox."
+    dataset: neoprint
+    render-table:
+      gene:
+        link-to-url: https://www.ensembl.org/Homo_sapiens/Gene/Summary?g={value}
