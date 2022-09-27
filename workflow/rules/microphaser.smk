@@ -1,13 +1,13 @@
 rule norm_bcf:
     input:
         "results/final-calls/{group}.{set}.bcf",
-        genome="resources/genome.fasta",
+        ref="resources/genome.fasta",
     output:
         "results/final-calls/{group}.{set}.norm.bcf",
     log:
         "logs/bcftools/norm/{group}.{set}.log",
     params:
-        lambda w, input: "-f {} -O b -m-".format(input.genome),  # optional parameters for bcftools norm (except -o)
+        extra="-m-"
     wrapper:
         "v1.12.0/bio/bcftools/norm"
 
@@ -58,7 +58,7 @@ rule merge_tumor_normal:
     params:
         extra="-O b -a",
     wrapper:
-        "v1.12.0/bio/bcftools/concat"
+        "v1.14.1/bio/bcftools/concat"
 
 
 rule microphaser_tumor:
