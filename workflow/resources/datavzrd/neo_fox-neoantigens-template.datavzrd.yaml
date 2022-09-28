@@ -30,7 +30,7 @@ __variables__:
     PRIME_best_rank:
       plot:
         heatmap:
-          scale: linear
+          scale: symlog
           domain:
             - 0.0
             - 100.0
@@ -319,7 +319,14 @@ datasets:
 
 views:
   overview:
-    desc: ?f"Neopeptide candidates for {wildcards.group} tumor sample {wildcards.tumor_alias}, with annotations gathered and provided by NeoFox."
+    desc: |
+      Neopeptide candidates with annotations gathered and provided by NeoFox.
+
+      ### Column descriptions
+      * **Recognition_Potential_MHCI_9mer:** The recognition potential of a neoantigen is the likelihood that it is effectively recognized by the TCR repertoire (definition: Amplitude_MHCI_affinity_9mer x Pathogensimiliarity_MHCI_affinity_9mer) \[[runup to equation (5) in Luksza et al. 2017](https://doi.org/10.1038/nature24473)\].
+      * **Selfsimilarity_MHCI_conserved_binder:** Score for k-mer based similarity between Best_rank_MHCI_score_epitope and Best_affinity_MHCI_epitope_WT. For conserved binders only (i.e. NOT improved binders), where this score is considered indicative of immunogenicity \[[page 3 of Bjerregaard et al., 2017, Front Immunol.](https://doi.org/10.3389/fimmu.2017.01566)\].
+      * **Improved_Binder_MHCI:** Cutoff of 1.2 on the ratio between normal and mutated peptide rank scores to designate a peptide as an improved binder (as opposed to a conserved binder) (definition: (Best_rank_MHCI_score_WT / Best_rank_MHCI_score ) > 1.2) \[[page 4 of Bjerregaard et al., 2017, Front Immunol.](https://doi.org/10.3389/fimmu.2017.01566)\]
+
     dataset: neoprint
     
     render-table:
