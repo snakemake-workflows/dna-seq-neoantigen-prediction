@@ -7,7 +7,8 @@ rule prepare_neoprint:
     log:
         "logs/prepare_neoprint/{group}.{tumor_alias}.log",
     params:
-        purity = lambda wc: samples.loc[(samples["group"] == wc.group) & (samples["alias"] == wc.tumor_alias), "purity"].squeeze()
+        purity = lambda wc: samples.loc[(samples["group"] == wc.group) & (samples["alias"] == wc.tumor_alias), "purity"].squeeze(),
+        neofox_important_cols=neofox_important_cols,
     conda:
         "../envs/pandas.yaml"
     script:
@@ -22,6 +23,8 @@ rule render_datavzrd_neoprint_config:
         neopeptides="results/tables/neoprint/{group}.{tumor_alias}.annotated_neopeptides.{mhc}.sorted.tsv",
     output:
         "resources/datavzrd/{group}.{tumor_alias}.datavzrd_neoprint.{mhc}.yaml",
+    params:
+        neofox_important_cols=neofox_important_cols,
     log:
         "logs/datavzrd_render_neoprint/{group}.{tumor_alias}.{mhc}.log",
     template_engine:

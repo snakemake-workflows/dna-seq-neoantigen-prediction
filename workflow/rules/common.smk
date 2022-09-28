@@ -219,3 +219,42 @@ def get_alleles_MHCII(wildcards):
         group=wildcards.group,
         alias=alias,
     )
+
+
+##### Other stuff ####
+
+neofox_important_cols = {
+    "general": [
+            "gene",
+            "mutation_mutatedXmer",
+            "mutation_wildTypeXmer",
+            "purity_adjusted_DNA_VAF",
+            "imputedGeneExpression",
+        ],
+    "I": [
+            "PRIME_best_rank",
+            "PRIME_best_score",
+            "PRIME_best_peptide",
+            "PRIME_best_allele",
+            "Recognition_Potential_MHCI_9mer",
+            "Improved_Binder_MHCI",
+            "Selfsimilarity_MHCI_conserved_binder",
+            "Best_rank_MHCI_9mer_score",
+            "Best_rank_MHCI_9mer_score_WT",
+            "Best_rank_MHCI_9mer_epitope",
+            "Best_rank_MHCI_9mer_epitope_WT",
+            "Best_rank_MHCI_9mer_allele",
+            "Best_rank_MHCI_9mer_allele_WT",
+        ],
+    "II": [
+            "MixMHC2pred_best_rank",
+            "MixMHC2pred_best_peptide",
+            "MixMHC2pred_best_allele",
+            "Best_rank_MHCII_score",
+            "Best_rank_MHCII_score_WT",
+            "Best_rank_MHCII_score_epitope",
+            "Best_rank_MHCII_score_epitope_WT",
+            "Best_rank_MHCII_score_allele",
+            "Best_rank_MHCII_score_allele_WT",
+        ]
+}

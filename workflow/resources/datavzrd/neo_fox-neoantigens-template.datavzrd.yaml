@@ -1,3 +1,313 @@
+__definitions__:
+  - import pandas as pd
+  - from itertools import chain
+  - from copy import deepcopy
+__variables__:
+  important_cols: ?set(params.neofox_important_cols["general"]) | set(params.neofox_important_cols[wildcards.mhc])
+  cols: ?set(pd.read_csv(input.neopeptides, sep="\t").columns.values)
+  coldefs:
+    gene:
+      link-to-url: https://www.ensembl.org/Homo_sapiens/Gene/Summary?g={value}
+    mutation_mutatedXmer:
+      custom: |
+        function(value, row) {
+          return value.split("").map(function(a) {
+            if (a === a.toLowerCase()) {
+              return `<b style="color: red">${a}</b>`
+            } else {
+              return a
+            }
+          }).join("");
+        }
+    purity_adjusted_DNA_VAF:
+      plot:
+        ticks:
+          scale: linear
+    imputedGeneExpression:
+      plot:
+        ticks:
+          scale: linear
+    PRIME_best_rank:
+      plot:
+        heatmap:
+          scale: linear
+          domain:
+            - 0.0
+            - 100.0
+          range:
+            - "#EC0000"
+            - white
+    PRIME_best_score:
+      plot:
+        ticks:
+          scale: linear
+    Best_rank_MHCI_9mer_score:
+      plot:
+        ticks:
+          scale: linear
+          aux-domain-columns:
+            - Best_rank_MHCI_9mer_score_WT
+    Best_rank_MHCI_9mer_score_WT:
+      plot:
+        ticks:
+          scale: linear
+          aux-domain-columns:
+            - Best_rank_MHCI_9mer_score
+    MixMHC2pred_best_rank:
+      plot:
+        heatmap:
+          scale: linear
+          domain:
+            - 0.0
+            - 100.0
+          range:
+            - "#EC0000"
+            - "#ffffff"
+    Best_rank_MHCII_score:
+      plot:
+        ticks:
+          scale: linear
+          aux-domain-columns:
+            - Best_rank_MHCII_score_WT
+    Best_rank_MHCII_score_WT:
+      plot:
+        ticks:
+          scale: linear
+          aux-domain-columns:
+            - Best_rank_MHCII_score
+    Recognition_Potential_MHCI_9mer:
+      plot:
+        ticks:
+          scale: linear
+    Improved_Binder_MHCI:
+      plot:
+        heatmap:
+          scale: ordinal
+          domain:
+            - 0
+            - 1
+          range:
+            - "#ffffff"
+            - "#2CA02C"
+    Selfsimilarity_MHCI_conserved_binder:
+      plot:
+        ticks:
+          scale: linear
+    mutation_position:
+      display-mode: detail
+    dnaVariantAlleleFrequency:
+      display-mode: detail
+    rnaVariantAlleleFrequency:
+      display-mode: hidden
+    rnaExpression:
+      display-mode: hidden
+    ADN_MHCI:
+      display-mode: detail
+      plot:
+        heatmap:
+          scale: ordinal
+          color-scheme: category20
+    ADN_MHCII:
+      display-mode: detail
+      plot:
+        heatmap:
+          scale: ordinal
+          color-scheme: category20
+    Amplitude_MHCII_rank:
+      display-mode: detail
+      plot:
+        heatmap:
+          scale: linear
+          domain:
+            - 0.0
+            - 100.0
+          range:
+            - "#EC0000"
+            - "#ffffff"
+    Amplitude_MHCI_affinity:
+      display-mode: detail
+      plot:
+        ticks:
+          scale: linear
+    Amplitude_MHCI_affinity_9mer:
+      display-mode: detail
+      plot:
+        ticks:
+          scale: linear
+    MixMHC2pred_best_allele:
+      plot:
+        heatmap:
+          scale: ordinal
+          color-scheme: category20
+          aux-domain-columns:
+            - MixMHC2pred_best_allele
+            - Best_rank_MHCII_score_allele
+            - Best_rank_MHCII_score_allele_WT
+            - Best_affinity_MHCII_allele
+            - Best_affinity_MHCII_allele_WT
+    Best_rank_MHCII_score_allele:
+      display-mode: detail
+      plot:
+        heatmap:
+          scale: ordinal
+          color-scheme: category20
+          aux-domain-columns:
+            - MixMHC2pred_best_allele
+            - Best_rank_MHCII_score_allele
+            - Best_rank_MHCII_score_allele_WT
+            - Best_affinity_MHCII_allele
+            - Best_affinity_MHCII_allele_WT
+    Best_rank_MHCII_score_allele_WT:
+      display-mode: detail
+      plot:
+        heatmap:
+          scale: ordinal
+          color-scheme: category20
+          aux-domain-columns:
+            - MixMHC2pred_best_allele
+            - Best_rank_MHCII_score_allele
+            - Best_rank_MHCII_score_allele_WT
+            - Best_rank_MHCII_allele_WT
+            - Best_affinity_MHCII_allele
+            - Best_affinity_MHCII_allele_WT
+    Best_affinity_MHCII_allele:
+      display-mode: detail
+      plot:
+        heatmap:
+          scale: ordinal
+          color-scheme: category20
+          aux-domain-columns:
+            - MixMHC2pred_best_allele
+            - Best_rank_MHCII_score_allele
+            - Best_rank_MHCII_score_allele_WT
+            - Best_rank_MHCII_allele_WT
+            - Best_affinity_MHCII_allele
+            - Best_affinity_MHCII_allele_WT
+    Best_affinity_MHCII_allele_WT:
+      display-mode: detail
+      plot:
+        heatmap:
+          scale: ordinal
+          color-scheme: category20
+          aux-domain-columns:
+            - MixMHC2pred_best_allele
+            - Best_rank_MHCII_score_allele
+            - Best_rank_MHCII_score_allele_WT
+            - Best_rank_MHCII_allele_WT
+            - Best_affinity_MHCII_allele
+            - Best_affinity_MHCII_allele_WT
+    Best_affinity_MHCII_score:
+      display-mode: detail
+      plot:
+        ticks:
+          scale: linear
+          aux-domain-columns:
+            - Best_affinity_MHCII_score_WT
+    Best_affinity_MHCII_score_WT:
+      display-mode: detail
+      plot:
+        ticks:
+          scale: linear
+          aux-domain-columns:
+            - Best_affinity_MHCII_score
+    PRIME_best_allele:
+      plot:
+        heatmap:
+          scale: ordinal
+          color-scheme: category20
+          aux-domain-columns:
+            - PRIME_best_allele
+            - Best_rank_MHCI_9mer_allele
+            - Best_rank_MHCI_9mer_allele_WT
+            - Best_affinity_MHCI_9mer_allele
+            - Best_affinity_MHCI_9mer_allele_WT
+            - Best_affinity_MHCI_allele
+            - Best_affinity_MHCI_allele_WT
+    Best_rank_MHCI_9mer_allele:
+      display-mode: detail
+      plot:
+        heatmap:
+          scale: ordinal
+          color-scheme: category20
+          aux-domain-columns:
+            - PRIME_best_allele
+            - Best_rank_MHCI_9mer_allele
+            - Best_rank_MHCI_9mer_allele_WT
+            - Best_affinity_MHCI_9mer_allele
+            - Best_affinity_MHCI_9mer_allele_WT
+            - Best_affinity_MHCI_allele
+            - Best_affinity_MHCI_allele_WT
+    Best_rank_MHCI_9mer_allele_WT:
+      display-mode: detail
+      plot:
+        heatmap:
+          scale: ordinal
+          color-scheme: category20
+          aux-domain-columns:
+            - PRIME_best_allele
+            - Best_rank_MHCI_9mer_allele
+            - Best_rank_MHCI_9mer_allele_WT
+            - Best_affinity_MHCI_9mer_allele
+            - Best_affinity_MHCI_9mer_allele_WT
+            - Best_affinity_MHCI_allele
+            - Best_affinity_MHCI_allele_WT
+    Best_affinity_MHCI_9mer_score:
+      display-mode: detail
+      plot:
+        ticks:
+          scale: linear
+          aux-domain-columns:
+            - Best_affinity_MHCI_9mer_score_WT
+    Best_affinity_MHCI_9mer_score_WT:
+      display-mode: detail
+      plot:
+        ticks:
+          scale: linear
+          aux-domain-columns:
+            - Best_affinity_MHCI_9mer_score
+    Best_affinity_MHCI_allele:
+      display-mode: detail
+      plot:
+        heatmap:
+          scale: ordinal
+          color-scheme: category20
+          aux-domain-columns:
+            - PRIME_best_allele
+            - Best_affinity_MHCII_allele
+            - Best_affinity_MHCII_allele_WT
+            - Best_affinity_MHCI_9mer_allele
+            - Best_affinity_MHCI_9mer_allele_WT
+            - Best_affinity_MHCI_allele
+            - Best_affinity_MHCI_allele_WT
+    Best_affinity_MHCI_allele_WT:
+      display-mode: detail
+      plot:
+        heatmap:
+          scale: ordinal
+          color-scheme: category20
+          aux-domain-columns:
+            - PRIME_best_allele
+            - Best_affinity_MHCII_allele
+            - Best_affinity_MHCII_allele_WT
+            - Best_affinity_MHCI_9mer_allele
+            - Best_affinity_MHCI_9mer_allele_WT
+            - Best_affinity_MHCI_allele
+            - Best_affinity_MHCI_allele_WT
+    Best_affinity_MHCI_score:
+      display-mode: detail
+      plot:
+        ticks:
+          scale: linear
+          aux-domain-columns:
+            - Best_affinity_MHCI_score_WT
+    Best_affinity_MHCI_score_WT:
+      display-mode: detail
+      plot:
+        ticks:
+          scale: linear
+          aux-domain-columns:
+            - Best_affinity_MHCI_score
+
 name: ?f"Neopeptide candidates for {wildcards.group}, tumor sample {wildcards.tumor_alias}"
 
 default-view: "overview"
@@ -11,6 +321,17 @@ views:
   overview:
     desc: ?f"Neopeptide candidates for {wildcards.group} tumor sample {wildcards.tumor_alias}, with annotations gathered and provided by NeoFox."
     dataset: neoprint
+    
     render-table:
-      gene:
-        link-to-url: https://www.ensembl.org/Homo_sapiens/Gene/Summary?g={value}
+      columns:
+        ?for col, coldef in coldefs.items():
+          __definitions__:
+            - |
+              coldef_ = deepcopy(coldef)
+              if col not in important_cols:
+                coldef_["display-mode"] = "detail"
+          ?col: ?coldef_
+        ?for col in cols:
+          ?if col not in coldefs and col not in important_cols:
+            ?col:
+              display-mode: detail

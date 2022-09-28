@@ -1,4 +1,5 @@
 import sys
+import json
 
 sys.stderr = open(snakemake.log[0], "w")
 
@@ -62,40 +63,9 @@ all_neopeptides = all_neopeptides.round(decimals=5)
 
 # define important columns to move to the left of the table
 
-important_cols_general = [
-            "gene",
-            "mutation_mutatedXmer",
-            "mutation_wildTypeXmer",
-            "purity_adjusted_DNA_VAF",
-            "imputedGeneExpression",
-        ]
+neofox_important_cols = snakemake.params.neofox_important_cols
 
-important_cols_one = [
-            "PRIME_best_rank",
-            "PRIME_best_score",
-            "PRIME_best_peptide",
-            "PRIME_best_allele",
-            "Best_rank_MHCI_9mer_score",
-            "Best_rank_MHCI_9mer_score_WT",
-            "Best_rank_MHCI_9mer_epitope",
-            "Best_rank_MHCI_9mer_epitope_WT",
-            "Best_rank_MHCI_9mer_allele",
-            "Best_rank_MHCI_9mer_allele_WT",
-        ]
-
-important_cols_two = [
-            "MixMHC2pred_best_rank",
-            "MixMHC2pred_best_peptide",
-            "MixMHC2pred_best_allele",
-            "Best_rank_MHCII_score",
-            "Best_rank_MHCII_score_WT",
-            "Best_rank_MHCII_score_epitope",
-            "Best_rank_MHCII_score_epitope_WT",
-            "Best_rank_MHCII_score_allele",
-            "Best_rank_MHCII_score_allele_WT",
-        ]
-
-important_cols = important_cols_general + important_cols_one + important_cols_two
+important_cols = neofox_important_cols["general"] + neofox_important_cols["I"] + neofox_important_cols["II"]
 
 
 mhc_one = (
@@ -109,7 +79,7 @@ mhc_one.to_csv(snakemake.output.mhc_one, sep="\t", index=False)
 
 # move important columns to the left of the table
 mhc_two = (
-    all_neopeptides[ important_cols_general + important_cols_two + important_cols_one + [ col for col in all_neopeptides.columns if col not in important_cols ] ]
+    all_neopeptides[ neofox_important_cols["general"] + neofox_important_cols["II"] + neofox_important_cols["I"] + [ col for col in all_neopeptides.columns if col not in important_cols ] ]
     .sort_values(by = ["MixMHC2pred_best_rank", "PRIME_best_rank"])
     .groupby("MixMHC2pred_best_rank")
     .head(n=1)

@@ -56,7 +56,7 @@ rule merge_tumor_normal:
     log:
         "logs/bcftools/concat-tumor-normal/{group}.merged_tumor_normal.log",
     params:
-        extra="-O b -a",
+        extra="-a",
     wrapper:
         "v1.14.1/bio/bcftools/concat"
 
