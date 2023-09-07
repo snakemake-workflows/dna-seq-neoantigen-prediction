@@ -12,6 +12,23 @@ scattergather:
     calling=24,
 
 
+##### required envvars #####
+
+
+envvars:
+    # For NeoFox installation:
+    # The tarballs for both netMHCpan and netMHCIIpan
+    # need to be donwloaded manually after registering
+    # online and deposited at a filesystem location
+    # that needs to be available as a shell environment
+    # variable when running snakemake.
+    # For downloading, see the "Downloads" tab at:
+    # https://services.healthtech.dtu.dk/service.php?NetMHCpan-4.1
+    "NET_MHC_PAN_4_1_TARBALL",
+    # https://services.healthtech.dtu.dk/service.php?NetMHCIIpan-4.0
+    "NET_MHC_TWO_PAN_4_0_TARBALL",
+
+
 ##### setup report #####
 
 
@@ -27,24 +44,14 @@ container: "docker://continuumio/miniconda3"
 
 include: "rules/common.smk"
 include: "rules/utils.smk"
-include: "rules/trim.smk"
 include: "rules/ref.smk"
-include: "rules/mapping.smk"
-include: "rules/calling.smk"
-include: "rules/candidate_calling.smk"
-include: "rules/varlociraptor.smk"
-include: "rules/annotation.smk"
-include: "rules/filtering.smk"
 include: "rules/microphaser.smk"
-include: "rules/HLAtyping.smk"
-include: "rules/MHC_binding.smk"
-include: "rules/RNA.smk"
-include: "rules/tmb.smk"
-include: "rules/vega.smk"
+include: "rules/hla_typing.smk"
+include: "rules/mhc_binding.smk"
+include: "rules/annotate_neoantigens.smk"
+include: "rules/datavzrd.smk"
 
 
 rule all:
     input:
         get_final_output(),
-        get_fusion_output(),
-        get_tmb_targets(),

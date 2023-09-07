@@ -1,1 +1,0 @@
-Typing of HLA profile.

@@ -1,8 +1,5 @@
 channels:
   - conda-forge
   - bioconda
-  - jafors
 dependencies:
-  - hla-la ==1.0.5
-  - samtools ==1.10
-  - boost-cpp ==1.73.0
+  - hla-la ==1.0.3

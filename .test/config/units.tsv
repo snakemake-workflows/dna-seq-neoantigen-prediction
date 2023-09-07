@@ -1,3 +1,3 @@
-sample	sequencing_type	unit	fq1	fq2	sra	adapters
+sample_name	sequencing_type	unit_name	fq1	fq2	sra	adapters
 A_normal	DNA	lane1	data/reads/A_normal.1.fastq.gz	data/reads/A_normal.2.fastq.gz		
 A_tumor	DNA	lane1	data/reads/A_tumor.1.fastq.gz	data/reads/A_tumor.2.fastq.gz		

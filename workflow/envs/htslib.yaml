@@ -2,5 +2,4 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - varlociraptor =2.3.0
-  - bcftools =1.14
+  - htslib =1.14

@@ -1,5 +1,4 @@
 channels:
   - conda-forge
-  - bioconda
 dependencies:
-  - bcftools =1.14
+  - gawk =5.1

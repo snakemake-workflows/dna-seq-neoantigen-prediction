@@ -10,7 +10,7 @@ rule get_genome:
         release=config["ref"]["release"],
     cache: True
     wrapper:
-        "0.45.1/bio/reference/ensembl-sequence"
+        "v1.12.0/bio/reference/ensembl-sequence"
 
 
 rule get_cdna:
@@ -25,21 +25,7 @@ rule get_cdna:
         release=config["ref"]["release"],
     cache: True
     wrapper:
-        "0.45.1/bio/reference/ensembl-sequence"
-
-
-rule kallisto_index:
-    input:
-        "resources/genome.cdna.fasta",
-    output:
-        "resources/kallisto/transcripts.idx",
-    params:
-        extra="",
-    log:
-        "logs/kallisto/index.log",
-    cache: True
-    wrapper:
-        "0.60.1/bio/kallisto/index"
+        "v1.12.0/bio/reference/ensembl-sequence"
 
 
 rule get_annotation:
@@ -55,29 +41,24 @@ rule get_annotation:
     log:
         "logs/get-annotation.log",
     wrapper:
-        "0.45.1/bio/reference/ensembl-annotation"
+        "v1.12.0/bio/reference/ensembl-annotation"
 
 
-rule STAR_index:
+# TODO: remove this rule, once microphaser is fixed to make gene_name optional
+rule remove_records_with_gene_name_missing:
     input:
-        fasta="resources/genome.fasta",
-        gtf="resources/genome.gtf",
+        "resources/genome.gtf",
     output:
-        directory("resources/STAR_index"),
-    params:
-        sjdb_overhang="100",
-        extra="",
+        "resources/genome.records_with_gene_name.gtf",
     log:
-        "logs/star/index.log",
-    threads: 32
-    cache: True
-    wrapper:
-        "0.42.0/bio/star/index"
+        "logs/remove_records_with_gene_name_missing.log",
+    shell:
+        '( grep "gene_name" {input} > {output} ) 2> {log}'
 
 
 rule split_annotation:
     input:
-        "resources/genome.gtf",
+        "resources/genome.records_with_gene_name.gtf",
     output:
         "resources/annotation/{contig}.gtf",
     log:
@@ -95,7 +76,58 @@ rule genome_faidx:
         "logs/genome-faidx.log",
     cache: True
     wrapper:
-        "0.45.1/bio/samtools/faidx"
+        "v1.12.0/bio/samtools/faidx"
+
+
+rule create_somatic_flag_header_line:
+    output:
+        "resources/somatic_flag_header_line.txt",
+    log:
+        "logs/create_somatic_flag_header_line.log",
+    shell:
+        """
+        ( echo '##INFO=<ID=SOMATIC,Number=0,Type=Flag,Description="Somatic tumor variant">' > {output} ) 2> {log}
+        """
+
+
+rule create_genome_somatic_flag_bed:
+    input:
+        "resources/genome.fasta.fai",
+    output:
+        "resources/genome.somatic_flag.bed",
+    log:
+        "logs/create_genome_somatic_flag_bed.log",
+    conda:
+        "../envs/gawk.yaml"
+    cache: True
+    shell:
+        """
+        ( awk 'BEGIN {{ OFS="\\t" }} {{ print $1,0,$2 }}' {input} > {output} ) 2> {log}
+        """
+
+
+rule bgzip_genome_somatic_flag_bed:
+    input:
+        "resources/genome.somatic_flag.bed",
+    output:
+        "resources/genome.somatic_flag.bed.gz",
+    log:
+        "logs/bgzip/genome.somatic_flag.log",
+    wrapper:
+        "v1.12.0/bio/bgzip"
+
+
+rule tabix_genome_somatic_flag_bed:
+    input:
+        "resources/genome.somatic_flag.bed.gz",
+    output:
+        "resources/genome.somatic_flag.bed.gz.tbi",
+    conda:
+        "../envs/htslib.yaml"
+    log:
+        "logs/tabix/genome.somatic_flag.log",
+    shell:
+        "( tabix -p bed {input} ) 2> {log}"
 
 
 rule genome_dict:
@@ -107,130 +139,63 @@ rule genome_dict:
         "logs/picard/create-dict.log",
     cache: True
     wrapper:
-        "0.45.1/bio/picard/createsequencedictionary"
+        "v1.12.0/bio/picard/createsequencedictionary"
 
 
-rule get_callregions:
-    input:
-        "resources/genome.fasta.fai",
-    output:
-        "resources/genome.callregions.bed.gz",
-    log:
-        "logs/get-callregions.log",
-    params:
-        n_contigs=config["ref"]["n_chromosomes"],
-    conda:
-        "../envs/index.yaml"
-    shell:
-        "paste <(cut -f1 {input}) <(yes 0 | head -n {params.n_contigs}) <(cut -f2 {input})"
-        " | head -n {params.n_contigs} | bgzip -c > {output} && tabix -p bed {output}"
-
-
-rule get_known_variants:
-    input:
-        # use fai to annotate contig lengths for GATK BQSR
-        fai="resources/genome.fasta.fai",
-    output:
-        vcf="resources/variation.vcf.gz",
-    log:
-        "logs/get-known-variants.log",
-    params:
-        species=config["ref"]["species"],
-        release=config["ref"]["release"],
-        build=config["ref"]["build"],
-        type="all",
-    cache: True
-    wrapper:
-        "0.59.2/bio/reference/ensembl-variation"
-
-
-rule remove_iupac_codes:
-    input:
-        "resources/variation.vcf.gz",
-    output:
-        "resources/variation.noiupac.vcf.gz",
-    log:
-        "logs/fix-iupac-alleles.log",
-    conda:
-        "../envs/rbt.yaml"
-    cache: True
-    shell:
-        "rbt vcf-fix-iupac-alleles < {input} | bcftools view -Oz > {output}"
-
-
-rule bwa_index:
-    input:
-        "resources/genome.fasta",
-    output:
-        multiext("resources/genome.fasta", ".amb", ".ann", ".bwt", ".pac", ".sa"),
-    log:
-        "logs/bwa_index.log",
-    cache: True
-    wrapper:
-        "0.45.1/bio/bwa/index"
-
-
-rule download_HLALA_graph:
+rule download_hla_la_graph:
     output:
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/PRG"),
-        directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome"),
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/knownReferences"),
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/mapping"),
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/mapping_PRGonly"),
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/referenceGenomeSimulations"),
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/sampledReferenceGenomes"),
         directory("resources/graphs/PRG_MHC_GRCh38_withIMGT/translation"),
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.fa",
         "resources/graphs/PRG_MHC_GRCh38_withIMGT/sequences.txt",
+    params:
+        graphs_dir=lambda w, output: output[0].replace(
+            "graphs/PRG_MHC_GRCh38_withIMGT/PRG", "graphs"
+        ),
     log:
-        "logs/download-HLA-LA-graph.log",
-    cache: True
+        "logs/download_hla_la_graph.log",
     shell:
-        "cd resources/graphs && wget  http://www.well.ox.ac.uk/downloads/PRG_MHC_GRCh38_withIMGT.tar.gz "
-        "&& tar -xvzf PRG_MHC_GRCh38_withIMGT.tar.gz"
+        "( cd {params.graphs_dir} && wget  http://www.well.ox.ac.uk/downloads/PRG_MHC_GRCh38_withIMGT.tar.gz "
+        "&& tar -xvzf PRG_MHC_GRCh38_withIMGT.tar.gz && rm  PRG_MHC_GRCh38_withIMGT.tar.gz ) 2> {log}"
 
 
-rule index_HLALA:
+rule index_hla_la:
     input:
         "resources/graphs/PRG_MHC_GRCh38_withIMGT/sequences.txt",
     output:
         "resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH",
-        "resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH_preGapPathindex",
-    cache: True
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/serializedGRAPH_preGapPathIndex",
     conda:
         "../envs/hla_la.yaml"
     params:
         path=lambda wc, input: os.path.dirname(os.path.dirname(input[0])),
         graph=lambda wc, input: os.path.basename(os.path.dirname(input[0])),
     log:
-        "logs/index-HLA-LA-graph.log",
+        "logs/index_hla_la_graph.log",
     shell:
         "HLA-LA.pl --prepareGraph 1 --customGraphDir {params.path} --graph {params.graph} > {log} 2>&1"
 
 
-rule get_vep_cache:
+rule index_hla_la_extended_ref:
+    input:
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.fa",
     output:
-        directory("resources/vep/cache"),
-    params:
-        species=config["ref"]["species"],
-        build=config["ref"]["build"],
-        release=config["ref"]["release"],
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.amb",
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.ann",
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.bwt",
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.pac",
+        "resources/graphs/PRG_MHC_GRCh38_withIMGT/extendedReferenceGenome/extendedReferenceGenome.sa",
+    conda:
+        "../envs/hla_la.yaml"
     log:
-        "logs/vep/cache.log",
-    cache: True
-    wrapper:
-        "0.59.2/bio/vep/cache"
-
-
-rule get_vep_plugins:
-    output:
-        directory("resources/vep/plugins"),
-    params:
-        release=config["ref"]["release"],
-    log:
-        "logs/vep/plugins.log",
-    cache: True
-    wrapper:
-        "0.59.2/bio/vep/plugins"
+        "logs/index_hla_la_extended_ref.log",
+    shell:
+        "bwa index {input} > {log} 2>&1"
 
 
 rule make_sampleheader:

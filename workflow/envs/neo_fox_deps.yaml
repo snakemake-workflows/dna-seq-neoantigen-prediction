@@ -1,0 +1,30 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  # https://neofox.readthedocs.io/en/latest/02_installation.html#step-by-step-guide-without-docker
+  - r-base =3.6
+  - python >=3.7, <=3.8
+  # implicit unmentioned dependency of MixMHCpred and PRIME
+  - perl
+  # https://neofox.readthedocs.io/en/latest/02_installation.html#install-blastp
+  - blast =2
+  # https://github.com/GfellerLab/MixMHCpred/blob/75374a7a0de214278c1cda00bb9dee4b2f475ec3/README#L64
+  - cxx-compiler
+  # needed for netMHCpan and netMHCIIpan, as their executables are tcsh-scripts
+  - tcsh =6.24
+  # just make sure this is available for the post-deploy.sh script
+  - sed =4.8
+  # R packages mentioned at the end of this section:
+  # https://neofox.readthedocs.io/en/latest/02_installation.html#configuration-of-the-reference-folder
+  - r-lattice
+  - r-ggplot2
+  - r-caret
+  - r-peptides
+  - r-doparallel
+  - r-gbm
+  - bioconductor-biostrings
+  # https://neofox.readthedocs.io/en/latest/02_installation.html#install-neofox
+  - pip
+  - pip:
+    - neofox==0.6.4

@@ -4,21 +4,6 @@ description: snakemake configuration file
 
 type: object
 
-definitions:
-  filterentry:
-    type: object
-    additionalProperties:
-      type: string
-  evententry:
-    type: object
-    properties:
-      varlociraptor:
-        type: array
-        items: 
-          type: string
-      filter:
-        type: string
-
 properties:
   samples:
     type: string
@@ -42,198 +27,61 @@ properties:
       - build
       - n_chromosomes
 
-
-  tmb:
-    type: object
-    properties:
-      activate:
-        type: boolean
-      coding_genome_size:
-        # TODO allow integer here!
-        type: string
-      tumor_sample:
-        type: string
-      somatic_events:
-        type: array
-        items: 
-          type: string
-    required:
-      - activate
-      - coding_genome_size
-      - tumor_sample
-      - somatic_events
-
-
-  calling:
-    type: object
-    properties:
-      freebayes:
-        type: object
-        properties:
-          activate:
-            type: boolean
-      scenario:
-        type: string
-      fdr-control:
-        type: object
-        properties:
-          threshold:
-            type: number
-            minimum: 0.0
-            maximum: 1.0
-          events:
-            $ref: "#/definitions/evententry"
-            description: "a map of <eventname: event> pairs"
-        required:
-          - threshold
-          - events
-    required:
-      - freebayes
-      - scenario
-      - fdr-control
-  
-  remove_duplicates:
-    type: object
-    properties:
-      activate:
-        type: boolean
-
-  trimming:
-    type: object
-    properties:
-      activate:
-        type: boolean
-
-  epitope_prediction:
+  neoantigen_prediction:
     type: object
     properties:
       activate:
         type: boolean
   
-  affinity:
-    type: object
-    properties:
-      netMHCpan:
-        type: object
-        properties:
-          activate:
-            type: boolean
-          params:
-            type: string
-      netMHCIIpan:
-        type: object
-        properties:
-          activate:
-            type: boolean
-          params:
-            type: string
-
-  HLAtyping:
-    type: object
-    properties:
-      HLA_LA:
-        type: object
-        properties:
-          activate:
-            type: boolean
-
-  annotations:
-    type: object
-    properties:
-      vep:
-        properties:
-          params:
-            type: string
-          plugins:
-            type: array
-            items:
-              type: string
-        required:
-          - params
-          - plugins
-    required:
-      - vep
-
-  fusion:
-    type: object
-    properties:
-      arriba:
-        type: object
-        properties:
-          activate:
-            type: boolean
-          blacklist:
-            type: string
-          params:
-            type: string
-
   params:
     type: object
     properties:
-      cutadapt:
-        type: string
-      bwa:
-        type: string
-      gatk:
-        type: object
-        properties:
-          BaseRecalibrator:
-            type: string
-          applyBQSR:
-            type: string
-        required:
-          - BaseRecalibrator
-          - applyBQSR
-      picard:
-        type: object
-        properties:
-          MarkDuplicates:
-            type: string
-        required:
-          - MarkDuplicates
-      strelka:
-        type: object
-        properties:
-          config:
-            type: string
-          run:
-            type: string
-      razers3:
-        type: string
-      optitype:
-        type: string
       microphaser:
         type: object
         properties:
-          window_len:
-            type: integer
-          peptide_len:
+          events:
             type: object
             properties:
-              netMHCpan:
-                type: integer
-              netMHCIIpan:
-                type: integer
-      kallisto:
-        type: string
-      star:
-        type: string
+              normal:
+                type: string
+              tumor:
+                type: string
+            required:
+              - normal
+              - tumor
+      net_mhc_pan:
+        type: object
+        properties:
+          activate:
+            type: boolean
+          peptide_len:
+            type: integer
+          extra:
+            type: string
+          location:
+            type: string
+        required:
+          - activate
+      net_mhc_two_pan:
+        type: object
+        properties:
+          activate:
+            type: boolean
+          peptide_len:
+            type: integer
+          extra:
+            type: string
+        required:
+          - activate
     required:
-      - bwa
-      - gatk
-      - picard
-      - strelka
-      - razers3
       - microphaser
-      - optitype
+      - net_mhc_pan
+      - net_mhc_two_pan
+
 
 required:
   - samples
   - units
   - ref
-  - tmb
-  - calling
   - params
-  - annotations
-  - epitope_prediction
-  - affinity
+  - neoantigen_prediction
